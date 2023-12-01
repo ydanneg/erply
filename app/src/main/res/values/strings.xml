@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">erply</string>
+    <string name="exit_confirmation">Please click BACK again to exit</string>
+</resources>
