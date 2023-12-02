@@ -14,19 +14,15 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import erply.ui.screens.groups.ProductGroupsScreen
-import erply.ui.screens.groups.ProductGroupsScreenViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import erply.ui.screens.login.LoginScreen
 import erply.ui.screens.login.LoginScreenViewModel
-import erply.ui.screens.products.ProductsScreen
-import erply.ui.screens.products.ProductsScreenViewModel
+import erply.ui.screens.main.MainScreen
 
 class ErplyAppState(
     isLoggedIn: Boolean = false,
@@ -48,8 +44,8 @@ fun rememberMainScreenState(
 
 @Composable
 fun ErplyApp(viewModel: ErplyAppViewModel) {
-    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-    val username by viewModel.username.collectAsState()
+    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val username by viewModel.username.collectAsStateWithLifecycle()
 
     val appState = rememberMainScreenState(isLoggedIn, username)
 
@@ -73,21 +69,12 @@ private fun ErplyAppContent(padding: PaddingValues, state: ErplyAppState, onLogo
                 ),
             ),
     ) {
-        var selectedGroup by remember { mutableStateOf<String?>(null) }
-
-        val productsViewModel = hiltViewModel<ProductsScreenViewModel>()
-        val productGroupsModel = hiltViewModel<ProductGroupsScreenViewModel>()
-
         Column(Modifier.fillMaxSize()) {
             if (!state.isLoggedIn) {
                 val loginViewModel = hiltViewModel<LoginScreenViewModel>()
                 LoginScreen(viewModel = loginViewModel)
             } else {
-                if (selectedGroup != null) {
-                    ProductsScreen(viewModel = productsViewModel, selectedGroup!!, onBack = { selectedGroup = null })
-                } else {
-                    ProductGroupsScreen(productGroupsModel, onGroupSelected = { selectedGroup = it })
-                }
+                MainScreen()
             }
         }
     }

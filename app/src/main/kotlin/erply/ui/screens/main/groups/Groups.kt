@@ -1,6 +1,6 @@
-package erply.ui.screens.products
+package erply.ui.screens.main.groups
 
-import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,60 +14,63 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ydanneg.erply.model.ErplyProduct
-import com.ydanneg.erply.model.ErplyProductType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ydanneg.erply.model.ErplyProductGroup
 import com.ydanneg.erply.model.LocalizedValue
 import erply.ui.theme.ErplyThemePreviewSurface
 import erply.ui.theme.PreviewThemes
 
+
 @PreviewThemes
 @Composable
-fun ProductsScreenContentPreview() {
-    val products = (1L..15L).map {
-        ErplyProduct(
-            id = it.toString(),
-            name = LocalizedValue("name$it"),
-            groupId = it.toString(),
-            price = "19.99",
-            type = ErplyProductType.PRODUCT,
-            description = LocalizedValue("description$it")
+fun ProductGroupPreview() {
+    val groups = (1L..15L).mapIndexed { index, item ->
+        ErplyProductGroup(
+            id = item.toString(),
+            name = LocalizedValue("name$item"),
+            parentId = "0",
+            order = index,
+            description = LocalizedValue("description$item"),
+            changed = (System.currentTimeMillis() / 1000).toInt()
         )
     }
+
     ErplyThemePreviewSurface {
-        ProductsScreenContent(false, products)
+        ProductGroupsScreenContent(groups = groups)
     }
 }
 
 @Composable
-fun ProductsScreen(viewModel: ProductsScreenViewModel, groupId: String, onBack: () -> Unit = {}) {
-    val products by viewModel.products.collectAsState()
+fun ProductGroupsScreen(
+    viewModel: ProductGroupsScreenViewModel,
+    onGroupSelected: (String) -> Unit = {}
+) {
+    val groups by viewModel.groups.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadProducts(groupId)
+        if (groups.isEmpty()) {
+//            viewModel.loadGroups()
+        }
     }
 
-    BackHandler {
-        onBack()
-    }
-
-    ProductsScreenContent(
-        isLoading = false,
-        products = products,
-        onLogOut = { viewModel.logOut() }
+    ProductGroupsScreenContent(
+        groups = groups,
+        onLogOut = { viewModel.logOut() },
+        onGroupClicked = onGroupSelected
     )
 }
 
 @Composable
-fun ProductsScreenContent(
+fun ProductGroupsScreenContent(
+    groups: List<ErplyProductGroup>,
     isLoading: Boolean = false,
-    products: List<ErplyProduct>,
-    onLogOut: () -> Unit = {}
+    onLogOut: () -> Unit = {},
+    onGroupClicked: (String) -> Unit = {}
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = onLogOut) {
@@ -80,8 +83,13 @@ fun ProductsScreenContent(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(products, key = { it.id }) {
-                Box(modifier = Modifier.size(128.dp), contentAlignment = Alignment.Center) {
+            items(groups, key = { it.id }) {
+                Box(
+                    modifier = Modifier
+                        .size(128.dp)
+                        .clickable { onGroupClicked(it.id) },
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(text = it.name.en, textAlign = TextAlign.Center)
                 }
             }

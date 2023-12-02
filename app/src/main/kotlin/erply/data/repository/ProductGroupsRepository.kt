@@ -2,28 +2,33 @@ package erply.data.repository
 
 import android.util.Log
 import com.ydanneg.erply.api.ErplyApi
-import com.ydanneg.erply.model.ErplyProductGroup
+import erply.database.dao.GroupsDao
+import erply.database.mappers.fromEntity
+import erply.database.mappers.toEntity
+import erply.database.model.GroupEntity
 import erply.util.LogUtils.TAG
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ProductGroupsRepository @Inject constructor(
     private val erplyApi: ErplyApi,
+    private val groupsDao: GroupsDao,
     private val userSessionRepository: UserSessionRepository
 ) {
 
-    private var _productGroups = MutableStateFlow<List<ErplyProductGroup>>(listOf())
-    val productGroups = _productGroups.asStateFlow()
+    val productGroups = groupsDao.getAll().toModel()
 
     suspend fun loadProductGroups() {
         try {
             val userSession = userSessionRepository.userSessionData.first()
-            val received = erplyApi.products.listProductGroups(userSession.token)
-            _productGroups.emit(received)
+            val received = erplyApi.products.listProductGroups(userSession.token).map { it.toEntity() }
+            groupsDao.insertOrIgnore(received)
         } catch (e: Throwable) {
             Log.e(TAG, "error", e)
         }
     }
+
+    private fun Flow<List<GroupEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }
 }

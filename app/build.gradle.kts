@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.android.navigation.safeargs)
     alias(libs.plugins.hilt.android)
@@ -94,14 +95,21 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
 
-
+    // ProtoBuf
     implementation(libs.protobuf.kotlin.lite)
 
     // AndroidX
     implementation(libs.androidx.core)
-    implementation(libs.androidx.lifecycle.runtime)
+//    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.dataStore.core)
+    implementation(libs.bundles.androidx.room)
+
+    ksp(libs.androidx.room.compiler)
+
+    // KotlinX
+    implementation(libs.kotlinx.datetime)
 
     // Hilt
     implementation(libs.hilt.android)

@@ -71,7 +71,9 @@ data class ErplyProduct(
     @SerialName("description")
     val description: LocalizedValue? = null,
     @SerialName("price")
-    val price: String
+    val price: String,
+    @SerialName("changed")
+    val changed: Int
 )
 
 @Serializable
@@ -85,5 +87,7 @@ data class ErplyProductGroup(
     @SerialName("name")
     val name: LocalizedValue,
     @SerialName("description")
-    val description: LocalizedValue? = null
+    val description: LocalizedValue? = null,
+    @SerialName("changed")
+    val changed: Int
 )

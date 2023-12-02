@@ -17,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,7 +28,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import erply.ui.components.ErplyTextField
+import erply.ui.components.ExitConfirmation
 import erply.ui.components.FadedVisibility
 import erply.ui.theme.ErplyThemePreviewSurface
 import erply.ui.theme.PreviewThemes
@@ -63,8 +64,9 @@ fun LoginScreenLoadingPreview() {
 fun LoginScreen(
     viewModel: LoginScreenViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val uiState by viewModel.uiState.collectAsState()
+    ExitConfirmation()
 
     LoginScreenContent(
         isLoading = uiState.isLoading(),
