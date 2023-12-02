@@ -18,8 +18,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import erply.ui.screens.groups.ProductGroupsScreen
+import erply.ui.screens.groups.ProductGroupsScreenViewModel
 import erply.ui.screens.login.LoginScreen
 import erply.ui.screens.login.LoginScreenViewModel
 import erply.ui.screens.products.ProductsScreen
@@ -70,21 +73,21 @@ private fun ErplyAppContent(padding: PaddingValues, state: ErplyAppState, onLogo
                 ),
             ),
     ) {
+        var selectedGroup by remember { mutableStateOf<String?>(null) }
+
+        val productsViewModel = hiltViewModel<ProductsScreenViewModel>()
+        val productGroupsModel = hiltViewModel<ProductGroupsScreenViewModel>()
+
         Column(Modifier.fillMaxSize()) {
             if (!state.isLoggedIn) {
                 val loginViewModel = hiltViewModel<LoginScreenViewModel>()
                 LoginScreen(viewModel = loginViewModel)
             } else {
-                val productsViewModel = hiltViewModel<ProductsScreenViewModel>()
-                ProductsScreen(viewModel = productsViewModel)
-//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-//                        Text(text = state.username, style = MaterialTheme.typography.displaySmall)
-//                        Button(onClick = onLogout) {
-//                            Text(text = "Log out")
-//                        }
-//                    }
-//                }
+                if (selectedGroup != null) {
+                    ProductsScreen(viewModel = productsViewModel, selectedGroup!!, onBack = { selectedGroup = null })
+                } else {
+                    ProductGroupsScreen(productGroupsModel, onGroupSelected = { selectedGroup = it })
+                }
             }
         }
     }

@@ -7,7 +7,6 @@ import com.ydanneg.erply.api.KInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import java.math.BigDecimal
 
 @Serializable
 data class ErplyResponseStatus(
@@ -47,21 +46,44 @@ class ErplyResponse<R>(
 )
 
 @Serializable
-data class ProductName(
+data class LocalizedValue(
     @SerialName("en")
-    val en: String
+    val en: String = ""
 )
+
+enum class ErplyProductType {
+    PRODUCT,
+    BUNDLE,
+    MATRIX,
+    ASSEMBLY
+}
 
 @Serializable
 data class ErplyProduct(
     @SerialName("id")
-    val id: Long,
+    val id: String,
     @SerialName("type")
-    val type: String,
+    val type: ErplyProductType = ErplyProductType.PRODUCT,
     @SerialName("group_id")
-    val groupId: Long,
+    val groupId: String,
     @SerialName("name")
-    val name: ProductName,
+    val name: LocalizedValue,
+    @SerialName("description")
+    val description: LocalizedValue? = null,
     @SerialName("price")
     val price: String
+)
+
+@Serializable
+data class ErplyProductGroup(
+    @SerialName("id")
+    val id: String,
+    @SerialName("parent_id")
+    val parentId: String,
+    @SerialName("order")
+    val order: Int,
+    @SerialName("name")
+    val name: LocalizedValue,
+    @SerialName("description")
+    val description: LocalizedValue? = null
 )

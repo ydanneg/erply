@@ -15,7 +15,7 @@ class ErplyApi(onLog: (String) -> Unit = {}) {
 
     val discovery: DiscoveryApi by lazy { DiscoveryApi(httpClient) }
     val auth: AuthApi by lazy { AuthApi(httpClient) }
-    val products: ProductApi by lazy { ProductApi(httpClient) }
+    val products: ProductsApi by lazy { ProductsApi(httpClient) }
 
     private val httpClient = HttpClient(OkHttp.create { config { engineDefaults() } }) {
         expectSuccess = true
