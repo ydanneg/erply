@@ -13,7 +13,7 @@ const val PAGE_SIZE = 1000
 class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> {
-        val url = "https://api-pim-eu10.erply.com/v1/product/group?fields=id,parent_id,order,name,changed&filter=$showInWebFilter"
+        val url = "https://api-pim-eu10.erply.com/v1/product/group?fields=id,parent_id,order,name,changed&skip=0&take=1000&filter=$showInWebFilter&withTotalCount=1"
         return httpClient.get(url) {
             headers {
                 append("jwt", token)

@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import erply.ui.components.ExitConfirmation
 import erply.ui.screens.login.LoginScreen
 import erply.ui.screens.login.LoginScreenViewModel
 import erply.ui.screens.main.MainScreen
@@ -48,6 +49,8 @@ fun ErplyApp(viewModel: ErplyAppViewModel) {
     val username by viewModel.username.collectAsStateWithLifecycle()
 
     val appState = rememberMainScreenState(isLoggedIn, username)
+
+    ExitConfirmation()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

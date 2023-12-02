@@ -7,9 +7,11 @@ import erply.database.mappers.fromEntity
 import erply.database.mappers.toEntity
 import erply.database.model.GroupEntity
 import erply.util.LogUtils.TAG
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ProductGroupsRepository @Inject constructor(
@@ -21,13 +23,14 @@ class ProductGroupsRepository @Inject constructor(
     val productGroups = groupsDao.getAll().toModel()
 
     suspend fun loadProductGroups() {
-        try {
+        Log.i(TAG, "loadProductGroups")
+        withContext(Dispatchers.IO) {
             val userSession = userSessionRepository.userSessionData.first()
             val received = erplyApi.products.listProductGroups(userSession.token).map { it.toEntity() }
             groupsDao.insertOrIgnore(received)
-        } catch (e: Throwable) {
-            Log.e(TAG, "error", e)
         }
+        Log.i(TAG, "loadProductGroups complete")
+
     }
 
     private fun Flow<List<GroupEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }

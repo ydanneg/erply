@@ -89,18 +89,18 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.splashscreen)
 
     // Material
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
+//    implementation(libs.compose.material3.pullrefresh)
 
     // ProtoBuf
     implementation(libs.protobuf.kotlin.lite)
 
     // AndroidX
     implementation(libs.androidx.core)
-//    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.dataStore.core)

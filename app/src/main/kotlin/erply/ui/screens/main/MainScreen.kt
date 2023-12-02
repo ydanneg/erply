@@ -7,24 +7,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import erply.ui.components.ExitConfirmation
 
 @Composable
 fun MainScreen() {
-    val mainNavController = rememberNavController()
-
-    ExitConfirmation()
+    val navController = rememberNavController()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = { MainBottomNavigationBar(mainNavController) },
+        bottomBar = { MainBottomNavigationBar(navController) },
         content = {
             NavHost(
                 modifier = Modifier.padding(it),
-                navController = mainNavController,
+                navController = navController,
                 startDestination = Screen.TopLevel.Catalog.route
             ) {
-                mainNavGraph(mainNavController)
+                mainNavGraph(navController)
             }
         }
     )

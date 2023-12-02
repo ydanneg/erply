@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import erply.data.repository.ProductsRepository
 import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,9 +21,11 @@ class ProductsScreenViewModel @Inject constructor(
     private val userSessionRepository: UserSessionRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private var job: Job? = null
-
     private val groupId: String = checkNotNull(savedStateHandle[GROUP_ID_STATE_KEY])
+
+    init {
+        loadProducts()
+    }
 
     val products = productsRepository.productsByGroupId(groupId)
         .stateIn(
@@ -33,16 +34,9 @@ class ProductsScreenViewModel @Inject constructor(
             listOf()
         )
 
-    fun setGroupId(groupId: String) {
-        savedStateHandle[GROUP_ID_STATE_KEY] = groupId
-    }
-
-    fun loadProducts() {
+    private fun loadProducts() {
         Log.i(TAG, "loading products...")
-        if (job?.isActive == true) {
-            return
-        }
-        job = viewModelScope.launch {
+        viewModelScope.launch {
             productsRepository.loadProductsByGroupId(groupId)
         }
     }

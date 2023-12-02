@@ -1,23 +1,13 @@
 package erply.ui.screens.main
 
 import android.util.Log
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
-import androidx.navigation.compose.composable
-
-fun NavGraphBuilder.screen(screen: Screen, content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit) = composable(
-    route = screen.route,
-    content = content
-)
 
 sealed class Screen(open val route: String) {
     sealed class TopLevel(

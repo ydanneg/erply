@@ -8,16 +8,36 @@ import erply.data.repository.ProductGroupsRepository
 import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class ProductGroupsScreenUiState {
+    data object Loading : ProductGroupsScreenUiState()
+    data object Success : ProductGroupsScreenUiState()
+    data class Error(val message: String?) : ProductGroupsScreenUiState()
+
+    fun ProductGroupsScreenUiState.isLoading() = this is Loading
+    fun ProductGroupsScreenUiState.isError() = this is Error
+}
 
 @HiltViewModel
 class ProductGroupsScreenViewModel @Inject constructor(
     private val productGroupsRepository: ProductGroupsRepository,
     private val userSessionRepository: UserSessionRepository
 ) : ViewModel() {
+    private var job: Job? = null
+
+    private var _uiState = MutableStateFlow<ProductGroupsScreenUiState>(ProductGroupsScreenUiState.Loading)
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        loadGroups()
+    }
 
     val groups = productGroupsRepository.productGroups
         .stateIn(
@@ -26,15 +46,21 @@ class ProductGroupsScreenViewModel @Inject constructor(
             listOf()
         )
 
-    private var job: Job? = null
-
     fun loadGroups() {
-        Log.i(TAG, "loading groups...")
         if (job?.isActive == true) {
+            Log.d(TAG, "loading is already in progress")
             return
         }
+        Log.d(TAG, "loading groups...")
         job = viewModelScope.launch {
-            productGroupsRepository.loadProductGroups()
+            try {
+                _uiState.value = ProductGroupsScreenUiState.Loading
+                productGroupsRepository.loadProductGroups()
+                delay(1000)
+                _uiState.value = ProductGroupsScreenUiState.Success
+            } catch (e: Throwable) {
+                _uiState.value = ProductGroupsScreenUiState.Error(e.message)
+            }
         }
     }
 
