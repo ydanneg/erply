@@ -7,18 +7,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import erply.data.repository.ProductGroupsRepository
 import erply.data.repository.ProductsRepository
-import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG
-import kotlinx.coroutines.CoroutineScope
+import erply.util.toStateFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,7 +35,6 @@ class ProductsScreenViewModel @Inject constructor(
     productGroupsRepository: ProductGroupsRepository,
     private val savedStateHandle: SavedStateHandle,
     private val productsRepository: ProductsRepository,
-    private val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
     private val groupId: String = checkNotNull(savedStateHandle[GROUP_ID_STATE_KEY])
 
@@ -59,9 +54,11 @@ class ProductsScreenViewModel @Inject constructor(
         savedStateHandle[SEARCH_QUERY_KEY] = search
     }
 
+    // TODO: combine to uiState
     val products = productsRepository.productsByGroupId(groupId).toStateFlow(viewModelScope, listOf())
 
 
+    // TODO: combine to uiState
     @OptIn(ExperimentalCoroutinesApi::class)
     val filteredProducts = searchQuery.flatMapLatest { query ->
         if (query?.isNotBlank() == true) {
@@ -71,6 +68,7 @@ class ProductsScreenViewModel @Inject constructor(
         }
     }.toStateFlow(viewModelScope, listOf())
 
+    // TODO: combine to uiState
     val groupName = productGroupsRepository.group(groupId).map { it.name.en }.toStateFlow(viewModelScope, "")
 
     fun loadProducts() {
@@ -90,17 +88,4 @@ class ProductsScreenViewModel @Inject constructor(
             }
         }
     }
-
-    fun logOut() {
-        viewModelScope.launch {
-            userSessionRepository.logout()
-        }
-    }
 }
-
-private fun <T> Flow<T>.toStateFlow(scope: CoroutineScope, default: T) =
-    stateIn(
-        scope,
-        SharingStarted.WhileSubscribed(5_000),
-        default
-    )

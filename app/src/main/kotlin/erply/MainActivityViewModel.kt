@@ -19,39 +19,24 @@ package erply
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import erply.data.datastore.UserPreferencesDataSource
-import erply.data.repository.UserSessionRepository
-import erply.model.UserPreferences
-import kotlinx.coroutines.flow.SharingStarted
+import erply.data.repository.UserDataRepository
+import erply.model.UserData
+import erply.util.toStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    userSessionRepository: UserSessionRepository,
-    userPreferencesDataSource: UserPreferencesDataSource
+    userDataRepository: UserDataRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<MainActivityUiState> =
-        combine(userSessionRepository.isLoggedIn, userPreferencesDataSource.userPreferences) { isLoggedIn, userPreferences ->
-            Pair(isLoggedIn, userPreferences)
-        }
-            .map { MainActivityUiState.Success(it.second) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                MainActivityUiState.Loading
-            )
-
-    val userPreferences = userPreferencesDataSource.userPreferences
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), UserPreferences())
-
+    val uiState: StateFlow<MainActivityUiState> = userDataRepository.userData
+        .map { MainActivityUiState.Success(it) }
+        .toStateFlow(viewModelScope, MainActivityUiState.Loading)
 }
 
 sealed interface MainActivityUiState {
     data object Loading : MainActivityUiState
-    data class Success(val userPreferences: UserPreferences) : MainActivityUiState
+    data class Success(val userData: UserData) : MainActivityUiState
 }

@@ -9,7 +9,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(val userSessionRepository: UserSessionRepository) : ViewModel() {
-
     fun logOut() = viewModelScope.launch {
         userSessionRepository.logout()
     }

@@ -2,26 +2,27 @@ package erply.data.datastore
 
 import android.util.Log
 import androidx.datastore.core.DataStore
-import com.ydanneg.erply.datastore.UserSession
-import com.ydanneg.erply.datastore.copy
 import com.ydanneg.erply.api.model.ErplyVerifiedUser
+import com.ydanneg.erply.datastore.UserSessionProto
+import com.ydanneg.erply.datastore.copy
 import erply.util.LogUtils.TAG
 import java.io.IOException
 import javax.inject.Inject
 
 class UserSessionDataSource @Inject constructor(
-    private val userSession: DataStore<UserSession>
+    private val userSessionDataStore: DataStore<UserSessionProto>
 ) {
 
-    val userSessionData = userSession.data
+    val userSession = userSessionDataStore.data
 
-    suspend fun setVerifiedUser(verifiedUser: ErplyVerifiedUser) {
+    suspend fun setVerifiedUser(clientCode: String, verifiedUser: ErplyVerifiedUser) {
         try {
-            userSession.updateData {
+            userSessionDataStore.updateData {
                 it.copy {
                     userId = verifiedUser.userId
                     username = verifiedUser.username
                     token = verifiedUser.token
+                    this.clientCode = clientCode
                 }
             }
         } catch (e: IOException) {
@@ -30,11 +31,12 @@ class UserSessionDataSource @Inject constructor(
     }
 
     suspend fun clear() {
-        userSession.updateData {
+        userSessionDataStore.updateData {
             it.copy {
                 userId = ""
                 username = ""
                 token = ""
+                this.clientCode = ""
             }
         }
     }

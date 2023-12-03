@@ -5,13 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import erply.data.repository.ProductGroupsRepository
-import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG
+import erply.util.toStateFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +24,7 @@ sealed class ProductGroupsScreenUiState {
 
 @HiltViewModel
 class ProductGroupsScreenViewModel @Inject constructor(
-    private val productGroupsRepository: ProductGroupsRepository,
-    private val userSessionRepository: UserSessionRepository
+    private val productGroupsRepository: ProductGroupsRepository
 ) : ViewModel() {
     private var job: Job? = null
 
@@ -38,12 +35,8 @@ class ProductGroupsScreenViewModel @Inject constructor(
         loadProductGroups()
     }
 
-    val groups = productGroupsRepository.productGroups
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            listOf()
-        )
+    // TODO: combine to uiState
+    val groups = productGroupsRepository.productGroups.toStateFlow(viewModelScope, listOf())
 
     fun loadProductGroups() {
         if (job?.isActive == true) {
@@ -59,12 +52,6 @@ class ProductGroupsScreenViewModel @Inject constructor(
             } catch (e: Throwable) {
                 _uiState.value = ProductGroupsScreenUiState.Error(e.message)
             }
-        }
-    }
-
-    fun logOut() {
-        viewModelScope.launch {
-            userSessionRepository.logout()
         }
     }
 }

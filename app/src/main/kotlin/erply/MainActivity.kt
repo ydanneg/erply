@@ -78,7 +78,7 @@ private fun shouldUseDarkTheme(
     uiState: MainActivityUiState,
 ) = when (uiState) {
     MainActivityUiState.Loading -> isSystemInDarkTheme()
-    is MainActivityUiState.Success -> when (uiState.userPreferences.darkThemeConfig) {
+    is MainActivityUiState.Success -> when (uiState.userData.prefs.darkThemeConfig) {
         DarkThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme()
         DarkThemeConfig.LIGHT -> false
         DarkThemeConfig.DARK -> true

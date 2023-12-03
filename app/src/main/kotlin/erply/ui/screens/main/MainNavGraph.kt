@@ -133,7 +133,7 @@ fun ErplyMainNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
                 DrawerContent(
-                    username = state.appState.loggedInUser?.username ?: "Guest",
+                    username = state.appState.userData.session?.username ?: "Guest",
                     items = drawerItems,
                     selectedItem = navBackStackEntry?.destination?.route?.let { route -> drawerItems.find { it.route.route == route } },
                     onItemClick = { item ->

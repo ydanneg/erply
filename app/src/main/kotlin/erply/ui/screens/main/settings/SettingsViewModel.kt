@@ -6,8 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import erply.data.datastore.UserPreferencesDataSource
 import erply.model.DarkThemeConfig
 import erply.model.UserPreferences
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import erply.util.toStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,8 +15,8 @@ class SettingsViewModel @Inject constructor(
     private val userPreferencesDataSource: UserPreferencesDataSource
 ) : ViewModel() {
 
-    val userPreferences = userPreferencesDataSource.userPreferences
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserPreferences())
+    // TODO: combine to uiState
+    val userPreferences = userPreferencesDataSource.userPreferences.toStateFlow(viewModelScope, UserPreferences())
 
     fun changeDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
         viewModelScope.launch {

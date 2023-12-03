@@ -1,3 +1,4 @@
+- Handle Deletes (sync?)
 - Load real images
 - handle 401 (re-login automatically)
 - use discovery API

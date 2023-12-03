@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import com.ydanneg.erply.datastore.UserPreferencesProto
-import com.ydanneg.erply.datastore.UserSession
+import com.ydanneg.erply.datastore.UserSessionProto
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +28,7 @@ object DataStoreModule {
         @Dispatcher(ErplyDispatchers.IO) dispatcher: CoroutineDispatcher,
         @ApplicationScope scope: CoroutineScope,
         userPreferencesSerializer: UserSessionSerializer,
-    ): DataStore<UserSession> =
+    ): DataStore<UserSessionProto> =
         DataStoreFactory.create(
             serializer = userPreferencesSerializer,
             scope = CoroutineScope(scope.coroutineContext + dispatcher)
