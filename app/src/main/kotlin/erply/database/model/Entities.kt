@@ -3,7 +3,7 @@ package erply.database.model
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ydanneg.erply.model.ErplyProductType
+import com.ydanneg.erply.api.model.ErplyProductType
 
 const val PRODUCTS_TABLE_NAME = "products"
 const val GROUPS_TABLE_NAME = "product_groups"

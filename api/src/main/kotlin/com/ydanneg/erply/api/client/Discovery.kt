@@ -1,7 +1,7 @@
-package com.ydanneg.erply.api
+package com.ydanneg.erply.api.client
 
-import com.ydanneg.erply.model.Endpoints
-import com.ydanneg.erply.model.ErplyResponse
+import com.ydanneg.erply.api.model.Endpoints
+import com.ydanneg.erply.api.model.ErplyResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormDataContent
@@ -18,7 +18,6 @@ class DiscoveryApi internal constructor(private val httpClient: HttpClient) {
                 append("request", "getServiceEndpoints")
                 append("sendContentType", "1")
             }))
-        }.body<ErplyResponse<Endpoints>>()
-            .contentOrThrow()
+        }.body<ErplyResponse<Endpoints>>().contentOrThrow()
     }
 }

@@ -1,8 +1,8 @@
 package erply.database.mappers
 
-import com.ydanneg.erply.model.ErplyProduct
-import com.ydanneg.erply.model.ErplyProductGroup
-import com.ydanneg.erply.model.LocalizedValue
+import com.ydanneg.erply.api.model.ErplyProduct
+import com.ydanneg.erply.api.model.ErplyProductGroup
+import com.ydanneg.erply.api.model.LocalizedValue
 import erply.database.model.ProductGroupEntity
 import erply.database.model.ProductEntity
 

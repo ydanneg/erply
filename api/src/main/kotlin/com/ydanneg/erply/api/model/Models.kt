@@ -1,12 +1,7 @@
-@file:UseSerializers(KBigDecimalSerializer::class, KInstantSerializer::class)
+package com.ydanneg.erply.api.model
 
-package com.ydanneg.erply.model
-
-import com.ydanneg.erply.api.KBigDecimalSerializer
-import com.ydanneg.erply.api.KInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class ErplyResponseStatus(

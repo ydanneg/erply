@@ -1,7 +1,7 @@
 package erply.data.repository
 
 import android.util.Log
-import com.ydanneg.erply.api.ErplyApi
+import erply.data.api.ErplyApiDataSource
 import erply.database.dao.ErplyProductDao
 import erply.database.mappers.fromEntity
 import erply.database.mappers.toEntity
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ProductsRepository @Inject constructor(
-    private val erplyApi: ErplyApi,
+    private val erplyApiDataSource: ErplyApiDataSource,
     private val erplyProductDao: ErplyProductDao,
     private val userSessionRepository: UserSessionRepository
 ) {
@@ -27,9 +27,9 @@ class ProductsRepository @Inject constructor(
     suspend fun loadProductsByGroupId(groupId: String) {
         Log.d(TAG, "Fetching products, group: $groupId")
         val userSession = userSessionRepository.userSessionData.first()
-        val received = erplyApi.products.fetchProductsByGroupId(userSession.token, groupId).map { it.toEntity() }
-        Log.d(TAG, "Received ${received.size} products, group: $groupId")
-        erplyProductDao.insertOrIgnore(received)
+        val products = erplyApiDataSource.fetchProductsByGroupId(userSession.token, groupId).map { it.toEntity() }
+        Log.d(TAG, "Received ${products.size} products, group: $groupId")
+        erplyProductDao.insertOrIgnore(products)
     }
 
     private fun Flow<List<ProductEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }

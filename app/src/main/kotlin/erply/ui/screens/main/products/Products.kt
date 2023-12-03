@@ -41,9 +41,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.ydanneg.erply.model.ErplyProduct
-import com.ydanneg.erply.model.ErplyProductType
-import com.ydanneg.erply.model.LocalizedValue
+import com.ydanneg.erply.api.model.ErplyProduct
+import com.ydanneg.erply.api.model.ErplyProductType
+import com.ydanneg.erply.api.model.LocalizedValue
 import erply.ui.components.ErplyNavTopAppbar
 import erply.ui.components.FadedProgressIndicator
 import erply.ui.screens.main.MainScreenState

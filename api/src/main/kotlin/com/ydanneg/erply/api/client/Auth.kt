@@ -1,7 +1,9 @@
-package com.ydanneg.erply.api
+package com.ydanneg.erply.api.client
 
-import com.ydanneg.erply.model.ErplyResponse
-import com.ydanneg.erply.model.ErplyVerifiedUser
+import com.ydanneg.erply.api.model.ErplyApiError
+import com.ydanneg.erply.api.model.ErplyApiException
+import com.ydanneg.erply.api.model.ErplyResponse
+import com.ydanneg.erply.api.model.ErplyVerifiedUser
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormDataContent
@@ -23,8 +25,7 @@ class AuthApi internal constructor(private val httpClient: HttpClient) {
                 append("request", "verifyUser")
                 append("sendContentType", "1")
             }))
-        }.body<ErplyResponse<ErplyVerifiedUser>>()
-            .contentOrThrow()
+        }.body<ErplyResponse<ErplyVerifiedUser>>().contentOrThrow()
     }
 }
 

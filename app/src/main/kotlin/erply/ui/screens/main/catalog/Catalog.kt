@@ -31,8 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ydanneg.erply.model.ErplyProductGroup
-import com.ydanneg.erply.model.LocalizedValue
+import com.ydanneg.erply.api.model.ErplyProductGroup
+import com.ydanneg.erply.api.model.LocalizedValue
 import erply.ui.components.ErplyDrawerTopAppbar
 import erply.ui.components.FadedProgressIndicator
 import erply.ui.screens.main.MainScreenState

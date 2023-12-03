@@ -1,7 +1,7 @@
-package com.ydanneg.erply.api
+package com.ydanneg.erply.api.client
 
-import com.ydanneg.erply.model.ErplyProduct
-import com.ydanneg.erply.model.ErplyProductGroup
+import com.ydanneg.erply.api.model.ErplyProduct
+import com.ydanneg.erply.api.model.ErplyProductGroup
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

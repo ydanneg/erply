@@ -1,4 +1,4 @@
-package com.ydanneg.erply.api
+package com.ydanneg.erply.api.model
 
 enum class ErplyApiError {
     ConnectionError,

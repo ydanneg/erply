@@ -1,7 +1,7 @@
 package erply.di
 
 import android.util.Log
-import com.ydanneg.erply.api.ErplyApi
+import com.ydanneg.erply.api.client.ErplyApiClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +14,7 @@ object ErplyApiModule {
 
     @Provides
     @Singleton
-    fun providesErplyApi(): ErplyApi = ErplyApi(onLog = {
+    fun providesErplyApi(): ErplyApiClient = ErplyApiClient(onLog = {
         Log.v("HTTP", it)
     })
 }

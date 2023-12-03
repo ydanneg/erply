@@ -1,5 +1,6 @@
-package com.ydanneg.erply.api
+package com.ydanneg.erply.api.client
 
+import com.ydanneg.erply.api.client.serializer.Serializers
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.UserAgent
@@ -11,7 +12,7 @@ import io.ktor.serialization.kotlinx.json.json
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class ErplyApi(onLog: (String) -> Unit = {}) {
+class ErplyApiClient(onLog: (String) -> Unit = {}) {
 
     val discovery: DiscoveryApi by lazy { DiscoveryApi(httpClient) }
     val auth: AuthApi by lazy { AuthApi(httpClient) }
@@ -38,6 +39,7 @@ class ErplyApi(onLog: (String) -> Unit = {}) {
 
     private fun OkHttpClient.Builder.engineDefaults() {
         followRedirects(false)
+        // TODO: extract to configuration
         connectTimeout(10, TimeUnit.SECONDS)
         readTimeout(10, TimeUnit.SECONDS)
         writeTimeout(10, TimeUnit.SECONDS)

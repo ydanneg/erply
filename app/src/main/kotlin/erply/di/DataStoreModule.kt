@@ -25,7 +25,7 @@ object DataStoreModule {
     @Singleton
     fun providesUserSessionDataStore(
         @ApplicationContext context: Context,
-        @ErplyDispatcher(ErplyDispatchers.IO) dispatcher: CoroutineDispatcher,
+        @Dispatcher(ErplyDispatchers.IO) dispatcher: CoroutineDispatcher,
         @ApplicationScope scope: CoroutineScope,
         userPreferencesSerializer: UserSessionSerializer,
     ): DataStore<UserSession> =
@@ -41,7 +41,7 @@ object DataStoreModule {
     @Singleton
     fun providesUserPreferencesDataStore(
         @ApplicationContext context: Context,
-        @ErplyDispatcher(ErplyDispatchers.IO) dispatcher: CoroutineDispatcher,
+        @Dispatcher(ErplyDispatchers.IO) dispatcher: CoroutineDispatcher,
         @ApplicationScope scope: CoroutineScope,
         userPreferencesSerializer: UserPreferencesSerializer,
     ): DataStore<UserPreferencesProto> =

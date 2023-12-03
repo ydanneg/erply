@@ -1,11 +1,11 @@
-package com.ydanneg.erply.api
+package com.ydanneg.erply.api.client.serializer
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonBuilder
 
 @OptIn(ExperimentalSerializationApi::class)
-object Serializers {
+internal object Serializers {
     val json = buildWithDefaults()
     val prettyJson = buildWithDefaults { prettyPrint = true }
 

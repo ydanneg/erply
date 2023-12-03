@@ -3,8 +3,8 @@ package erply.ui.screens.login
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ydanneg.erply.api.ErplyApiError
-import com.ydanneg.erply.api.ErplyApiException
+import com.ydanneg.erply.api.model.ErplyApiError
+import com.ydanneg.erply.api.model.ErplyApiException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG

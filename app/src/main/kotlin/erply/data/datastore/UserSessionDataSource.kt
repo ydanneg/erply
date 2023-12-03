@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import com.ydanneg.erply.datastore.UserSession
 import com.ydanneg.erply.datastore.copy
-import com.ydanneg.erply.model.ErplyVerifiedUser
+import com.ydanneg.erply.api.model.ErplyVerifiedUser
 import erply.util.LogUtils.TAG
 import java.io.IOException
 import javax.inject.Inject

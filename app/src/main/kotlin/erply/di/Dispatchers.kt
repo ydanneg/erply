@@ -21,7 +21,7 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
 
 @Qualifier
 @Retention(RUNTIME)
-annotation class ErplyDispatcher(val dispatcher: ErplyDispatchers)
+annotation class Dispatcher(val dispatcher: ErplyDispatchers)
 
 enum class ErplyDispatchers {
     Default, IO,

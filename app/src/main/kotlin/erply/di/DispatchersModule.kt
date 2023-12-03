@@ -12,10 +12,10 @@ import kotlinx.coroutines.Dispatchers
 object DispatchersModule {
 
     @Provides
-    @ErplyDispatcher(ErplyDispatchers.IO)
+    @Dispatcher(ErplyDispatchers.IO)
     fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
-    @ErplyDispatcher(ErplyDispatchers.Default)
+    @Dispatcher(ErplyDispatchers.Default)
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 }

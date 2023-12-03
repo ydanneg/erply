@@ -22,6 +22,6 @@ object CoroutineScopesModule {
     @Singleton
     @ApplicationScope
     fun providesCoroutineScope(
-        @ErplyDispatcher(ErplyDispatchers.Default) dispatcher: CoroutineDispatcher,
+        @Dispatcher(ErplyDispatchers.Default) dispatcher: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 }
