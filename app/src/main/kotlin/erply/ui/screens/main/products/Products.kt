@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -95,7 +94,7 @@ fun ProductsScreen(
 
     LaunchedEffect(uiState, pullToRefreshState) {
         when (uiState) {
-            ProductsScreenUiState.Success -> pullToRefreshState.endRefresh()
+            ProductsScreenUiState.Success, is ProductsScreenUiState.Error -> pullToRefreshState.endRefresh()
             else -> {}
         }
     }
@@ -125,6 +124,8 @@ private fun ProductsScreenContent(
     navController: NavController = rememberNavController(),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
+    val placeholder = rememberVectorPainter(Icons.Filled.ImageNotSupported)
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -140,57 +141,53 @@ private fun ProductsScreenContent(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Column {
-                    LazyVerticalGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        columns = GridCells.Adaptive(minSize = 128.dp),
-                        contentPadding = PaddingValues(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(products, key = { it.id }) {
-                            Card(
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Adaptive(minSize = 128.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(products, key = { it.id }) {
+                        Card(
+                            modifier = Modifier
+                                .size(156.dp)
+                                .clickable { },
+                        ) {
+                            Column(
                                 modifier = Modifier
-                                    .size(156.dp)
-                                    .clickable { },
+                                    .fillMaxSize()
+                                    .padding(4.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(4.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    val placeholder = rememberVectorPainter(Icons.Filled.ImageNotSupported)
-                                    AsyncImage(
-                                        modifier = Modifier.size(64.dp),
-                                        model = null,
-                                        contentDescription = it.name.en,
-                                        placeholder = placeholder
-                                    )
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        text = it.name.en,
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 3,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Spacer(Modifier.weight(1.0f))
-                                    Text(
-                                        text = "\$${it.price}",
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                }
+                                AsyncImage(
+                                    modifier = Modifier.size(64.dp),
+                                    // FIXME
+                                    model = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
+                                    contentDescription = it.name.en,
+                                    placeholder = placeholder
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = it.name.en,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Spacer(Modifier.weight(1.0f))
+                                Text(
+                                    text = "\$${it.price}",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                )
                             }
-//                            }
                         }
                     }
                 }
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
-
                 FadedProgressIndicator(isLoading)
             }
         }

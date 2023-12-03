@@ -21,6 +21,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,7 +34,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ydanneg.erply.model.ErplyProductGroup
 import com.ydanneg.erply.model.LocalizedValue
 import erply.ui.components.ErplyDrawerTopAppbar
+import erply.ui.components.FadedProgressIndicator
 import erply.ui.screens.main.MainScreenState
+import erply.ui.screens.main.catalog.ProductGroupsScreenUiState.Loading.isLoading
 import erply.ui.theme.ErplyThemePreviewSurface
 import erply.ui.theme.PreviewThemes
 
@@ -70,14 +73,15 @@ fun ProductGroupsScreen(
     val pullToRefreshState = rememberPullToRefreshState(enabled = { true })
 
     if (pullToRefreshState.isRefreshing) {
-        LaunchedEffect(Unit) {
+        DisposableEffect(Unit) {
             viewModel.loadProductGroups()
+            pullToRefreshState.endRefresh()
+            onDispose { }
         }
     }
 
     LaunchedEffect(uiState, pullToRefreshState) {
         when (uiState) {
-//            ProductGroupsScreenUiState.Loading -> pullToRefreshState.startRefresh()
             is ProductGroupsScreenUiState.Success, is ProductGroupsScreenUiState.Error -> pullToRefreshState.endRefresh()
             else -> {}
         }
@@ -91,6 +95,7 @@ fun ProductGroupsScreen(
     }
 
     ProductGroupsScreenContent(
+        isLoading = uiState.isLoading(),
         groups = groups,
         onGroupClicked = onGroupSelected,
         pullToRefreshState = pullToRefreshState,
@@ -119,7 +124,8 @@ private fun ProductGroupsScreenContent(
             Box(
                 modifier = Modifier
                     .nestedScroll(pullToRefreshState.nestedScrollConnection)
-                    .padding(paddingValues)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
@@ -139,6 +145,7 @@ private fun ProductGroupsScreenContent(
                     }
                 }
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
+                FadedProgressIndicator(isLoading)
             }
         }
     )
