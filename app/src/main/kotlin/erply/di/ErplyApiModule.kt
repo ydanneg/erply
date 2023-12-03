@@ -15,6 +15,6 @@ object ErplyApiModule {
     @Provides
     @Singleton
     fun providesErplyApi(): ErplyApi = ErplyApi(onLog = {
-        Log.d("HTTP", it)
+        Log.v("HTTP", it)
     })
 }

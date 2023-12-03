@@ -1,4 +1,4 @@
-package erply.ui.screens.main.groups
+package erply.ui.screens.main.catalog
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,7 +8,6 @@ import erply.data.repository.ProductGroupsRepository
 import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +18,7 @@ import javax.inject.Inject
 sealed class ProductGroupsScreenUiState {
     data object Loading : ProductGroupsScreenUiState()
     data object Success : ProductGroupsScreenUiState()
-    data class Error(val message: String?) : ProductGroupsScreenUiState()
+    data class Error(val message: String? = "An error occurred") : ProductGroupsScreenUiState()
 
     fun ProductGroupsScreenUiState.isLoading() = this is Loading
     fun ProductGroupsScreenUiState.isError() = this is Error
@@ -36,7 +35,7 @@ class ProductGroupsScreenViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        loadGroups()
+        loadProductGroups()
     }
 
     val groups = productGroupsRepository.productGroups
@@ -46,7 +45,7 @@ class ProductGroupsScreenViewModel @Inject constructor(
             listOf()
         )
 
-    fun loadGroups() {
+    fun loadProductGroups() {
         if (job?.isActive == true) {
             Log.d(TAG, "loading is already in progress")
             return
@@ -56,7 +55,6 @@ class ProductGroupsScreenViewModel @Inject constructor(
             try {
                 _uiState.value = ProductGroupsScreenUiState.Loading
                 productGroupsRepository.loadProductGroups()
-                delay(1000)
                 _uiState.value = ProductGroupsScreenUiState.Success
             } catch (e: Throwable) {
                 _uiState.value = ProductGroupsScreenUiState.Error(e.message)

@@ -20,6 +20,7 @@ protobuf = "3.25.0"
 protobufPlugin = "0.9.4"
 dataStore = "1.0.0"
 room = "2.5.0"
+coil = "2.5.0"
 
 [libraries]
 androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -36,10 +37,8 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.2.0-alpha12"}
+compose-material3 = { module = "androidx.compose.material3:material3", version = "1.2.0-alpha12" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
-#compose-material3-pullrefresh = { module = "androidx.compose.material3:pulltorefresh" }
-
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -64,6 +63,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 [bundles]
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx", "androidx-room-paging"]

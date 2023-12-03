@@ -3,16 +3,16 @@ package erply.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import erply.database.dao.GroupsDao
-import erply.database.dao.ProductsDao
-import erply.database.model.GroupEntity
+import erply.database.dao.ErplyProductGroupDao
+import erply.database.dao.ErplyProductDao
+import erply.database.model.ProductGroupEntity
 import erply.database.model.ProductEntity
 import erply.database.util.InstantConverter
 
 @Database(
     entities = [
         ProductEntity::class,
-        GroupEntity::class
+        ProductGroupEntity::class
     ],
     version = 1,
     autoMigrations = [],
@@ -22,6 +22,6 @@ import erply.database.util.InstantConverter
     InstantConverter::class,
 )
 abstract class ErplyDatabase : RoomDatabase() {
-    abstract fun productDao(): ProductsDao
-    abstract fun groupDao(): GroupsDao
+    abstract fun productDao(): ErplyProductDao
+    abstract fun groupDao(): ErplyProductGroupDao
 }

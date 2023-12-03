@@ -10,7 +10,7 @@ import erply.database.model.ProductEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ProductsDao {
+interface ErplyProductDao {
 
     @Query(value = "SELECT * FROM $PRODUCTS_TABLE_NAME")
     fun getAll(): Flow<List<ProductEntity>>

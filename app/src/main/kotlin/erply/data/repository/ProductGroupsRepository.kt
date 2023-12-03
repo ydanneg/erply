@@ -2,10 +2,10 @@ package erply.data.repository
 
 import android.util.Log
 import com.ydanneg.erply.api.ErplyApi
-import erply.database.dao.GroupsDao
+import erply.database.dao.ErplyProductGroupDao
 import erply.database.mappers.fromEntity
 import erply.database.mappers.toEntity
-import erply.database.model.GroupEntity
+import erply.database.model.ProductGroupEntity
 import erply.util.LogUtils.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -16,22 +16,24 @@ import javax.inject.Inject
 
 class ProductGroupsRepository @Inject constructor(
     private val erplyApi: ErplyApi,
-    private val groupsDao: GroupsDao,
+    private val erplyProductGroupDao: ErplyProductGroupDao,
     private val userSessionRepository: UserSessionRepository
 ) {
 
-    val productGroups = groupsDao.getAll().toModel()
+    val productGroups = erplyProductGroupDao.getAll().toModel()
+
+    fun group(groupId: String) = erplyProductGroupDao.getById(groupId).map { it.fromEntity() }
 
     suspend fun loadProductGroups() {
-        Log.i(TAG, "loadProductGroups")
+        Log.d(TAG, "Fetching product groups...")
         withContext(Dispatchers.IO) {
             val userSession = userSessionRepository.userSessionData.first()
             val received = erplyApi.products.listProductGroups(userSession.token).map { it.toEntity() }
-            groupsDao.insertOrIgnore(received)
+            Log.d(TAG, "Received ${received.size} product groups")
+            erplyProductGroupDao.insertOrIgnore(received)
         }
-        Log.i(TAG, "loadProductGroups complete")
 
     }
 
-    private fun Flow<List<GroupEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }
+    private fun Flow<List<ProductGroupEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }
 }

@@ -3,7 +3,7 @@ package erply.database.mappers
 import com.ydanneg.erply.model.ErplyProduct
 import com.ydanneg.erply.model.ErplyProductGroup
 import com.ydanneg.erply.model.LocalizedValue
-import erply.database.model.GroupEntity
+import erply.database.model.ProductGroupEntity
 import erply.database.model.ProductEntity
 
 fun ErplyProduct.toEntity() = ProductEntity(
@@ -27,7 +27,7 @@ fun ProductEntity.fromEntity() = ErplyProduct(
 )
 
 
-fun ErplyProductGroup.toEntity() = GroupEntity(
+fun ErplyProductGroup.toEntity() = ProductGroupEntity(
     id = id,
     parentId = parentId,
     name = name.en,
@@ -36,7 +36,7 @@ fun ErplyProductGroup.toEntity() = GroupEntity(
     order = order
 )
 
-fun GroupEntity.fromEntity() = ErplyProductGroup(
+fun ProductGroupEntity.fromEntity() = ErplyProductGroup(
     id = id,
     parentId = parentId,
     name = LocalizedValue(name),

@@ -1,4 +1,4 @@
-package erply.ui.screens.main.groups
+package erply.ui.screens.main.catalog
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -6,15 +6,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ydanneg.erply.model.ErplyProductGroup
 import com.ydanneg.erply.model.LocalizedValue
+import erply.ui.components.ErplyDrawerTopAppbar
+import erply.ui.screens.main.MainScreenState
 import erply.ui.theme.ErplyThemePreviewSurface
 import erply.ui.theme.PreviewThemes
 
@@ -34,7 +41,7 @@ import erply.ui.theme.PreviewThemes
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewThemes
 @Composable
-fun ProductGroupPreview() {
+private fun ProductGroupPreview() {
     val groups = (1L..15L).mapIndexed { index, item ->
         ErplyProductGroup(
             id = item.toString(),
@@ -51,13 +58,11 @@ fun ProductGroupPreview() {
     }
 }
 
-const val TAG = "ProductGroupsScreen"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductGroupsScreen(
-    viewModel: ProductGroupsScreenViewModel,
-    onGroupSelected: (String) -> Unit = {}
+    mainScreenState: MainScreenState,
+    viewModel: ProductGroupsScreenViewModel, onGroupSelected: (String) -> Unit = {}
 ) {
     val groups by viewModel.groups.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,14 +71,14 @@ fun ProductGroupsScreen(
 
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(Unit) {
-            viewModel.loadGroups()
+            viewModel.loadProductGroups()
         }
     }
 
     LaunchedEffect(uiState, pullToRefreshState) {
         when (uiState) {
 //            ProductGroupsScreenUiState.Loading -> pullToRefreshState.startRefresh()
-            ProductGroupsScreenUiState.Success -> pullToRefreshState.endRefresh()
+            is ProductGroupsScreenUiState.Success, is ProductGroupsScreenUiState.Error -> pullToRefreshState.endRefresh()
             else -> {}
         }
     }
@@ -87,43 +92,56 @@ fun ProductGroupsScreen(
 
     ProductGroupsScreenContent(
         groups = groups,
-        onLogOut = { viewModel.logOut() },
         onGroupClicked = onGroupSelected,
-        pullToRefreshState = pullToRefreshState
+        pullToRefreshState = pullToRefreshState,
+        drawerState = mainScreenState.drawerState
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductGroupsScreenContent(
+private fun ProductGroupsScreenContent(
     groups: List<ErplyProductGroup>,
     isLoading: Boolean = false,
-    onRefresh: () -> Unit = {},
-    onLogOut: () -> Unit = {},
     onGroupClicked: (String) -> Unit = {},
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
-    Box(Modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Adaptive(minSize = 128.dp),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(groups, key = { it.id }) {
-                Box(
-                    modifier = Modifier
-                        .size(128.dp)
-                        .clickable { onGroupClicked(it.id) },
-                    contentAlignment = Alignment.Center
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            ErplyDrawerTopAppbar(
+                title = "Catalog",
+                drawerState = drawerState
+            )
+        },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                    .padding(paddingValues)
+            ) {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Adaptive(minSize = 128.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = it.name.en, textAlign = TextAlign.Center)
+                    items(groups, key = { it.id }) {
+                        Box(
+                            modifier = Modifier
+                                .size(128.dp)
+                                .clickable { onGroupClicked(it.id) }, contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = it.name.en, textAlign = TextAlign.Center)
+                        }
+                    }
                 }
+                PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
             }
         }
-        PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
-    }
+    )
 }
 
 @Composable

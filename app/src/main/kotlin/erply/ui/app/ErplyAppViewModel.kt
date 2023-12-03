@@ -15,14 +15,19 @@ class ErplyAppViewModel @Inject constructor(
     private val userSessionRepository: UserSessionRepository
 ) : ViewModel() {
 
-    val username = userSessionRepository.userSessionData.map { it.username }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "Anonymous")
-
-    val isLoggedIn = userSessionRepository.isLoggedIn.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        false
-    )
+    val loggedInUser = userSessionRepository.userSessionData
+        .map {
+            if (it.userId.isNotBlank() && it.username.isNotBlank() && it.token.isNotBlank()) {
+                LoggedInUser(
+                    userId = it.userId,
+                    username = it.username,
+                    token = it.token
+                )
+            } else {
+                null
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun logOut() {
         viewModelScope.launch {

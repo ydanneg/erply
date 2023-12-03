@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,13 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import erply.ui.components.ErplyTextField
 import erply.ui.components.ExitConfirmation
-import erply.ui.components.FadedVisibility
+import erply.ui.components.FadedProgressIndicator
 import erply.ui.theme.ErplyThemePreviewSurface
 import erply.ui.theme.PreviewThemes
 
 @PreviewThemes
 @Composable
-fun LoginScreenPreview() {
+private fun LoginScreenPreview() {
     ErplyThemePreviewSurface {
         LoginScreenContent()
     }
@@ -45,7 +44,7 @@ fun LoginScreenPreview() {
 
 @PreviewThemes
 @Composable
-fun LoginScreenWithErrorPreview() {
+private fun LoginScreenWithErrorPreview() {
     ErplyThemePreviewSurface {
         LoginScreenContent(isLoading = false, error = "Bad credentials! Try again!")
     }
@@ -53,7 +52,7 @@ fun LoginScreenWithErrorPreview() {
 
 @PreviewThemes
 @Composable
-fun LoginScreenLoadingPreview() {
+private fun LoginScreenLoadingPreview() {
     ErplyThemePreviewSurface {
         LoginScreenContent(isLoading = true)
     }
@@ -77,10 +76,10 @@ fun LoginScreen(
     )
 }
 
-typealias OnLoginClicked = (String, String, String) -> Unit
+private typealias OnLoginClicked = (String, String, String) -> Unit
 
 @Composable
-fun LoginScreenContent(
+private fun LoginScreenContent(
     isLoading: Boolean = false,
     error: String? = null,
     onLoginClicked: OnLoginClicked? = null
@@ -141,7 +140,7 @@ fun LoginScreenContent(
                     enabled = !isLoading,
                     onClick = { onLoginClicked?.invoke(clientCode, username, password) }
                 ) {
-                    Text(text = "Login")
+                    Text(text = "Log in")
                 }
 
                 if (!error.isNullOrBlank()) {
@@ -149,9 +148,7 @@ fun LoginScreenContent(
                 }
             }
         }
-        FadedVisibility(visible = isLoading) {
-            CircularProgressIndicator()
-        }
+        FadedProgressIndicator(isLoading)
     }
 
 }

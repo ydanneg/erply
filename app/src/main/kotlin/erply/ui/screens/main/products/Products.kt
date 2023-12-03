@@ -1,37 +1,66 @@
 package erply.ui.screens.main.products
 
-import androidx.activity.compose.BackHandler
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ImageNotSupported
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.ydanneg.erply.model.ErplyProduct
 import com.ydanneg.erply.model.ErplyProductType
 import com.ydanneg.erply.model.LocalizedValue
+import erply.ui.components.ErplyNavTopAppbar
+import erply.ui.components.FadedProgressIndicator
+import erply.ui.screens.main.MainScreenState
+import erply.ui.screens.main.products.ProductsScreenUiState.Loading.isLoading
 import erply.ui.theme.ErplyThemePreviewSurface
 import erply.ui.theme.PreviewThemes
+import erply.ui.util.generateAlphanumeric
 
+@OptIn(ExperimentalMaterial3Api::class)
 @PreviewThemes
 @Composable
-fun ProductsScreenContentPreview() {
+private fun ProductsScreenContentPreview() {
     val products = (1L..15L).map {
         ErplyProduct(
             id = it.toString(),
-            name = LocalizedValue("name$it"),
+            name = LocalizedValue("$it ${generateAlphanumeric()}"),
             groupId = it.toString(),
             price = "19.99",
             type = ErplyProductType.PRODUCT,
@@ -40,47 +69,130 @@ fun ProductsScreenContentPreview() {
         )
     }
     ErplyThemePreviewSurface {
-        ProductsScreenContent(false, products)
+        ProductsScreenContent(true, "Very long group name, da, da, dadadada", products)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsScreen(viewModel: ProductsScreenViewModel, onBack: () -> Unit = {}) {
+fun ProductsScreen(
+    mainScreenState: MainScreenState,
+    viewModel: ProductsScreenViewModel
+) {
     val products by viewModel.products.collectAsStateWithLifecycle()
+    val group by viewModel.groupName.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BackHandler {
-        onBack()
+    val pullToRefreshState = rememberPullToRefreshState(enabled = { true })
+
+    if (pullToRefreshState.isRefreshing) {
+        DisposableEffect(Unit) {
+            viewModel.loadProducts()
+            pullToRefreshState.endRefresh()
+            onDispose { }
+        }
+    }
+
+    LaunchedEffect(uiState, pullToRefreshState) {
+        when (uiState) {
+            ProductsScreenUiState.Success -> pullToRefreshState.endRefresh()
+            else -> {}
+        }
+    }
+
+    val context = LocalContext.current
+    if (uiState is ProductsScreenUiState.Error) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, "Failed to update data", Toast.LENGTH_SHORT).show()
+        }
     }
 
     ProductsScreenContent(
-        isLoading = false,
+        isLoading = uiState.isLoading(),
+        groupName = group,
         products = products,
-        onLogOut = { viewModel.logOut() }
+        navController = mainScreenState.navController,
+        pullToRefreshState = pullToRefreshState
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsScreenContent(
+private fun ProductsScreenContent(
     isLoading: Boolean = false,
+    groupName: String,
     products: List<ErplyProduct>,
-    onLogOut: () -> Unit = {}
+    navController: NavController = rememberNavController(),
+    pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(onClick = onLogOut) {
-            Text(text = "Log out")
-        }
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Adaptive(minSize = 128.dp),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(products, key = { it.id }) {
-                Box(modifier = Modifier.size(128.dp), contentAlignment = Alignment.Center) {
-                    Text(text = it.name.en, textAlign = TextAlign.Center)
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            ErplyNavTopAppbar(
+                title = groupName,
+                navController = navController
+            )
+        },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        columns = GridCells.Adaptive(minSize = 128.dp),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(products, key = { it.id }) {
+                            Card(
+                                modifier = Modifier
+                                    .size(156.dp)
+                                    .clickable { },
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(4.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    val placeholder = rememberVectorPainter(Icons.Filled.ImageNotSupported)
+                                    AsyncImage(
+                                        modifier = Modifier.size(64.dp),
+                                        model = null,
+                                        contentDescription = it.name.en,
+                                        placeholder = placeholder
+                                    )
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        text = it.name.en,
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 3,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Spacer(Modifier.weight(1.0f))
+                                    Text(
+                                        text = "\$${it.price}",
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                            }
+//                            }
+                        }
+                    }
                 }
+                PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
+
+                FadedProgressIndicator(isLoading)
             }
         }
-    }
+    )
 }

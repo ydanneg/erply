@@ -4,25 +4,30 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 
-sealed class Screen(open val route: String) {
+sealed class Screen(
+    open val route: String,
+    open val label: String,
+) {
     sealed class TopLevel(
         override val route: String,
-        val label: String,
+        override val label: String,
         val icon: ImageVector,
-    ) : Screen(route) {
+    ) : Screen(route, label) {
         data object Catalog : TopLevel("catalog", "Catalog", Icons.Filled.Home)
 
-        data object Profile : TopLevel("profile", "Account", Icons.Filled.Person)
+        data object Settings : TopLevel("settings", "Settings", Icons.Filled.Settings)
     }
 
 
     data object ProductGroup : Screen(
-        route = "group/{groupId}"
+        route = "group/{groupId}",
+        label = "Product"
     ) {
         fun view(groupId: String) = "group/$groupId"
     }

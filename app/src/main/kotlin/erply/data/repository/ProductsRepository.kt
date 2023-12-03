@@ -2,7 +2,7 @@ package erply.data.repository
 
 import android.util.Log
 import com.ydanneg.erply.api.ErplyApi
-import erply.database.dao.ProductsDao
+import erply.database.dao.ErplyProductDao
 import erply.database.mappers.fromEntity
 import erply.database.mappers.toEntity
 import erply.database.model.ProductEntity
@@ -14,22 +14,20 @@ import javax.inject.Inject
 
 class ProductsRepository @Inject constructor(
     private val erplyApi: ErplyApi,
-    private val productsDao: ProductsDao,
+    private val erplyProductDao: ErplyProductDao,
     private val userSessionRepository: UserSessionRepository
 ) {
 
-    val products = productsDao.getAll().toModel()
+    val products = erplyProductDao.getAll().toModel()
 
-    fun productsByGroupId(groupId: String) = productsDao.getAllByGroupId(groupId).toModel()
+    fun productsByGroupId(groupId: String) = erplyProductDao.getAllByGroupId(groupId).toModel()
 
     suspend fun loadProductsByGroupId(groupId: String) {
-        try {
-            val userSession = userSessionRepository.userSessionData.first()
-            val received = erplyApi.products.fetchProductsByGroupId(userSession.token, groupId).map { it.toEntity() }
-            productsDao.insertOrIgnore(received)
-        } catch (e: Throwable) {
-            Log.e(TAG, "error", e)
-        }
+        Log.d(TAG, "Fetching products, group: $groupId")
+        val userSession = userSessionRepository.userSessionData.first()
+        val received = erplyApi.products.fetchProductsByGroupId(userSession.token, groupId).map { it.toEntity() }
+        Log.d(TAG, "Received ${received.size} products, group: $groupId")
+        erplyProductDao.insertOrIgnore(received)
     }
 
     private fun Flow<List<ProductEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }

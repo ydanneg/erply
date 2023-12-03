@@ -1,13 +1,10 @@
 package erply.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
 
 
 private val LightColors = lightColorScheme(
@@ -75,24 +72,19 @@ private val DarkColors = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
-val shapes = Shapes(
-    extraSmall = RoundedCornerShape(1.dp),
-    small = RoundedCornerShape(4.dp),
-    medium = RoundedCornerShape(6.dp),
-    large = RoundedCornerShape(8.dp),
-    extraLarge = RoundedCornerShape(12.dp)
-)
-
 @Composable
 fun ErplyTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable() () -> Unit
 ) {
-    val colors = if (useDarkTheme) DarkColors else LightColors
+    val colors = if (!useDarkTheme) {
+        LightColors
+    } else {
+        DarkColors
+    }
 
     MaterialTheme(
         colorScheme = colors,
-        shapes = shapes,
         content = content
     )
 }
