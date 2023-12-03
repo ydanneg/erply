@@ -21,6 +21,9 @@ interface ErplyProductDao {
     @Query("SELECT * FROM $PRODUCTS_TABLE_NAME WHERE groupId = :groupId")
     fun getAllByGroupId(groupId: String): Flow<List<ProductEntity>>
 
+    @Query("SELECT * FROM $PRODUCTS_TABLE_NAME WHERE groupId = :groupId AND name LIKE '%' || :name || '%'")
+    fun findAllByGroupIdAndName(groupId: String, name: String): Flow<List<ProductEntity>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertOrIgnore(products: List<ProductEntity>): List<Long>
 

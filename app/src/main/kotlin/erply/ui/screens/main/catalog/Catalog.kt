@@ -147,7 +147,8 @@ private fun ProductGroupsScreenContent(
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
                 FadedProgressIndicator(isLoading)
             }
-        }
+        },
+
     )
 }
 

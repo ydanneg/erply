@@ -78,9 +78,11 @@ fun ProductsScreen(
     mainScreenState: MainScreenState,
     viewModel: ProductsScreenViewModel
 ) {
-    val products by viewModel.products.collectAsStateWithLifecycle()
+    val products by viewModel.filteredProducts.collectAsStateWithLifecycle()
     val group by viewModel.groupName.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullToRefreshState(enabled = { true })
 
@@ -110,6 +112,8 @@ fun ProductsScreen(
         isLoading = uiState.isLoading(),
         groupName = group,
         products = products,
+        searchQuery = searchQuery,
+        onSearch = viewModel::setSearchQuery,
         navController = mainScreenState.navController,
         pullToRefreshState = pullToRefreshState
     )
@@ -121,6 +125,8 @@ private fun ProductsScreenContent(
     isLoading: Boolean = false,
     groupName: String,
     products: List<ErplyProduct>,
+    searchQuery: String? = null,
+    onSearch: (String?) -> Unit = {},
     navController: NavController = rememberNavController(),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
@@ -131,6 +137,8 @@ private fun ProductsScreenContent(
         topBar = {
             ErplyNavTopAppbar(
                 title = groupName,
+                searchQuery = searchQuery,
+                onSearch = onSearch,
                 navController = navController
             )
         },

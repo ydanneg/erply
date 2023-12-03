@@ -22,6 +22,8 @@ class ProductsRepository @Inject constructor(
 
     fun productsByGroupId(groupId: String) = erplyProductDao.getAllByGroupId(groupId).toModel()
 
+    fun productsByGroupIdAndNameLike(groupId: String, name: String) = erplyProductDao.findAllByGroupIdAndName(groupId, name).toModel()
+
     suspend fun loadProductsByGroupId(groupId: String) {
         Log.d(TAG, "Fetching products, group: $groupId")
         val userSession = userSessionRepository.userSessionData.first()

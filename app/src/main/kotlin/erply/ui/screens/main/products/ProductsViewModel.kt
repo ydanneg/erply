@@ -9,16 +9,21 @@ import erply.data.repository.ProductGroupsRepository
 import erply.data.repository.ProductsRepository
 import erply.data.repository.UserSessionRepository
 import erply.util.LogUtils.TAG
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val GROUP_ID_STATE_KEY = "groupId"
+const val SEARCH_QUERY_KEY = "searchQuery"
 
 sealed class ProductsScreenUiState {
     data object Loading : ProductsScreenUiState()
@@ -32,7 +37,7 @@ sealed class ProductsScreenUiState {
 @HiltViewModel
 class ProductsScreenViewModel @Inject constructor(
     productGroupsRepository: ProductGroupsRepository,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val productsRepository: ProductsRepository,
     private val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
@@ -43,23 +48,30 @@ class ProductsScreenViewModel @Inject constructor(
     private var _uiState = MutableStateFlow<ProductsScreenUiState>(ProductsScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    val searchQuery = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
+
     init {
         loadProducts()
     }
 
-    val products = productsRepository.productsByGroupId(groupId)
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            listOf()
-        )
+    fun setSearchQuery(search: String?) {
+        Log.i(TAG, "setSearchQuery: $search")
+        savedStateHandle[SEARCH_QUERY_KEY] = search
+    }
 
-    val groupName = productGroupsRepository.group(groupId).map { it.name.en }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            ""
-        )
+    val products = productsRepository.productsByGroupId(groupId).toStateFlow(viewModelScope, listOf())
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val filteredProducts = searchQuery.flatMapLatest { query ->
+        if (query?.isNotBlank() == true) {
+            productsRepository.productsByGroupIdAndNameLike(groupId, query)
+        } else {
+            productsRepository.productsByGroupId(groupId)
+        }
+    }.toStateFlow(viewModelScope, listOf())
+
+    val groupName = productGroupsRepository.group(groupId).map { it.name.en }.toStateFlow(viewModelScope, "")
 
     fun loadProducts() {
         if (job?.isActive == true) {
@@ -85,3 +97,10 @@ class ProductsScreenViewModel @Inject constructor(
         }
     }
 }
+
+private fun <T> Flow<T>.toStateFlow(scope: CoroutineScope, default: T) =
+    stateIn(
+        scope,
+        SharingStarted.WhileSubscribed(5_000),
+        default
+    )
