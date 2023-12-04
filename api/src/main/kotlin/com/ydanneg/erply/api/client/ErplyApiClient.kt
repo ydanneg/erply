@@ -12,36 +12,44 @@ import io.ktor.serialization.kotlinx.json.json
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class ErplyApiClient(onLog: (String) -> Unit = {}) {
+class ErplyApiClient(private val apiConfiguration: ErplyApiClientConfiguration = ErplyApiClientConfiguration()) {
 
-    val discovery: DiscoveryApi by lazy { DiscoveryApi(httpClient) }
-    val auth: AuthApi by lazy { AuthApi(httpClient) }
-    val products: ProductsApi by lazy { ProductsApi(httpClient) }
+    val discovery: DiscoveryApi by lazy { DiscoveryApi(httpClient(apiConfiguration.logger)) }
+    val auth: AuthApi by lazy { AuthApi(httpClient(apiConfiguration.logger)) }
+    val products: ProductsApi by lazy { ProductsApi(httpClient(apiConfiguration.logger)) }
 
-    private val httpClient = HttpClient(OkHttp.create { config { engineDefaults() } }) {
-        expectSuccess = true
-        install(ContentNegotiation) {
-            json(Serializers.json)
-        }
-        install(UserAgent) {
-            agent = "com.ydanneg.erply" // TODO: extract to configuration
-        }
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    val msg = if (message.contains("�")) "<binary data>" else message
-                    onLog(msg)
-                }
+    private fun httpClient(onLog: (String) -> Unit = {}) =
+        HttpClient(OkHttp.create { config { engineDefaults() } }) {
+            expectSuccess = true
+            install(ContentNegotiation) {
+                json(Serializers.json)
             }
-            level = LogLevel.ALL // TODO: extract to configuration
+            install(UserAgent) {
+                agent = apiConfiguration.userAgent
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        val msg = if (message.contains("�")) "<binary data>" else message
+                        onLog(msg)
+                    }
+                }
+                level = apiConfiguration.logLevel.toKtor()
+            }
         }
-    }
 
     private fun OkHttpClient.Builder.engineDefaults() {
         followRedirects(false)
-        // TODO: extract to configuration
-        connectTimeout(10, TimeUnit.SECONDS)
-        readTimeout(10, TimeUnit.SECONDS)
-        writeTimeout(10, TimeUnit.SECONDS)
+        connectTimeout(apiConfiguration.connectionTimeoutSeconds, TimeUnit.SECONDS)
+        readTimeout(apiConfiguration.readTimeoutSeconds, TimeUnit.SECONDS)
+        writeTimeout(apiConfiguration.writeTimeoutSeconds, TimeUnit.SECONDS)
+    }
+
+    private fun ErplyApiClientLogLevel.toKtor() = when (this) {
+        ErplyApiClientLogLevel.ALL -> LogLevel.ALL
+        ErplyApiClientLogLevel.HEADERS -> LogLevel.HEADERS
+        ErplyApiClientLogLevel.BODY -> LogLevel.BODY
+        ErplyApiClientLogLevel.INFO -> LogLevel.INFO
+        ErplyApiClientLogLevel.NONE -> LogLevel.NONE
     }
 }
