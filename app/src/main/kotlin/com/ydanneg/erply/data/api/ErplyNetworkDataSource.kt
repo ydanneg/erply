@@ -27,7 +27,7 @@ class ErplyNetworkDataSource @Inject constructor(
         erplyApiClient.products.fetchProducts(token, changedSince)
     }
 
-    suspend fun fetchDeletedProductIds(token: String, changedSince: Long? = 0): List<String> = withContext(dispatcher) {
+    suspend fun fetchDeletedProductIds(token: String, changedSince: Long): List<String> = withContext(dispatcher) {
         erplyApiClient.products.fetchDeletedProductIds(token, changedSince)
     }
 

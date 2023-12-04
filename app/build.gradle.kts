@@ -93,7 +93,6 @@ dependencies {
     // Material
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
-//    implementation(libs.compose.material3.pullrefresh)
 
     // ProtoBuf
     implementation(libs.protobuf.kotlin.lite)
@@ -104,11 +103,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.dataStore.core)
-//    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
 
-    // AndroiX Room
+    // AndroidX Room
     implementation(libs.bundles.androidx.room)
     ksp(libs.androidx.room.compiler)
 
@@ -117,8 +116,8 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    ksp(libs.hilt.ext.compiler)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.compiler)
 
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)

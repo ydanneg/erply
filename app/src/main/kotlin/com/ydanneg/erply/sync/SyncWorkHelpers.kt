@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
+import com.ydanneg.erply.R
 
 const val SYNC_TOPIC = "sync"
 private const val SYNC_NOTIFICATION_ID = 0
@@ -50,7 +51,7 @@ private fun Context.syncWorkNotification(): Notification {
         this,
         SYNC_NOTIFICATION_CHANNEL_ID,
     )
-//        .setSmallIcon(R.drawable.ic_notification)
+        .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle("Erply")
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .build()

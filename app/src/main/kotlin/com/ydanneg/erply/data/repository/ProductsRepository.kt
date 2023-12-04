@@ -40,7 +40,7 @@ class ProductsRepository @Inject constructor(
         val userSession = userSessionRepository.userSession.first()
         return erplyNetworkDataSource.fetchProductsByGroupId(userSession.token!!, groupId).also { products ->
             Log.d(TAG, "Received ${products.size} products")
-            erplyProductDao.insertOrIgnore(products.map { it.toEntity(userSession.clientCode) })
+            erplyProductDao.upsert(products.map { it.toEntity(userSession.clientCode) })
         }
     }
 

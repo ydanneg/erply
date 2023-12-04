@@ -15,7 +15,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> {
         val fields = fields("id", "parent_id", "order", "name", "changed")
-        val url = "v1/product/group?fields=$fields&skip=0&take=$PAGE_SIZE&filter=$showInWebFilter&withTotalCount=1"
+        val url = "v1/product/group?skip=0&take=$PAGE_SIZE&filter=[$showInWebFilter]&withTotalCount=1"
         return executeOrThrow {
             httpClient.get(url) {
                 headers {
@@ -31,8 +31,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
     suspend fun fetchProductGroups(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProductGroup> =
         executeOrThrow {
-            val fields = fields("id", "parent_id", "order", "name", "changed")
-            val url = "v1/product/group?fields=$fields&skip=$skip&take=$take&withTotalCount=1".let { url ->
+            val url = "v1/product/group?skip=$skip&take=$take&withTotalCount=1".let { url ->
                 if (changedSince != null) "$url&filter=[${changedFilter(changedSince)}]" else url
             }
             httpClient.get(url) {
@@ -50,7 +49,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         val fields = fields("id", "type", "group_id", "name", "price", "changed")
         val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let { url ->
             val filter = showInWebFilter.let {
-                if (changedSince != null) "$it,${changedFilter(changedSince)}" else it
+                if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
             }
             "$url&filter=[$filter]"
         }
@@ -61,7 +60,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         }.body()
     }
 
-    suspend fun fetchDeletedProductIds(token: String, changedSince: Long? = null): List<String> {
+    suspend fun fetchDeletedProductIds(token: String, changedSince: Long): List<String> {
         val url = "v1/product/deleted/ids?skip=0&take=$PAGE_SIZE"
         return executeOrThrow {
             httpClient.get(url) {
@@ -109,7 +108,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         """.trimIndent()
 
     private fun changedFilter(changedSince: Long) = """
-        ["change",">=","$changedSince"]
+        ["changed",">=","$changedSince"]
         """.trimIndent()
 
 

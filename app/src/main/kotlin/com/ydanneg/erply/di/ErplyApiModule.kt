@@ -20,7 +20,7 @@ object ErplyApiModule {
         ErplyApiClient(
             ErplyApiClientConfiguration(
                 logger = { Log.v("HTTP", it) },
-                logLevel = ErplyApiClientLogLevel.INFO
+                logLevel = ErplyApiClientLogLevel.ALL
             )
         )
 }

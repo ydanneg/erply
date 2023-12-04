@@ -45,7 +45,7 @@ class SyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         // First sync the repositories in parallel
         val syncedSuccessfully = awaitAll(
-//            async { productsRepository.sync() },
+            async { productsRepository.sync() },
             async { productGroupsRepository.sync() },
         ).all { it }
 

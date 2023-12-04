@@ -1,0 +1,61 @@
+23:59:34.413  W  SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+23:59:34.413  W  SLF4J: Defaulting to no-operation (NOP) logger implementation
+23:59:34.413  W  SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+23:59:34.549  V  REQUEST: https://.erply.com/api/
+                 METHOD: HttpMethod(value=POST)
+23:59:36.012  V  RESPONSE: 200 OK
+                 METHOD: HttpMethod(value=POST)
+                 FROM: https://.erply.com/api/
+23:59:36.162  D  loading groups...
+23:59:36.163  D  Fetching product groups...
+23:59:36.382  V  REQUEST: https://api-pim-eu10.erply.com/v1/product/group?fields=id,parent_id,order,name,changed&skip=0&take=1000&filter=["show_in_webshop","=","1"]&withTotalCount=1
+                 METHOD: HttpMethod(value=GET)
+23:59:36.719  V  RESPONSE: 400 Bad Request
+                 METHOD: HttpMethod(value=GET)
+                 FROM: https://api-pim-eu10.erply.com/v1/product/group?fields=id,parent_id,order,name,changed&skip=0&take=1000&filter=["show_in_webshop","=","1"]&withTotalCount=1
+23:59:36.740  E  error
+                 com.ydanneg.erply.api.model.ErplyApiException: Unknown
+                 	at com.ydanneg.erply.api.client.ProductsApi.handleError(Products.kt:131)
+                 	at com.ydanneg.erply.api.client.ProductsApi.executeOrThrow(Products.kt:121)
+                 	at com.ydanneg.erply.api.client.ProductsApi.access$executeOrThrow(Products.kt:14)
+                 	at com.ydanneg.erply.api.client.ProductsApi$executeOrThrow$1.invokeSuspend(Unknown Source:15)
+                 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+                 	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:106)
+                 	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:115)
+                 	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:103)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:584)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:793)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:697)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:684)
+23:59:36.756  D  Compat change id reported: 147798919; UID 10186; state: ENABLED
+23:59:59.058  I  Background young concurrent copying GC freed 104574(3506KB) AllocSpace objects, 0(0B) LOS objects, 34% free, 6544KB/9948KB, paused 5.595ms total 639.804ms
+00:01:25.161  I  Moving WorkSpec (68b0bfd0-3de7-4b36-8277-29aa9e06a11f) to the foreground
+00:01:25.178  I  Started foreground service Intent { act=ACTION_START_FOREGROUND cmp=com.ydanneg.erply/androidx.work.impl.foreground.SystemForegroundService (has extras) }
+00:01:25.253  V  REQUEST: https://api-pim-eu10.erply.com/v1/product/deleted/ids?skip=0&take=1000
+                 METHOD: HttpMethod(value=GET)
+00:01:25.497  V  RESPONSE: 200 OK
+                 METHOD: HttpMethod(value=GET)
+                 FROM: https://api-pim-eu10.erply.com/v1/product/deleted/ids?skip=0&take=1000
+00:01:25.550  V  REQUEST: https://api-pim-eu10.erply.com/v1/product/group?fields=id,parent_id,order,name,changed&skip=0&take=1000&withTotalCount=1&filter=[["change",">=","0"]]
+                 METHOD: HttpMethod(value=GET)
+00:01:25.630  V  RESPONSE: 500 Internal Server Error
+                 METHOD: HttpMethod(value=GET)
+                 FROM: https://api-pim-eu10.erply.com/v1/product/group?fields=id,parent_id,order,name,changed&skip=0&take=1000&withTotalCount=1&filter=[["change",">=","0"]]
+00:01:25.635  I  Failed to evaluate a suspendRunCatchingBlock. Returning failure Result
+                 com.ydanneg.erply.api.model.ErplyApiException: Unknown
+                 	at com.ydanneg.erply.api.client.ProductsApi.handleError(Products.kt:134)
+                 	at com.ydanneg.erply.api.client.ProductsApi.executeOrThrow(Products.kt:121)
+                 	at com.ydanneg.erply.api.client.ProductsApi.access$executeOrThrow(Products.kt:14)
+                 	at com.ydanneg.erply.api.client.ProductsApi$executeOrThrow$1.invokeSuspend(Unknown Source:15)
+                 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+                 	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:106)
+                 	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:115)
+                 	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:103)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:584)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:793)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:697)
+                 	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:684)
+00:01:25.638  I  Worker result RETRY for Work [ id=68b0bfd0-3de7-4b36-8277-29aa9e06a11f, tags={ com.ydanneg.erply.sync.workers.DelegatingWorker } ]
+00:01:25.652  I  Stopping foreground service
+00:01:25.930  E  No vibration for canceled notification : 0|com.ydanneg.erply|0|null|10186
+---------------------------- PROCESS ENDED (5617) for package com.ydanneg.erply ----------------------------

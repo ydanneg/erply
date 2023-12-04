@@ -70,7 +70,7 @@ fun ProductGroupsScreen(
     val groups by viewModel.groups.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val pullToRefreshState = rememberPullToRefreshState(enabled = { true })
+    val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading() })
 
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
