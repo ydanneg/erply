@@ -5,7 +5,7 @@ import com.ydanneg.erply.data.datastore.UserSessionDataSource
 import com.ydanneg.erply.data.datastore.mapper.toModel
 import com.ydanneg.erply.datastore.passwordOrNull
 import com.ydanneg.erply.model.UserSession
-import com.ydanneg.erply.util.EncryptionManager
+import com.ydanneg.erply.crypto.EncryptionManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

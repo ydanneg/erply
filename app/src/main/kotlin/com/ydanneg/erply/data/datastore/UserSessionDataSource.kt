@@ -6,7 +6,7 @@ import com.google.protobuf.kotlin.toByteString
 import com.ydanneg.erply.api.model.ErplyVerifiedUser
 import com.ydanneg.erply.datastore.UserSessionProto
 import com.ydanneg.erply.datastore.copy
-import com.ydanneg.erply.util.EncryptedData
+import com.ydanneg.erply.crypto.EncryptedData
 import com.ydanneg.erply.util.LogUtils.TAG
 import java.io.IOException
 import javax.inject.Inject

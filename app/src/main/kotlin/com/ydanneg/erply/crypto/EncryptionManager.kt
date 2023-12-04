@@ -1,4 +1,4 @@
-package com.ydanneg.erply.util
+package com.ydanneg.erply.crypto
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -74,7 +74,7 @@ class EncryptionManager @Inject constructor(
         private const val ALGORITHM = KEY_ALGORITHM_AES
         private const val BLOCK_MODE = BLOCK_MODE_CBC
         private const val PADDING = ENCRYPTION_PADDING_PKCS7
-        private const val TRANSFORMATION = "${ALGORITHM}/${BLOCK_MODE}/${PADDING}"
+        private const val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
         private const val KEY_SIZE = 256
 
         private val charset = charset("UTF-8")
