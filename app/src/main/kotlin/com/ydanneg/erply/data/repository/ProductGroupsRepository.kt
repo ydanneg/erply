@@ -8,13 +8,11 @@ import com.ydanneg.erply.database.mappers.fromEntity
 import com.ydanneg.erply.database.mappers.toEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
 import com.ydanneg.erply.util.LogUtils.TAG
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ProductGroupsRepository @Inject constructor(
     private val erplyApiDataSource: ErplyApiDataSource,
     private val erplyProductGroupDao: ErplyProductGroupDao,

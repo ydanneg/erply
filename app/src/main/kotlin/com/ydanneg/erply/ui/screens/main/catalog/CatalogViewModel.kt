@@ -25,7 +25,7 @@ sealed class ProductGroupsScreenUiState {
 
 @HiltViewModel
 class ProductGroupsScreenViewModel @Inject constructor(
-    private val productGroupsRepository: ProductGroupsRepository,
+    productGroupsRepository: ProductGroupsRepository,
     private val productGroupsFromRemoteUseCase: GetProductGroupsFromRemoteUseCase
 ) : ViewModel() {
     private var job: Job? = null

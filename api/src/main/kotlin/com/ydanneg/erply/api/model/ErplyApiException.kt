@@ -3,7 +3,7 @@ package com.ydanneg.erply.api.model
 enum class ErplyApiError {
     ConnectionError,
     WrongCredentials,
-    SessionExpired,
+    Unauthorized,
     RequestLimitReached,
     AccountNotFound,
     AccessDenied,

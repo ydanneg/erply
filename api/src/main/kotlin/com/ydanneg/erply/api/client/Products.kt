@@ -82,7 +82,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     private fun Throwable.handleError(): Nothing {
         throw when (this) {
             is ClientRequestException -> when (response.status) {
-                HttpStatusCode.Unauthorized -> ErplyApiException(ErplyApiError.SessionExpired)
+                HttpStatusCode.Unauthorized -> ErplyApiException(ErplyApiError.Unauthorized)
                 HttpStatusCode.Forbidden -> ErplyApiException(ErplyApiError.AccessDenied)
                 else -> throw ErplyApiException(ErplyApiError.Unknown)
             }

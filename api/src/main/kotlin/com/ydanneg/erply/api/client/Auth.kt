@@ -43,7 +43,7 @@ internal fun processErrorCode(errorCode: Int): Nothing {
         // If an authentication request fails with error codes 1051 and 1052, the credentials are wrong (user has been deleted from Erply, or its password updated). Re-sending the call will have no effect!
         1050, 1051, 1052 -> ErplyApiException(ErplyApiError.WrongCredentials)
         //Error codes 1054 and 1055 means that current session has expired. Perform a new verifyUser call with the script's credentials.
-        1054, 1055 -> ErplyApiException(ErplyApiError.SessionExpired)
+        1054, 1055 -> ErplyApiException(ErplyApiError.Unauthorized)
         // Error code 1002 means that the number of requests in the current hour has reached the allowed limit (by default, 1000 requests). The script should save its state and resume work the next hour.
         1002 -> ErplyApiException(ErplyApiError.RequestLimitReached)
         // 1001: Account not found. (Did the user mistype their account number?)

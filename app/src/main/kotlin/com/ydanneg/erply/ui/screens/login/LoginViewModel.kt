@@ -67,7 +67,7 @@ class LoginScreenViewModel @Inject constructor(
     private fun ErplyApiError.message(): String = when (this) {
         ErplyApiError.ConnectionError -> "Connection error"
         ErplyApiError.WrongCredentials -> "Wrong credentials"
-        ErplyApiError.SessionExpired -> "Session expired"
+        ErplyApiError.Unauthorized -> "Session expired"
         ErplyApiError.RequestLimitReached -> "Request limit reached"
         ErplyApiError.AccountNotFound -> "Account not found"
         ErplyApiError.AccessDenied -> "Access denied"

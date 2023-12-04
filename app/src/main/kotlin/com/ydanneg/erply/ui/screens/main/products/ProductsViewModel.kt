@@ -57,10 +57,6 @@ class ProductsScreenViewModel @Inject constructor(
     }
 
     // TODO: combine to uiState
-    val products = productsRepository.productsByGroupId(groupId).toStateFlow(viewModelScope, listOf())
-
-
-    // TODO: combine to uiState
     @OptIn(ExperimentalCoroutinesApi::class)
     val filteredProducts = searchQuery.flatMapLatest { query ->
         if (query?.isNotBlank() == true) {

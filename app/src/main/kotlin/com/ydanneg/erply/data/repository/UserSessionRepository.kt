@@ -47,11 +47,11 @@ class UserSessionRepository @Inject constructor(
         login(storedSession.clientCode, storedSession.username, storedSession.password!!)
     }
 
-    suspend fun <T> tryLoginIf401(block: suspend () -> T): T {
+    suspend fun <T> tryAuthenticateUnauthorized(enabled: Boolean = true, block: suspend () -> T): T {
         return try {
             block()
         } catch (e: ErplyApiException) {
-            if (e.type == ErplyApiError.SessionExpired) {
+            if (enabled && e.type == ErplyApiError.Unauthorized) {
                 reLogin()
                 block()
             } else {
