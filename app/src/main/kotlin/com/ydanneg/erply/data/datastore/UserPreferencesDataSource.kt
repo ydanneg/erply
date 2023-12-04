@@ -8,6 +8,7 @@ import com.ydanneg.erply.datastore.copy
 import com.ydanneg.erply.model.DarkThemeConfig
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.util.LogUtils.TAG
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -23,8 +24,27 @@ class UserPreferencesDataSource @Inject constructor(
                 DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT -> DarkThemeConfig.LIGHT
                 else -> DarkThemeConfig.FOLLOW_SYSTEM
             },
-            isKeepMeSignedIn = it.keepMeSignedIn
+            isKeepMeSignedIn = it.keepMeSignedIn,
+            lastSyncTimestamps = LastSyncTimestamps(
+                productsLastSyncTimestamp = it.productsLastSyncTimestamp,
+                productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp
+            )
         )
+    }.distinctUntilChanged()
+
+    suspend fun updateChangeListVersion(update: LastSyncTimestamps.() -> LastSyncTimestamps) {
+        dataStore.updateData {
+            val updatedLastSyncTimestamps = update(
+                LastSyncTimestamps(
+                    productsLastSyncTimestamp = it.productsLastSyncTimestamp,
+                    productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp
+                )
+            )
+            it.copy {
+                productsLastSyncTimestamp = updatedLastSyncTimestamps.productsLastSyncTimestamp
+                productGroupsLastSyncTimestamp = updatedLastSyncTimestamps.productGroupsLastSyncTimestamp
+            }
+        }
     }
 
     suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {

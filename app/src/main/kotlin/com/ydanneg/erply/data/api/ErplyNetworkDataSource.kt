@@ -10,13 +10,25 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ErplyApiDataSource @Inject constructor(
+class ErplyNetworkDataSource @Inject constructor(
     private val erplyApiClient: ErplyApiClient,
     @Dispatcher(ErplyDispatchers.IO) private val dispatcher: CoroutineDispatcher,
 ) {
 
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> = withContext(dispatcher) {
         erplyApiClient.products.listProductGroups(token)
+    }
+
+    suspend fun fetchProductGroups(token: String, changedSince: Long? = 0): List<ErplyProductGroup> = withContext(dispatcher) {
+        erplyApiClient.products.fetchProductGroups(token, changedSince)
+    }
+
+    suspend fun fetchProducts(token: String, changedSince: Long? = 0): List<ErplyProduct> = withContext(dispatcher) {
+        erplyApiClient.products.fetchProducts(token, changedSince)
+    }
+
+    suspend fun fetchDeletedProductIds(token: String, changedSince: Long? = 0): List<String> = withContext(dispatcher) {
+        erplyApiClient.products.fetchDeletedProductIds(token, changedSince)
     }
 
     suspend fun fetchProductsByGroupId(token: String, groupId: String): List<ErplyProduct> = withContext(dispatcher) {

@@ -3,7 +3,7 @@ package com.ydanneg.erply.data.repository
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.crypto.EncryptionManager
-import com.ydanneg.erply.data.api.ErplyApiDataSource
+import com.ydanneg.erply.data.api.ErplyNetworkDataSource
 import com.ydanneg.erply.data.datastore.UserSessionDataSource
 import com.ydanneg.erply.data.datastore.mapper.toModel
 import com.ydanneg.erply.datastore.passwordOrNull
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 
@@ -21,7 +22,7 @@ private const val ENCRYPTION_KEY_ALIAS = "userPasswordKey"
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserSessionRepository @Inject constructor(
-    private val erplyApiDataSource: ErplyApiDataSource,
+    private val erplyNetworkDataSource: ErplyNetworkDataSource,
     private val userSessionDataSource: UserSessionDataSource,
     private val encryptionManager: EncryptionManager
 ) {
@@ -37,7 +38,7 @@ class UserSessionRepository @Inject constructor(
     }
 
     suspend fun login(clientCode: String, username: String, password: String) {
-        val verifiedUser = erplyApiDataSource.login(clientCode, username, password)
+        val verifiedUser = erplyNetworkDataSource.login(clientCode, username, password)
         val encryptedPassword = encryptionManager.encryptText(ENCRYPTION_KEY_ALIAS, password)
         userSessionDataSource.setVerifiedUser(clientCode, encryptedPassword, verifiedUser)
     }
@@ -64,9 +65,17 @@ class UserSessionRepository @Inject constructor(
         userSessionDataSource.clear()
     }
 
-    fun <T> withClientCode(block: (String) -> Flow<T>): Flow<T> =
+    fun <T> withClientCode(block: suspend (String) -> Flow<T>): Flow<T> =
         userSession
             .map { it.clientCode }
+            .distinctUntilChanged()
+            .flatMapLatest {
+                block(it)
+            }
+
+    fun <T> withToken(block: suspend (String) -> Flow<T>): Flow<T> =
+        userSession
+            .mapNotNull { it.token }
             .distinctUntilChanged()
             .flatMapLatest {
                 block(it)
