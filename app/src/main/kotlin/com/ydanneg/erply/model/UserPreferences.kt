@@ -7,5 +7,5 @@ enum class DarkThemeConfig {
 
 data class UserPreferences(
     val darkThemeConfig: DarkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
-    val keepMeSignedIn: Boolean = false
+    val isKeepMeSignedIn: Boolean = false
 )

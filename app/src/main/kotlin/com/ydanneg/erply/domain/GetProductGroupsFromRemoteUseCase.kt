@@ -13,11 +13,11 @@ class GetProductGroupsFromRemoteUseCase @Inject constructor(
     private val userSessionRepository: UserSessionRepository,
     userPreferencesDataSource: UserPreferencesDataSource
 ) {
-    private val keepMeSignedIn = userPreferencesDataSource.userPreferences
-        .map { it.keepMeSignedIn }
+    private val isKeepMeSignedIn = userPreferencesDataSource.userPreferences
+        .map { it.isKeepMeSignedIn }
 
     suspend operator fun invoke(): List<ErplyProductGroup> {
-        if (keepMeSignedIn.first()) {
+        if (isKeepMeSignedIn.first()) {
             return userSessionRepository.tryLoginIf401 { productGroupsRepository.updateProductGroups() }
         }
         return productGroupsRepository.updateProductGroups()

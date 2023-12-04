@@ -23,7 +23,7 @@ class UserPreferencesDataSource @Inject constructor(
                 DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT -> DarkThemeConfig.LIGHT
                 else -> DarkThemeConfig.FOLLOW_SYSTEM
             },
-            keepMeSignedIn = it.keepMeSignedIn
+            isKeepMeSignedIn = it.keepMeSignedIn
         )
     }
 

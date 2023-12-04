@@ -86,7 +86,6 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
                 HttpStatusCode.Forbidden -> ErplyApiException(ErplyApiError.AccessDenied)
                 else -> throw ErplyApiException(ErplyApiError.Unknown)
             }
-
             else -> throw ErplyApiException(ErplyApiError.Unknown)
         }
     }

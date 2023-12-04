@@ -15,7 +15,7 @@ class GetProductsFromRemoteUseCase @Inject constructor(
 ) {
 
     private val keepMeSignedIn = userPreferencesDataSource.userPreferences
-        .map { it.keepMeSignedIn }
+        .map { it.isKeepMeSignedIn }
 
     suspend operator fun invoke(groupId: String): List<ErplyProduct> {
         val keepMeSignedIn = keepMeSignedIn.first()

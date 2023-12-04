@@ -17,11 +17,13 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import dagger.hilt.android.AndroidEntryPoint
+import com.ydanneg.erply.MainActivityUiState.Loading.isInitialized
 import com.ydanneg.erply.model.DarkThemeConfig
 import com.ydanneg.erply.ui.app.ErplyApp
 import com.ydanneg.erply.ui.app.ErplyAppViewModel
 import com.ydanneg.erply.ui.theme.ErplyTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -39,16 +41,14 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.onEach { uiState = it }.collect()
+                viewModel.uiState.onEach {
+                    delay(100)
+                    uiState = it
+                }.collect()
             }
         }
 
-        splashScreen.setKeepOnScreenCondition {
-            when (uiState) {
-                MainActivityUiState.Loading -> true
-                is MainActivityUiState.Success -> false
-            }
-        }
+        splashScreen.setKeepOnScreenCondition { !uiState.isInitialized() }
 
         setContent {
             val darkTheme = shouldUseDarkTheme(uiState)

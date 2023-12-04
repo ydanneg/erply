@@ -41,7 +41,7 @@ class LoginScreenViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     val keepMeSignedIn = userPreferencesDataSource.userPreferences
-        .map { it.keepMeSignedIn }
+        .map { it.isKeepMeSignedIn }
         .toStateFlow(viewModelScope, false)
 
     fun setKeepMeLoggedIn(value: Boolean) {
