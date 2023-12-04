@@ -7,5 +7,12 @@ message UserSessionProto {
   string user_id = 1;
   string username = 2;
   string clientCode = 3;
-  string token = 4;
+  optional string token = 4;
+
+  message EncryptedPasswordProto {
+    bytes iv = 1;
+    bytes value = 2;
+  }
+
+  optional EncryptedPasswordProto password = 5;
 }
