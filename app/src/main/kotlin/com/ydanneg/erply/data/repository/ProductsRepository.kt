@@ -1,6 +1,7 @@
 package com.ydanneg.erply.data.repository
 
 import android.util.Log
+import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.data.api.ErplyApiDataSource
 import com.ydanneg.erply.database.dao.ErplyProductDao
 import com.ydanneg.erply.database.mappers.fromEntity
@@ -30,13 +31,13 @@ class ProductsRepository @Inject constructor(
         erplyProductDao.findAllByGroupIdAndName(it, groupId, name).toModelFlow()
     }
 
-    suspend fun loadProductsByGroupId(groupId: String) {
+    suspend fun updateProductsByGroupId(groupId: String): List<ErplyProduct> {
         Log.d(TAG, "Fetching products, group: $groupId")
         val userSession = userSessionRepository.userSession.first()
-        val products = erplyApiDataSource.fetchProductsByGroupId(userSession.token!!, groupId)
-            .map { it.toEntity(userSession.clientCode) }
-        Log.d(TAG, "Received ${products.size} products, group: $groupId")
-        erplyProductDao.insertOrIgnore(products)
+        return erplyApiDataSource.fetchProductsByGroupId(userSession.token!!, groupId).also { products ->
+            Log.d(TAG, "Received ${products.size} products")
+            erplyProductDao.insertOrIgnore(products.map { it.toEntity(userSession.clientCode) })
+        }
     }
 
     private fun Flow<List<ProductEntity>>.toModelFlow() = map { entities -> entities.map { it.fromEntity() } }

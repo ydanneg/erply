@@ -6,7 +6,11 @@ enum class ErplyApiError {
     SessionExpired,
     RequestLimitReached,
     AccountNotFound,
+    AccessDenied,
     Unknown
 }
 
-class ErplyApiException(val type: ErplyApiError) : Exception()
+class ErplyApiException(val type: ErplyApiError) : Exception() {
+    override val message: String
+        get() = type.toString()
+}

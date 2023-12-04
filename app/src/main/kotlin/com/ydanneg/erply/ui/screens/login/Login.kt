@@ -3,14 +3,17 @@ package com.ydanneg.erply.ui.screens.login
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +67,7 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val keepMeSignedIn by viewModel.keepMeSignedIn.collectAsStateWithLifecycle()
 
     ExitConfirmation()
 
@@ -72,7 +76,9 @@ fun LoginScreen(
         error = uiState.getError(),
         onLoginClicked = { client, user, pass ->
             viewModel.doLogin(client, user, pass)
-        }
+        },
+        keepMeSignedIn = keepMeSignedIn,
+        onKeepMeSignedInChanged = viewModel::setKeepMeLoggedIn
     )
 }
 
@@ -82,7 +88,9 @@ private typealias OnLoginClicked = (String, String, String) -> Unit
 private fun LoginScreenContent(
     isLoading: Boolean = false,
     error: String? = null,
-    onLoginClicked: OnLoginClicked? = null
+    onLoginClicked: OnLoginClicked? = null,
+    keepMeSignedIn: Boolean = false,
+    onKeepMeSignedInChanged: (Boolean) -> Unit = {}
 ) {
     var clientCode by rememberSaveable { mutableStateOf("") }
     var username by rememberSaveable { mutableStateOf("") }
@@ -136,13 +144,16 @@ private fun LoginScreenContent(
                     },
                     maxLength = 50
                 )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = keepMeSignedIn, onCheckedChange = onKeepMeSignedInChanged)
+                    Text(text = "Keep me signed in", modifier = Modifier.wrapContentWidth())
+                }
                 Button(
                     enabled = !isLoading,
                     onClick = { onLoginClicked?.invoke(clientCode, username, password) }
                 ) {
-                    Text(text = "Log in")
+                    Text(text = "Sign in")
                 }
-
                 if (!error.isNullOrBlank()) {
                     Text(text = error, color = MaterialTheme.colorScheme.error)
                 }

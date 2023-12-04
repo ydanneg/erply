@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.util.LogUtils.TAG
+import com.ydanneg.erply.util.toStateFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,13 +31,24 @@ fun LoginUIState.getError() = if (this is LoginUIState.Error) message else null
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
-    private val userSessionRepository: UserSessionRepository
+    private val userSessionRepository: UserSessionRepository,
+    private val userPreferencesDataSource: UserPreferencesDataSource
 ) : ViewModel() {
+
+    private var loginJob: Job? = null
 
     private var _uiState = MutableStateFlow<LoginUIState>(LoginUIState.Idle)
     val uiState = _uiState.asStateFlow()
 
-    private var loginJob: Job? = null
+    val keepMeSignedIn = userPreferencesDataSource.userPreferences
+        .map { it.keepMeSignedIn }
+        .toStateFlow(viewModelScope, false)
+
+    fun setKeepMeLoggedIn(value: Boolean) {
+        viewModelScope.launch {
+            userPreferencesDataSource.setKeepMeSignedIn(value)
+        }
+    }
 
     fun doLogin(clientId: String, username: String, password: String) {
         loginJob?.cancel()
@@ -56,6 +70,7 @@ class LoginScreenViewModel @Inject constructor(
         ErplyApiError.SessionExpired -> "Session expired"
         ErplyApiError.RequestLimitReached -> "Request limit reached"
         ErplyApiError.AccountNotFound -> "Account not found"
+        ErplyApiError.AccessDenied -> "Access denied"
         ErplyApiError.Unknown -> "Unknown error. Try again later."
     }
 }

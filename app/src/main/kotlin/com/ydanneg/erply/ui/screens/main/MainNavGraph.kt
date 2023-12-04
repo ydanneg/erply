@@ -102,7 +102,7 @@ private fun DrawerContent(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = onLogout) {
-                Text(text = "Log out")
+                Text(text = "Sign out")
             }
         }
 

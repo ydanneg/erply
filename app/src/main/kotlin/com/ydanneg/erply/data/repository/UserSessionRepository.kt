@@ -1,14 +1,17 @@
 package com.ydanneg.erply.data.repository
 
+import com.ydanneg.erply.api.model.ErplyApiError
+import com.ydanneg.erply.api.model.ErplyApiException
+import com.ydanneg.erply.crypto.EncryptionManager
 import com.ydanneg.erply.data.api.ErplyApiDataSource
 import com.ydanneg.erply.data.datastore.UserSessionDataSource
 import com.ydanneg.erply.data.datastore.mapper.toModel
 import com.ydanneg.erply.datastore.passwordOrNull
 import com.ydanneg.erply.model.UserSession
-import com.ydanneg.erply.crypto.EncryptionManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -37,6 +40,24 @@ class UserSessionRepository @Inject constructor(
         val verifiedUser = erplyApiDataSource.login(clientCode, username, password)
         val encryptedPassword = encryptionManager.encryptText(ENCRYPTION_KEY_ALIAS, password)
         userSessionDataSource.setVerifiedUser(clientCode, encryptedPassword, verifiedUser)
+    }
+
+    private suspend fun reLogin() {
+        val storedSession = userSession.first()
+        login(storedSession.clientCode, storedSession.username, storedSession.password!!)
+    }
+
+    suspend fun <T> tryLoginIf401(block: suspend () -> T): T {
+        return try {
+            block()
+        } catch (e: ErplyApiException) {
+            if (e.type == ErplyApiError.SessionExpired) {
+                reLogin()
+                block()
+            } else {
+                throw e
+            }
+        }
     }
 
     suspend fun logout() {

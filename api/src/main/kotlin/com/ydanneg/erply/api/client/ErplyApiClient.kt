@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
@@ -14,13 +15,15 @@ import java.util.concurrent.TimeUnit
 
 class ErplyApiClient(private val apiConfiguration: ErplyApiClientConfiguration = ErplyApiClientConfiguration()) {
 
-    val discovery: DiscoveryApi by lazy { DiscoveryApi(httpClient(apiConfiguration.logger)) }
-    val auth: AuthApi by lazy { AuthApi(httpClient(apiConfiguration.logger)) }
-    val products: ProductsApi by lazy { ProductsApi(httpClient(apiConfiguration.logger)) }
+    val auth: AuthApi by lazy { AuthApi(httpClient(null, apiConfiguration.logger)) }
+    val products: ProductsApi by lazy { ProductsApi(httpClient(apiConfiguration.baseUrl, apiConfiguration.logger)) }
 
-    private fun httpClient(onLog: (String) -> Unit = {}) =
+    private fun httpClient(baseUrl: String?, logger: LoggerCallback = {}) =
         HttpClient(OkHttp.create { config { engineDefaults() } }) {
             expectSuccess = true
+            defaultRequest {
+                baseUrl?.also { url(it) }
+            }
             install(ContentNegotiation) {
                 json(Serializers.json)
             }
@@ -28,10 +31,10 @@ class ErplyApiClient(private val apiConfiguration: ErplyApiClientConfiguration =
                 agent = apiConfiguration.userAgent
             }
             install(Logging) {
-                logger = object : Logger {
+                this.logger = object : Logger {
                     override fun log(message: String) {
                         val msg = if (message.contains("�")) "<binary data>" else message
-                        onLog(msg)
+                        logger(msg)
                     }
                 }
                 level = apiConfiguration.logLevel.toKtor()

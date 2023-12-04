@@ -12,4 +12,5 @@ enum DarkThemeConfigProto {
 
 message UserPreferencesProto {
   DarkThemeConfigProto dark_theme_config = 1;
+  bool keep_me_signed_in = 2;
 }

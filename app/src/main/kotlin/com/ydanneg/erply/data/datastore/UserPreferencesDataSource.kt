@@ -18,11 +18,12 @@ class UserPreferencesDataSource @Inject constructor(
 
     val userPreferences = dataStore.data.map {
         UserPreferences(
-            when (it.darkThemeConfig) {
+            darkThemeConfig = when (it.darkThemeConfig) {
                 DarkThemeConfigProto.DARK_THEME_CONFIG_DARK -> DarkThemeConfig.DARK
                 DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT -> DarkThemeConfig.LIGHT
                 else -> DarkThemeConfig.FOLLOW_SYSTEM
-            }
+            },
+            keepMeSignedIn = it.keepMeSignedIn
         )
     }
 
@@ -35,6 +36,18 @@ class UserPreferencesDataSource @Inject constructor(
                         DarkThemeConfig.FOLLOW_SYSTEM -> DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM
                         DarkThemeConfig.LIGHT -> DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT
                     }
+                }
+            }
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to update user preferences", e)
+        }
+    }
+
+    suspend fun setKeepMeSignedIn(value: Boolean) {
+        try {
+            dataStore.updateData {
+                it.copy {
+                    keepMeSignedIn = value
                 }
             }
         } catch (e: IOException) {

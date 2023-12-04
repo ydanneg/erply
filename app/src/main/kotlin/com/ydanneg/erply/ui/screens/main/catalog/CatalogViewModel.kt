@@ -3,10 +3,11 @@ package com.ydanneg.erply.ui.screens.main.catalog
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
+import com.ydanneg.erply.domain.GetProductGroupsFromRemoteUseCase
 import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,8 @@ sealed class ProductGroupsScreenUiState {
 
 @HiltViewModel
 class ProductGroupsScreenViewModel @Inject constructor(
-    private val productGroupsRepository: ProductGroupsRepository
+    private val productGroupsRepository: ProductGroupsRepository,
+    private val productGroupsFromRemoteUseCase: GetProductGroupsFromRemoteUseCase
 ) : ViewModel() {
     private var job: Job? = null
 
@@ -47,9 +49,10 @@ class ProductGroupsScreenViewModel @Inject constructor(
         job = viewModelScope.launch {
             try {
                 _uiState.value = ProductGroupsScreenUiState.Loading
-                productGroupsRepository.loadProductGroups()
+                productGroupsFromRemoteUseCase()
                 _uiState.value = ProductGroupsScreenUiState.Success
             } catch (e: Throwable) {
+                Log.e(TAG, "error", e)
                 _uiState.value = ProductGroupsScreenUiState.Error(e.message)
             }
         }
