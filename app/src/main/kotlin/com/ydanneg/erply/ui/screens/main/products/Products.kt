@@ -45,7 +45,6 @@ import com.ydanneg.erply.api.model.ErplyProductType
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
 import com.ydanneg.erply.ui.screens.main.MainScreenState
-import com.ydanneg.erply.ui.screens.main.products.ProductsScreenUiState.Success.isLoading
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
 import com.ydanneg.erply.ui.util.generateAlphanumeric
@@ -87,12 +86,15 @@ fun ProductsScreen(
     viewModel: ProductsScreenViewModel
 ) {
     val products by viewModel.filteredProducts.collectAsStateWithLifecycle()
-    val group by viewModel.group.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading })
 
-    val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading() })
+    LaunchedEffect(uiState) {
+        if (uiState.group == null && !uiState.isLoading) {
+            mainScreenState.navController.popBackStack()
+        }
+    }
 
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
@@ -101,17 +103,15 @@ fun ProductsScreen(
         }
     }
 
-    LaunchedEffect(uiState, pullToRefreshState) {
-        when (uiState) {
-            is ProductsScreenUiState.Loading -> pullToRefreshState.startRefresh()
-            else -> pullToRefreshState.endRefresh()
-        }
+    DisposableEffect(uiState) {
+        if (uiState.isLoading) pullToRefreshState.startRefresh() else pullToRefreshState.endRefresh()
+        onDispose { }
     }
 
     ProductsScreenContent(
-        group = group,
+        group = uiState.group,
         products = products,
-        searchQuery = searchQuery,
+        searchQuery = uiState.searchQuery,
         onSearch = viewModel::setSearchQuery,
         navController = mainScreenState.navController,
         pullToRefreshState = pullToRefreshState

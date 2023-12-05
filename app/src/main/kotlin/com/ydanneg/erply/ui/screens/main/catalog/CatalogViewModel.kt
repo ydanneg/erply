@@ -1,9 +1,11 @@
 package com.ydanneg.erply.ui.screens.main.catalog
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.sync.WorkManagerSyncManager
+import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
@@ -30,6 +32,7 @@ class ProductGroupsScreenViewModel @Inject constructor(
     val groups = productGroupsRepository.productGroups.toStateFlow(viewModelScope, listOf())
 
     fun loadProductGroups() {
+        Log.d(TAG, "loadProducts...")
         viewModelScope.launch {
             workManagerSyncManager.requestSync()
         }

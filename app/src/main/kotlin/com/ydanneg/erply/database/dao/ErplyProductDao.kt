@@ -16,7 +16,7 @@ interface ErplyProductDao {
     fun getAll(clientCode: String): Flow<List<ProductEntity>>
 
     @Query("SELECT * FROM $PRODUCTS_TABLE_NAME WHERE id = :productId AND clientCode = :clientCode")
-    fun getById(clientCode: String, productId: String): Flow<ProductEntity>
+    fun getById(clientCode: String, productId: String): Flow<ProductEntity?>
 
     @Query("SELECT * FROM $PRODUCTS_TABLE_NAME WHERE groupId = :groupId AND clientCode = :clientCode")
     fun getAllByGroupId(clientCode: String, groupId: String): Flow<List<ProductEntity>>

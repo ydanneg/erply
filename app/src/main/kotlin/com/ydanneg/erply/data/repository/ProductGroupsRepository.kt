@@ -30,7 +30,7 @@ class ProductGroupsRepository @Inject constructor(
 
     fun group(groupId: String) = userSessionRepository.withClientCode {
         erplyProductGroupDao.getById(it, groupId)
-    }.map { it.fromEntity() }
+    }.map { it?.fromEntity() }
 
     suspend fun updateProductGroups(): List<ErplyProductGroup> {
         Log.d(TAG, "Fetching product groups...")

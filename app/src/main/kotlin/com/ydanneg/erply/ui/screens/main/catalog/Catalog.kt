@@ -1,6 +1,5 @@
 package com.ydanneg.erply.ui.screens.main.catalog
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,7 +79,6 @@ fun ProductGroupsScreen(
 
     val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading() })
 
-    Log.i("ProductGroupsScreen", "uiState: $uiState")
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
             viewModel.loadProductGroups()
