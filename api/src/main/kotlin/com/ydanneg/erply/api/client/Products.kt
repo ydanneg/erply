@@ -1,5 +1,6 @@
 package com.ydanneg.erply.api.client
 
+import com.ydanneg.erply.api.client.util.fetchAllPages
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.api.model.ErplyProduct
@@ -11,10 +12,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.yield
 
-typealias PageFetcher<T> = suspend (Int, Int) -> List<T>
 
 class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
@@ -46,7 +44,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
 
     suspend fun fetchAllProductGroups(token: String, changedSince: Long? = null): Flow<List<ErplyProductGroup>> =
-        fetchAllPages { skip, take ->
+        fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchProductGroups(token = token, changedSince = changedSince, skip = skip, take = take)
         }
 
@@ -71,7 +69,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
     //
     suspend fun fetchAllProducts(token: String, changedSince: Long? = null): Flow<List<ErplyProduct>> =
-        fetchAllPages { skip, take ->
+        fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchProducts(token, changedSince, skip = skip, take = take)
         }
 
@@ -92,7 +90,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
 
     suspend fun fetchAllDeletedProductIds(token: String, changedSince: Long): Flow<List<String>> =
-        fetchAllPages { skip, take ->
+        fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchDeletedProductIds(token, changedSince, skip = skip, take = take)
         }
 
@@ -161,25 +159,6 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
             }
 
             else -> throw ErplyApiException(ErplyApiError.Unknown)
-        }
-    }
-
-    private fun <T> fetchAllPages(pageSize: Int = PAGE_SIZE, fetchPage: PageFetcher<T>): Flow<List<T>> {
-        return flow {
-            var skip = 0
-            while (true) {
-                val products = fetchPage(skip, pageSize)
-                println("fetched: ${products.size}")
-                if (products.isEmpty()) {
-                    break
-                }
-                emit(products)
-//                if (products.size < PAGE_SIZE) {
-//                    break
-//                }
-                yield()
-                skip += pageSize
-            }
         }
     }
 

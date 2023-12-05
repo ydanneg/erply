@@ -12,6 +12,7 @@ enum class ErplyApiClientLogLevel {
 
 data class ErplyApiClientConfiguration(
     val baseUrl: String = "https://api-pim-eu10.erply.com",
+    val cdnBaseUrl: String = "https://cdn-sb.erply.com",
     val logLevel: ErplyApiClientLogLevel = ErplyApiClientLogLevel.NONE,
     val logger: LoggerCallback = {},
     val userAgent: String = "com.ydanneg.erply",

@@ -63,7 +63,7 @@ private fun ProductsScreenContentPreview() {
             price = "19.99",
             type = ErplyProductType.PRODUCT,
             description = LocalizedValue("description$it"),
-            changed = (System.currentTimeMillis() / 100).toInt()
+            changed = System.currentTimeMillis() / 100
         )
     }
     ErplyThemePreviewSurface {
@@ -76,7 +76,7 @@ private fun ProductsScreenContentPreview() {
                 description = null,
                 changed = 0
             ),
-            products = products
+            products = products.map { ProductWithImages(it, listOf()) }
         )
     }
 }
@@ -151,7 +151,7 @@ fun ProductsScreen(
 private fun ProductsScreenContent(
     isLoading: Boolean = false,
     group: ErplyProductGroup?,
-    products: List<ErplyProduct>,
+    products: List<ProductWithImages>,
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
     navController: NavController = rememberNavController(),
@@ -185,7 +185,7 @@ private fun ProductsScreenContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(products, key = { it.id }) {
+                    items(products, key = { it.product.id }) {
                         Card(
                             modifier = Modifier
                                 .size(156.dp)
@@ -200,13 +200,13 @@ private fun ProductsScreenContent(
                                 AsyncImage(
                                     modifier = Modifier.size(64.dp),
                                     // FIXME
-                                    model = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
-                                    contentDescription = it.name.en,
+                                    model = it.imageUrl() ?: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
+                                    contentDescription = it.product.name.en,
                                     placeholder = placeholder
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    text = it.name.en,
+                                    text = it.product.name.en,
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = FontWeight.Bold,
@@ -215,7 +215,7 @@ private fun ProductsScreenContent(
                                 )
                                 Spacer(Modifier.weight(1.0f))
                                 Text(
-                                    text = "\$${it.price}",
+                                    text = "\$${it.product.price}",
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,

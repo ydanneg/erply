@@ -6,8 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
+import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
-import com.ydanneg.erply.data.repository.ProductsRepository
+import com.ydanneg.erply.data.repository.ProductImagesRepository
+import com.ydanneg.erply.database.mappers.fromEntity
+import com.ydanneg.erply.database.model.ProductEntity
+import com.ydanneg.erply.database.model.ProductPictureEntity
 import com.ydanneg.erply.sync.WorkManagerSyncManager
 import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
@@ -21,17 +25,24 @@ import javax.inject.Inject
 
 data class UiState(
     val group: ErplyProductGroup? = null,
-    val products: List<ErplyProduct> = listOf(),
+    val products: List<ProductWithImages> = listOf(),
     val isLoading: Boolean = false,
     val searchQuery: String? = null
 )
+
+data class ProductWithImages(
+    val product: ErplyProduct,
+    val images: List<ErplyProductPicture>
+)
+
+fun ProductWithImages.imageUrl(): String? = images.firstOrNull()?.let { "https://cdn-sb.erply.com/images/${it.tenant}/${it.filename}" }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProductsScreenViewModel @Inject constructor(
     productGroupsRepository: ProductGroupsRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val productsRepository: ProductsRepository,
+    private val productImagesRepository: ProductImagesRepository,
     private val workManagerSyncManager: WorkManagerSyncManager
 ) : ViewModel() {
 
@@ -40,9 +51,9 @@ class ProductsScreenViewModel @Inject constructor(
     private val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
             if (query?.isNotBlank() == true) {
-                productsRepository.productsByGroupIdAndNameLike(groupId, query)
+                productImagesRepository.productsWithImagesByName(groupId, query)
             } else {
-                productsRepository.productsByGroupId(groupId)
+                productImagesRepository.productsWithImages(groupId)
             }
         }
 
@@ -54,7 +65,7 @@ class ProductsScreenViewModel @Inject constructor(
     ) { group, isSyncing, searchQuery, products ->
         UiState(
             group = group,
-            products = products,
+            products = products.fromEntity(),
             isLoading = isSyncing,
             searchQuery = searchQuery
         )
@@ -72,6 +83,9 @@ class ProductsScreenViewModel @Inject constructor(
             workManagerSyncManager.requestSync()
         }
     }
+
+    private fun Map<ProductEntity, List<ProductPictureEntity>>.fromEntity(): List<ProductWithImages> =
+        map { item -> ProductWithImages(item.key.fromEntity(), item.value.map { it.fromEntity() }) }
 
     companion object {
         private const val GROUP_ID_STATE_KEY = "groupId"

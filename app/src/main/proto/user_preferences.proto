@@ -15,4 +15,5 @@ message UserPreferencesProto {
   bool keep_me_signed_in = 2;
   int64 product_groups_last_sync_timestamp = 3;
   int64 products_last_sync_timestamp = 4;
+  int64 images_last_sync_timestamp = 5;
 }

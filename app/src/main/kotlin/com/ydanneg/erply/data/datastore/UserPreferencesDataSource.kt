@@ -27,7 +27,9 @@ class UserPreferencesDataSource @Inject constructor(
             isKeepMeSignedIn = it.keepMeSignedIn,
             lastSyncTimestamps = LastSyncTimestamps(
                 productsLastSyncTimestamp = it.productsLastSyncTimestamp,
-                productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp
+                productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp,
+                picturesLastSyncTimestamp = it.imagesLastSyncTimestamp
+
             )
         )
     }.distinctUntilChanged()
@@ -37,12 +39,14 @@ class UserPreferencesDataSource @Inject constructor(
             val updatedLastSyncTimestamps = update(
                 LastSyncTimestamps(
                     productsLastSyncTimestamp = it.productsLastSyncTimestamp,
-                    productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp
+                    productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp,
+                    picturesLastSyncTimestamp = it.imagesLastSyncTimestamp
                 )
             )
             it.copy {
                 productsLastSyncTimestamp = updatedLastSyncTimestamps.productsLastSyncTimestamp
                 productGroupsLastSyncTimestamp = updatedLastSyncTimestamps.productGroupsLastSyncTimestamp
+                imagesLastSyncTimestamp = updatedLastSyncTimestamps.picturesLastSyncTimestamp
             }
         }
     }

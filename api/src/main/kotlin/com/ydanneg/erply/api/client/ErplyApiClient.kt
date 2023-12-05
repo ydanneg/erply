@@ -17,6 +17,7 @@ class ErplyApiClient(private val apiConfiguration: ErplyApiClientConfiguration =
 
     val auth: AuthApi by lazy { AuthApi(httpClient(null, apiConfiguration.logger)) }
     val products: ProductsApi by lazy { ProductsApi(httpClient(apiConfiguration.baseUrl, apiConfiguration.logger)) }
+    val cdn: PicturesApi by lazy { PicturesApi(httpClient(apiConfiguration.cdnBaseUrl, apiConfiguration.logger)) }
 
     private fun httpClient(baseUrl: String?, logger: LoggerCallback = {}) =
         HttpClient(OkHttp.create { config { engineDefaults() } }) {

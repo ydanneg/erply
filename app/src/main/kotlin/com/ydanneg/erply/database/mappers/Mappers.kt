@@ -2,9 +2,27 @@ package com.ydanneg.erply.database.mappers
 
 import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
+import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
+import com.ydanneg.erply.database.model.ProductPictureEntity
+
+fun ErplyProductPicture.toEntity(clientCode: String) = ProductPictureEntity(
+    id = id,
+    clientCode = clientCode,
+    productId = productId,
+    tenant = tenant,
+    filename = filename
+)
+
+fun ProductPictureEntity.fromEntity() = ErplyProductPicture(
+    id = id,
+    productId = productId,
+    tenant = tenant,
+    filename = filename,
+)
+
 
 fun ErplyProduct.toEntity(clientCode: String) = ProductEntity(
     id = id,
@@ -16,6 +34,7 @@ fun ErplyProduct.toEntity(clientCode: String) = ProductEntity(
     description = description?.en,
     clientCode = clientCode
 )
+
 
 fun ProductEntity.fromEntity() = ErplyProduct(
     id = id,

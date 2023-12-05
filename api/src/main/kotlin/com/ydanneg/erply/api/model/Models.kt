@@ -68,7 +68,7 @@ data class ErplyProduct(
     @SerialName("price")
     val price: String,
     @SerialName("changed")
-    val changed: Int
+    val changed: Long
 )
 
 @Serializable
@@ -84,5 +84,26 @@ data class ErplyProductGroup(
     @SerialName("description")
     val description: LocalizedValue? = null,
     @SerialName("changed")
-    val changed: Int
+    val changed: Long
+)
+
+@Serializable
+data class ErplyProductPicturesResponse(
+    val page: Int,
+    val totalRecords: Int,
+    val recordsPerPage: Int,
+    val recordsReturned: Int,
+    val images: List<ErplyProductPicture>
+)
+
+@Serializable
+data class ErplyProductPicture(
+    @SerialName("id")
+    val id: String,
+    @SerialName("productId")
+    val productId: String,
+    @SerialName("tenant")
+    val tenant: String,
+    @SerialName("key")
+    val filename: String,
 )

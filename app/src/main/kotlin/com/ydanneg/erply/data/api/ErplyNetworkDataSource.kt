@@ -18,6 +18,10 @@ class ErplyNetworkDataSource @Inject constructor(
 
     suspend fun fetchServerTimestamp(token: String): Long = erplyApiClient.products.fetchTimestamp(token)
 
+    suspend fun fetchAllImages(token: String, changedSince: Long? = 0) = withContext(dispatcher) {
+        erplyApiClient.cdn.fetchAllProductPictures(token, changedSince)
+    }
+
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> = withContext(dispatcher) {
         erplyApiClient.products.listProductGroups(token)
     }

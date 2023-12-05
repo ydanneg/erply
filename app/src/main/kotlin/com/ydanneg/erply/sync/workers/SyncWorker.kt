@@ -3,13 +3,13 @@ package com.ydanneg.erply.sync.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkerParameters
 import com.ydanneg.erply.data.datastore.LastSyncTimestamps
 import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
+import com.ydanneg.erply.data.repository.ProductImagesRepository
 import com.ydanneg.erply.data.repository.ProductsRepository
 import com.ydanneg.erply.di.Dispatcher
 import com.ydanneg.erply.di.ErplyDispatchers
@@ -21,6 +21,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -36,6 +37,7 @@ class SyncWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val productsRepository: ProductsRepository,
     private val productGroupsRepository: ProductGroupsRepository,
+    private val productImagesRepository: ProductImagesRepository,
     private val userPreferencesDataSource: UserPreferencesDataSource,
     @Dispatcher(ErplyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(appContext, workerParams), Synchronizer {
@@ -46,20 +48,17 @@ class SyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         // First sync the repositories in parallel
         setForeground(appContext.syncForegroundInfo())
-        val syncedSuccessfully = awaitAll(
-            async { productGroupsRepository.sync() },
-            async {
-                // tiny delay to ensure they both don't re-authentication
-                delay(500)
-                productsRepository.sync()
-            },
-        ).all { it }
 
-        if (syncedSuccessfully) {
-            Result.success()
-        } else {
-            Result.retry()
+        val syncedSuccessfully = coroutineScope {
+            val deferredGroups = async { productGroupsRepository.sync() }
+            // tiny delay to ensure they all don't re-authentication
+            delay(500)
+            val deferredImages = async { productImagesRepository.sync() }
+            val deferredProducts = async { productsRepository.sync() }
+            awaitAll(deferredGroups, deferredImages, deferredProducts).all { it }
         }
+
+        if (syncedSuccessfully) Result.success() else Result.retry()
     }
 
     override suspend fun getChangeListVersions(): LastSyncTimestamps =
