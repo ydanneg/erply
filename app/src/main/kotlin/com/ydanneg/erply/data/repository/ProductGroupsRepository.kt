@@ -15,6 +15,7 @@ import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -55,8 +56,8 @@ class ProductGroupsRepository @Inject constructor(
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::productGroupsLastSyncTimestamp,
             serverVersionFetcher = { 0L },
-            deletedListFetcher = { listOf() }, // not supported
-            updatedListFetcher = { erplyNetworkDataSource.fetchProductGroups(token, it) },
+            deletedListFetcher = { flowOf() }, // not supported
+            updatedListFetcher = { erplyNetworkDataSource.fetchAllProductGroups(token, it) },
             versionUpdater = { copy(productGroupsLastSyncTimestamp = it) },
             modelDeleter = { erplyProductGroupDao.delete(clientCode, it) },
             modelUpdater = { erplyProductGroupDao.upsert(it.toModelList(clientCode)) },

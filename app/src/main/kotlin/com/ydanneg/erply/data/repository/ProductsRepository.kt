@@ -57,8 +57,8 @@ class ProductsRepository @Inject constructor(
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::productsLastSyncTimestamp,
             serverVersionFetcher = { erplyNetworkDataSource.fetchServerTimestamp(token) },
-            deletedListFetcher = { erplyNetworkDataSource.fetchDeletedProductIds(token, it) },
-            updatedListFetcher = { erplyNetworkDataSource.fetchProducts(token, it) },
+            deletedListFetcher = { erplyNetworkDataSource.fetchAllDeletedProductIds(token, it) },
+            updatedListFetcher = { erplyNetworkDataSource.fetchAllProducts(token, it) },
             versionUpdater = { copy(productsLastSyncTimestamp = it) },
             modelDeleter = { erplyProductDao.delete(clientCode, it) },
             modelUpdater = { erplyProductDao.upsert(it.toModelList(clientCode)) },

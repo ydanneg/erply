@@ -21,6 +21,9 @@ import com.ydanneg.erply.data.datastore.LastSyncTimestamps
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -70,8 +73,8 @@ private suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> = 
 suspend fun <T> Synchronizer.changeListSync(
     versionReader: (LastSyncTimestamps) -> Long,
     serverVersionFetcher: suspend () -> Long,
-    updatedListFetcher: suspend (Long) -> List<T>,
-    deletedListFetcher: suspend (Long) -> List<String>,
+    updatedListFetcher: suspend (Long) -> Flow<List<T>>,
+    deletedListFetcher: suspend (Long) -> Flow<List<String>>,
     versionUpdater: LastSyncTimestamps.(Long) -> LastSyncTimestamps,
     modelDeleter: suspend (List<String>) -> Unit,
     modelUpdater: suspend (List<T>) -> Unit,
@@ -79,21 +82,31 @@ suspend fun <T> Synchronizer.changeListSync(
     val latestSyncVersion = serverVersionFetcher()
     val previousSyncVersion = versionReader(getChangeListVersions())
 
-    val (deleted, updated) = coroutineScope {
-        val deferredDeleted = async { if (previousSyncVersion > 0) deletedListFetcher(previousSyncVersion) else listOf() }
-        val deferredUpdated = async { updatedListFetcher(previousSyncVersion) }
-        Pair(deferredDeleted.await(), deferredUpdated.await())
+    coroutineScope {
+        launch {
+            if (previousSyncVersion > 0)
+                deletedListFetcher(previousSyncVersion).collect {
+                    modelDeleter(it)
+                }
+        }
+        launch {
+            updatedListFetcher(previousSyncVersion)
+                .collect {
+                    modelUpdater(it)
+                }
+        }
+//        Pair(deferredDeleted.await(), deferredUpdated.await())
     }
+//
+//    if (deleted.isEmpty() && updated.isEmpty()) {
+//        // no changes, return
+//        return@suspendRunCatching true
+//    }
 
-    if (deleted.isEmpty() && updated.isEmpty()) {
-        // no changes, return
-        return@suspendRunCatching true
-    }
-
-    // Delete models that have been deleted server-side
-    modelDeleter(deleted)
-    // Using the change list, pull down and save the changes (akin to a git pull)
-    modelUpdater(updated)
+//    // Delete models that have been deleted server-side
+//    modelDeleter(deleted)
+//    // Using the change list, pull down and save the changes (akin to a git pull)
+//    modelUpdater(updated)
 
     // Update the last synced version (akin to updating local git HEAD)
     updateChangeListVersions {

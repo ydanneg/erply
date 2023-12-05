@@ -10,6 +10,11 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.yield
+
+typealias PageFetcher<T> = suspend (Int, Int) -> List<T>
 
 class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
@@ -25,7 +30,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     }
 
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> {
-        val url = "v1/product/group?skip=0&take=$PAGE_SIZE&filter=[$showInWebFilter]&withTotalCount=1"
+        val url = "v1/product/group?skip=0&take=$PAGE_SIZE&filter=[$showInWebShopFilter]&withTotalCount=1"
         return executeOrThrow {
             httpClient.get(url) {
                 headers {
@@ -39,10 +44,19 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         fetchProducts(token = token, filter = groupIdFilter(groupId)) //TODO: add more filters (e.g. 'show_in_webshop')
     }
 
+
+    suspend fun fetchAllProductGroups(token: String, changedSince: Long? = null): Flow<List<ErplyProductGroup>> =
+        fetchAllPages { skip, take ->
+            fetchProductGroups(token = token, changedSince = changedSince, skip = skip, take = take)
+        }
+
     suspend fun fetchProductGroups(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProductGroup> =
         executeOrThrow {
             val url = "v1/product/group?skip=$skip&take=$take&withTotalCount=1".let { url ->
-                if (changedSince != null) "$url&filter=[${changedFilter(changedSince)}]" else url
+                val filter = showInWebShopFilter.let {
+                    if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
+                }
+                "$url&filter=[$filter]"
             }
             httpClient.get(url) {
                 headers {
@@ -55,13 +69,19 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         TODO("PIM has no such functionality?")
     }
 
+    //
+    suspend fun fetchAllProducts(token: String, changedSince: Long? = null): Flow<List<ErplyProduct>> =
+        fetchAllPages { skip, take ->
+            fetchProducts(token, changedSince, skip = skip, take = take)
+        }
+
     suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> = executeOrThrow {
         val fields = fields("id", "type", "group_id", "name", "price", "changed")
         val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let { url ->
-            val filter = showInWebFilter.let {
+            val filter = displayedInWebShopFilter.let {
                 if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
             }
-            "$url&filter=[$filter]"
+            "$url&filter=[$filter,\"and\",[\"status\",\"=\",\"ACTIVE\"]]"
         }
         httpClient.get(url) {
             headers {
@@ -70,8 +90,14 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         }.body()
     }
 
-    suspend fun fetchDeletedProductIds(token: String, changedSince: Long): List<String> {
-        val url = "v1/product/deleted/ids?skip=0&take=$PAGE_SIZE"
+
+    suspend fun fetchAllDeletedProductIds(token: String, changedSince: Long): Flow<List<String>> =
+        fetchAllPages { skip, take ->
+            fetchDeletedProductIds(token, changedSince, skip = skip, take = take)
+        }
+
+    suspend fun fetchDeletedProductIds(token: String, changedSince: Long, skip: Int = 0, take: Int = PAGE_SIZE): List<String> {
+        val url = "v1/product/deleted/ids?skip=$skip&take=$take"
         return executeOrThrow {
             httpClient.get(url) {
                 headers {
@@ -81,21 +107,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
             }.body()
         }
     }
-//
-//    suspend fun fetchAllProducts(token: String): Flow<List<ErplyProduct>> {
-//        return flow {
-//            var skip = 0
-//            while (true) {
-//                val products = fetchProducts(token, skip = skip, take = PAGE_SIZE)
-//                if (products.isEmpty()) {
-//                    break
-//                }
-//                emit(products)
-//                yield()
-//                skip += PAGE_SIZE
-//            }
-//        }
-//    }
+
 
     private suspend fun fetchProducts(token: String, filter: String? = null, skip: Int = 0, take: Int = 1000): List<ErplyProduct> {
         val fields = fields("id", "type", "group_id", "name", "price", "changed")
@@ -113,8 +125,18 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         [["group_id","=","$groupId"]]
         """.trimIndent()
 
-    private val showInWebFilter = """
+    /**
+     * For groups
+     */
+    private val showInWebShopFilter = """
         ["show_in_webshop","=","1"]
+        """.trimIndent()
+
+    /**
+     * For products
+     */
+    private val displayedInWebShopFilter = """
+        ["displayed_in_webshop","=","1"]
         """.trimIndent()
 
     private fun changedFilter(changedSince: Long) = """
@@ -139,6 +161,25 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
             }
 
             else -> throw ErplyApiException(ErplyApiError.Unknown)
+        }
+    }
+
+    private fun <T> fetchAllPages(pageSize: Int = PAGE_SIZE, fetchPage: PageFetcher<T>): Flow<List<T>> {
+        return flow {
+            var skip = 0
+            while (true) {
+                val products = fetchPage(skip, pageSize)
+                println("fetched: ${products.size}")
+                if (products.isEmpty()) {
+                    break
+                }
+                emit(products)
+//                if (products.size < PAGE_SIZE) {
+//                    break
+//                }
+                yield()
+                skip += pageSize
+            }
         }
     }
 

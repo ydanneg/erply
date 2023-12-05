@@ -166,7 +166,7 @@ class RoomSchemaArgProvider(
 fun VariantDimension.configureErplyClient() {
     stringBuildConfig("CLIENT_USER_AGENT", "com.ydanneg.erply")
     stringBuildConfig("CLIENT_PIM_BASE_URL", "https://api-pim-eu10.erply.com")
-    clientLogLevelConfig(ClientLogLevels.ALL)
+    clientLogLevelConfig(ClientLogLevels.INFO)
     intBuildConfig("CLIENT_CONNECT_TIMEOUT_SECONDS", 10)
     intBuildConfig("CLIENT_READ_TIMEOUT_SECONDS", 60)
     intBuildConfig("CLIENT_WRITE_TIMEOUT_SECONDS", 30)
