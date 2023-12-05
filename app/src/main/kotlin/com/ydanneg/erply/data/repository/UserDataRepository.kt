@@ -9,7 +9,11 @@ class UserDataRepository @Inject constructor(
     userSessionRepository: UserSessionRepository,
     userPreferencesDataSource: UserPreferencesDataSource
 ) {
-    val userData = combine(userSessionRepository.userSession, userPreferencesDataSource.userPreferences) { userSession, userPreferences ->
+
+    val userData = combine(
+        userSessionRepository.userSession,
+        userPreferencesDataSource.userPreferences
+    ) { userSession, userPreferences ->
         UserData(
             session = userSession,
             prefs = userPreferences

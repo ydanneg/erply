@@ -44,8 +44,7 @@ class UserSessionRepository @Inject constructor(
     }
 
     private suspend fun reLogin() {
-        val storedSession = userSession.first()
-        login(storedSession.clientCode, storedSession.username, storedSession.password!!)
+        with(userSession.first()) { login(clientCode, username, password!!) }
     }
 
     suspend fun <T> tryAuthenticateUnauthorized(enabled: Boolean = true, block: suspend () -> T): T {

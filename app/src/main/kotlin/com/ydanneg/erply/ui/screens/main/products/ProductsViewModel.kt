@@ -8,7 +8,7 @@ import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
-import com.ydanneg.erply.data.repository.ProductImagesRepository
+import com.ydanneg.erply.data.repository.ProductWithImagesRepository
 import com.ydanneg.erply.database.mappers.fromEntity
 import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductPictureEntity
@@ -42,7 +42,7 @@ fun ProductWithImages.imageUrl(): String? = images.firstOrNull()?.let { "https:/
 class ProductsScreenViewModel @Inject constructor(
     productGroupsRepository: ProductGroupsRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val productImagesRepository: ProductImagesRepository,
+    private val productWithImagesRepository: ProductWithImagesRepository,
     private val workManagerSyncManager: WorkManagerSyncManager
 ) : ViewModel() {
 
@@ -51,9 +51,9 @@ class ProductsScreenViewModel @Inject constructor(
     private val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
             if (query?.isNotBlank() == true) {
-                productImagesRepository.productsWithImagesByName(groupId, query)
+                productWithImagesRepository.productsWithImagesByName(groupId, query)
             } else {
-                productImagesRepository.productsWithImages(groupId)
+                productWithImagesRepository.productsWithImages(groupId)
             }
         }
 

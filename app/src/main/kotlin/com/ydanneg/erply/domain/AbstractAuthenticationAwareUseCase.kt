@@ -1,35 +1,35 @@
 package com.ydanneg.erply.domain
 
+import android.util.Log
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
-import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
-import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.UserSessionRepository
+import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class GetProductGroupsFromRemoteUseCase @Inject constructor(
-    private val productGroupsRepository: ProductGroupsRepository,
+abstract class AbstractAuthenticationAwareUseCase(
+    userPreferencesDataSource: UserPreferencesDataSource,
     private val userSessionRepository: UserSessionRepository,
-    userPreferencesDataSource: UserPreferencesDataSource
 ) {
-
     private val isKeepMeSignedIn = userPreferencesDataSource.userPreferences
         .map { it.isKeepMeSignedIn }
 
-    suspend operator fun invoke(): List<ErplyProductGroup> {
+    protected suspend fun <T> withAuthenticationAware(defaultValue: T, block: suspend () -> T): T {
         val keepMeSignedIn = isKeepMeSignedIn.first()
+        Log.i(TAG, "withAuthenticationAware")
         try {
-            return userSessionRepository.tryAuthenticateUnauthorized(keepMeSignedIn) { productGroupsRepository.updateProductGroups() }
+            return userSessionRepository.tryAuthenticateUnauthorized(keepMeSignedIn, block)
         } catch (e: ErplyApiException) {
+            Log.e(TAG, "withAuthenticationAware", e)
             if (e.type == ErplyApiError.Unauthorized) {
                 // still 401? log out now!
                 userSessionRepository.logout()
-                return emptyList()
+                return defaultValue
             }
             throw e
         }
     }
+
 }
