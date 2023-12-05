@@ -13,8 +13,18 @@ import io.ktor.http.HttpStatusCode
 
 class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
+    suspend fun fetchTimestamp(token: String): Long {
+        // take only one item as an optimization
+        return httpClient.get("v1/product?fields=id&skip=0&take=1") {
+            headers {
+                append("jwt", token)
+            }
+        }.let {
+            it.headers["request-time-unix"]?.toLong() ?: 0
+        }
+    }
+
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> {
-        val fields = fields("id", "parent_id", "order", "name", "changed")
         val url = "v1/product/group?skip=0&take=$PAGE_SIZE&filter=[$showInWebFilter]&withTotalCount=1"
         return executeOrThrow {
             httpClient.get(url) {
@@ -42,7 +52,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         }
 
     suspend fun fetchDeletedProductGroups(token: String, changedSince: Long? = null): List<String> {
-        TODO("PIM has no such functionality")
+        TODO("PIM has no such functionality?")
     }
 
     suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> = executeOrThrow {

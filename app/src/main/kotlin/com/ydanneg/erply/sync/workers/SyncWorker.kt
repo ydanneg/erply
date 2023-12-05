@@ -21,6 +21,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -39,14 +40,19 @@ class SyncWorker @AssistedInject constructor(
     @Dispatcher(ErplyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(appContext, workerParams), Synchronizer {
 
-    override suspend fun getForegroundInfo(): ForegroundInfo =
-        appContext.syncForegroundInfo()
+//    override suspend fun getForegroundInfo(): ForegroundInfo =
+//        appContext.syncForegroundInfo()
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         // First sync the repositories in parallel
+        setForeground(appContext.syncForegroundInfo())
         val syncedSuccessfully = awaitAll(
-            async { productsRepository.sync() },
             async { productGroupsRepository.sync() },
+            async {
+                // tiny delay to ensure they both don't re-authentication
+                delay(500)
+                productsRepository.sync()
+            },
         ).all { it }
 
         if (syncedSuccessfully) {

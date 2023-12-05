@@ -1,6 +1,6 @@
 package com.ydanneg.erply.ui.screens.main.catalog
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
@@ -27,14 +28,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
-import com.ydanneg.erply.ui.components.FadedProgressIndicator
 import com.ydanneg.erply.ui.screens.main.MainScreenState
 import com.ydanneg.erply.ui.screens.main.catalog.ProductGroupsScreenUiState.Loading.isLoading
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
@@ -62,6 +61,15 @@ private fun ProductGroupPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@PreviewThemes
+@Composable
+private fun ProductGroupEmptyPreview() {
+    ErplyThemePreviewSurface {
+        ProductGroupsScreenContent(groups = listOf())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductGroupsScreen(
     mainScreenState: MainScreenState,
@@ -72,30 +80,22 @@ fun ProductGroupsScreen(
 
     val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading() })
 
+    Log.i("ProductGroupsScreen", "uiState: $uiState")
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
             viewModel.loadProductGroups()
-            pullToRefreshState.endRefresh()
             onDispose { }
         }
     }
 
     LaunchedEffect(uiState, pullToRefreshState) {
         when (uiState) {
-            is ProductGroupsScreenUiState.Success, is ProductGroupsScreenUiState.Error -> pullToRefreshState.endRefresh()
-            else -> {}
-        }
-    }
-
-    val context = LocalContext.current
-    if (uiState is ProductGroupsScreenUiState.Error) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, "Failed to update data", Toast.LENGTH_SHORT).show()
+            is ProductGroupsScreenUiState.Loading -> pullToRefreshState.startRefresh()
+            else -> pullToRefreshState.endRefresh()
         }
     }
 
     ProductGroupsScreenContent(
-        isLoading = uiState.isLoading(),
         groups = groups,
         onGroupClicked = onGroupSelected,
         pullToRefreshState = pullToRefreshState,
@@ -107,7 +107,6 @@ fun ProductGroupsScreen(
 @Composable
 private fun ProductGroupsScreenContent(
     groups: List<ErplyProductGroup>,
-    isLoading: Boolean = false,
     onGroupClicked: (String) -> Unit = {},
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
@@ -123,36 +122,37 @@ private fun ProductGroupsScreenContent(
         content = { paddingValues ->
             Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .nestedScroll(pullToRefreshState.nestedScrollConnection)
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                LazyVerticalGrid(
-                    modifier = Modifier.fillMaxSize(),
-                    columns = GridCells.Adaptive(minSize = 128.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(groups, key = { it.id }) {
-                        Box(
-                            modifier = Modifier
-                                .size(128.dp)
-                                .clickable { onGroupClicked(it.id) }, contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = it.name.en, textAlign = TextAlign.Center)
+                if (groups.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        columns = GridCells.Adaptive(minSize = 128.dp),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(groups, key = { it.id }) {
+                            Box(
+                                modifier = Modifier
+                                    .size(128.dp)
+                                    .clickable { onGroupClicked(it.id) }, contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = it.name.en, textAlign = TextAlign.Center)
+                            }
                         }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = "syncing...", style = MaterialTheme.typography.titleLarge)
                     }
                 }
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
-                FadedProgressIndicator(isLoading)
             }
         },
 
-    )
-}
-@Composable
-private fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
-    val context = LocalContext.current
-    Toast.makeText(context, message, duration).show()
+        )
 }

@@ -15,6 +15,8 @@ class ErplyNetworkDataSource @Inject constructor(
     @Dispatcher(ErplyDispatchers.IO) private val dispatcher: CoroutineDispatcher,
 ) {
 
+    suspend fun fetchServerTimestamp(token: String): Long = erplyApiClient.products.fetchTimestamp(token)
+
     suspend fun listProductGroups(token: String): List<ErplyProductGroup> = withContext(dispatcher) {
         erplyApiClient.products.listProductGroups(token)
     }

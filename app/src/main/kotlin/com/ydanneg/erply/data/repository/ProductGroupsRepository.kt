@@ -8,13 +8,13 @@ import com.ydanneg.erply.database.dao.ErplyProductGroupDao
 import com.ydanneg.erply.database.mappers.fromEntity
 import com.ydanneg.erply.database.mappers.toEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
-import com.ydanneg.erply.model.isLoggedIn
 import com.ydanneg.erply.sync.Syncable
 import com.ydanneg.erply.sync.Synchronizer
 import com.ydanneg.erply.sync.changeListSync
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -44,18 +44,24 @@ class ProductGroupsRepository @Inject constructor(
     private fun Flow<List<ProductGroupEntity>>.toModel() = map { entities -> entities.map { it.fromEntity() } }
 
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean {
-        val userSession = userSessionRepository.userSession.first()
-        if (!userSession.isLoggedIn()) {
-            Log.d(TAG, "Sync skipped. Not logged in.")
+        val userSession = userSessionRepository.userSession.firstOrNull()
+        if (userSession?.token == null) {
+            Log.d(TAG, "Sync Product groups skipped. Not logged in.")
             return false
         }
+
+        val token = userSession.token
+        val clientCode = userSession.clientCode
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::productGroupsLastSyncTimestamp,
-            deletedListFetcher = { erplyNetworkDataSource.fetchDeletedProductIds(userSession.token!!, it) },
-            updatedListFetcher = { erplyNetworkDataSource.fetchProductGroups(userSession.token!!, it) },
+            serverVersionFetcher = { 0L },
+            deletedListFetcher = { listOf() }, // not supported
+            updatedListFetcher = { erplyNetworkDataSource.fetchProductGroups(token, it) },
             versionUpdater = { copy(productGroupsLastSyncTimestamp = it) },
-            modelDeleter = { erplyProductGroupDao.delete(userSession.clientCode, it) },
-            modelUpdater = { erplyProductGroupDao.upsert(it.map { group -> group.toEntity(userSession.clientCode) }) },
+            modelDeleter = { erplyProductGroupDao.delete(clientCode, it) },
+            modelUpdater = { erplyProductGroupDao.upsert(it.toModelList(clientCode)) },
         )
     }
+
+    private fun List<ErplyProductGroup>.toModelList(clientCode: String) = map { it.toEntity(clientCode) }
 }

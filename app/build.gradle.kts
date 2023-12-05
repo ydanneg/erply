@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.VariantDimension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -23,6 +25,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        configureErplyClient()
     }
 
     buildTypes {
@@ -40,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.5"
@@ -157,3 +162,49 @@ class RoomSchemaArgProvider(
 ) : CommandLineArgumentProvider {
     override fun asArguments() = listOf("room.schemaLocation=${schemaDir.path}")
 }
+
+fun VariantDimension.configureErplyClient() {
+    stringBuildConfig("CLIENT_USER_AGENT", "com.ydanneg.erply")
+    stringBuildConfig("CLIENT_PIM_BASE_URL", "https://api-pim-eu10.erply.com")
+    clientLogLevelConfig(ClientLogLevels.ALL)
+    intBuildConfig("CLIENT_CONNECT_TIMEOUT_SECONDS", 10)
+    intBuildConfig("CLIENT_READ_TIMEOUT_SECONDS", 60)
+    intBuildConfig("CLIENT_WRITE_TIMEOUT_SECONDS", 30)
+}
+
+enum class ClientLogLevels {
+    ALL, HEADERS, BODY, INFO, NONE
+}
+
+fun VariantDimension.clientLogLevelConfig(level: ClientLogLevels) {
+    stringBuildConfig("CLIENT_LOG_LEVEL", level.name)
+}
+
+object BuildConfigTypes {
+    const val BOOLEAN = "boolean"
+    const val STRING = "String"
+    const val INT = "int"
+}
+
+object BuildConfigValues {
+    const val TRUE = "true"
+    const val FALSE = "false"
+}
+
+fun VariantDimension.boolBuildConfig(name: String, value: Boolean) {
+    buildConfigField(BuildConfigTypes.BOOLEAN, name, if (value) BuildConfigValues.TRUE else BuildConfigValues.FALSE)
+}
+
+fun VariantDimension.intBuildConfig(name: String, value: Int) {
+    buildConfigField(BuildConfigTypes.INT, name, value.toString())
+}
+
+fun VariantDimension.longBuildConfig(name: String, value: Long) {
+    buildConfigField(BuildConfigTypes.INT, name, value.toString())
+}
+
+fun VariantDimension.stringBuildConfig(name: String, value: String) {
+    buildConfigField(BuildConfigTypes.STRING, name, value.quoted())
+}
+
+fun String.quoted(): String = "\"$this\""
