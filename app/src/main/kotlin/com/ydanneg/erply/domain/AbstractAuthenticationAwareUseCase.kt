@@ -5,6 +5,7 @@ import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
+import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -16,9 +17,8 @@ abstract class AbstractAuthenticationAwareUseCase(
     private val isKeepMeSignedIn = userPreferencesDataSource.userPreferences
         .map { it.isKeepMeSignedIn }
 
-    protected suspend fun <T> withAuthenticationAware(defaultValue: T, block: suspend () -> T): T {
+    protected suspend fun <T> withAuthenticationAware(defaultValue: T, block: suspend (UserSession) -> T): T {
         val keepMeSignedIn = isKeepMeSignedIn.first()
-        Log.i(TAG, "withAuthenticationAware")
         try {
             return userSessionRepository.tryAuthenticateUnauthorized(keepMeSignedIn, block)
         } catch (e: ErplyApiException) {

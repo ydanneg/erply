@@ -9,6 +9,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkerParameters
 import com.ydanneg.erply.data.datastore.LastSyncTimestamps
 import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
+import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.di.Dispatcher
 import com.ydanneg.erply.di.ErplyDispatchers
 import com.ydanneg.erply.domain.GetServerVersionUseCase
@@ -41,6 +42,7 @@ class SyncWorker @AssistedInject constructor(
     private val syncProductImagesUseCase: SyncProductImagesUseCase,
     private val getServerVersionUseCase: GetServerVersionUseCase,
     private val userPreferencesDataSource: UserPreferencesDataSource,
+    private val userSessionRepository: UserSessionRepository,
     @Dispatcher(ErplyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(appContext, workerParams), Synchronizer {
 
@@ -48,14 +50,10 @@ class SyncWorker @AssistedInject constructor(
 //        appContext.syncForegroundInfo()
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
-        try {
-            // ensure authenticated!
-            getServerVersionUseCase.invoke()
-        } catch (e: Throwable) {
-            Log.e(TAG, "error", e)
-            return@withContext Result.failure()
-        }
-
+        // Login to be sure token is not expired within a sync job
+        runCatching {
+            userSessionRepository.tryLogin()
+        }.getOrNull() ?: return@withContext Result.failure()
 
         val syncedSuccessfully = coroutineScope {
             val deferredGroups = async { syncProductGroupsUseCase.sync() }
@@ -63,6 +61,7 @@ class SyncWorker @AssistedInject constructor(
             val deferredProducts = async { syncProductsUseCase.sync() }
             awaitAll(deferredGroups, deferredImages, deferredProducts).all { it }
         }
+        Log.i(TAG, "doWork complete: $syncedSuccessfully")
 
         if (syncedSuccessfully) Result.success() else Result.retry()
     }

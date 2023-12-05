@@ -11,7 +11,6 @@ fun <T> fetchAllPages(pageSize: Int, fetchPage: PageFetcher<T>): Flow<List<T>> {
         var skip = 0
         while (true) {
             val products = fetchPage(skip, pageSize)
-            println("fetched: ${products.size}")
             if (products.isEmpty()) {
                 break
             }

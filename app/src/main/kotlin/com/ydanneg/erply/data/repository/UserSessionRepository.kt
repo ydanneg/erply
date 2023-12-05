@@ -1,5 +1,6 @@
 package com.ydanneg.erply.data.repository
 
+import android.util.Log
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.crypto.EncryptionManager
@@ -8,6 +9,7 @@ import com.ydanneg.erply.data.datastore.UserSessionDataSource
 import com.ydanneg.erply.data.datastore.mapper.toModel
 import com.ydanneg.erply.datastore.passwordOrNull
 import com.ydanneg.erply.model.UserSession
+import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -43,17 +45,23 @@ class UserSessionRepository @Inject constructor(
         userSessionDataSource.setVerifiedUser(clientCode, encryptedPassword, verifiedUser)
     }
 
-    private suspend fun reLogin() {
+    suspend fun tryLogin() {
         with(userSession.first()) { login(clientCode, username, password!!) }
     }
 
-    suspend fun <T> tryAuthenticateUnauthorized(enabled: Boolean = true, block: suspend () -> T): T {
+    suspend fun <T> tryAuthenticateUnauthorized(enabled: Boolean = true, block: suspend (UserSession) -> T): T {
         return try {
-            block()
+            val first = userSession.first()
+            Log.i(TAG, "tryAuthenticateUnauthorized.executing: $first")
+            block(first)
         } catch (e: ErplyApiException) {
+            Log.e(TAG, "tryAuthenticateUnauthorized: $e")
             if (enabled && e.type == ErplyApiError.Unauthorized) {
-                reLogin()
-                block()
+            Log.i(TAG, "tryAuthenticateUnauthorized.reLogin()...")
+                tryLogin()
+                val first = userSession.first()
+                Log.i(TAG, "tryAuthenticateUnauthorized.block(): $first")
+                block(first)
             } else {
                 throw e
             }

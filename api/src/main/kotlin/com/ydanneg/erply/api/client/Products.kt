@@ -13,6 +13,7 @@ import io.ktor.client.request.headers
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlin.random.Random
 
 
 class ProductsApi internal constructor(private val httpClient: HttpClient) {

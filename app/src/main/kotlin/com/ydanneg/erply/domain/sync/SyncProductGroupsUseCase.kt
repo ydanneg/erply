@@ -28,13 +28,12 @@ class SyncProductGroupsUseCase @Inject constructor(
             return false
         }
 
-        val token = userSession.token
         val clientCode = userSession.clientCode
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::productGroupsLastSyncTimestamp,
             serverVersionFetcher = { 0L },
             deletedListFetcher = { flowOf() }, // not supported?
-            updatedListFetcher = { getAllProductGroupsFromRemoteUseCase.invoke(token, it) },
+            updatedListFetcher = { getAllProductGroupsFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(productGroupsLastSyncTimestamp = it) },
             modelDeleter = { erplyProductGroupDao.delete(clientCode, it) },
             modelUpdater = { erplyProductGroupDao.upsert(it.toModelList(clientCode)) },

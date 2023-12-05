@@ -31,13 +31,12 @@ class SyncProductsUseCase @Inject constructor(
             return false
         }
 
-        val token = userSession.token
         val clientCode = userSession.clientCode
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::productsLastSyncTimestamp,
             serverVersionFetcher = { getServerVersionUseCase.invoke() },
-            deletedListFetcher = { getAllDeletedProductsFromRemoteUseCase(token, it) },
-            updatedListFetcher = { getAllProductsFromRemoteUseCase(token, it) },
+            deletedListFetcher = { getAllDeletedProductsFromRemoteUseCase(it) },
+            updatedListFetcher = { getAllProductsFromRemoteUseCase(it) },
             versionUpdater = { copy(productsLastSyncTimestamp = it) },
             modelDeleter = { erplyProductDao.delete(clientCode, it) },
             modelUpdater = { erplyProductDao.upsert(it.toModelList(clientCode)) },

@@ -30,13 +30,12 @@ class SyncProductImagesUseCase @Inject constructor(
             return false
         }
 
-        val token = userSession.token
         val clientCode = userSession.clientCode
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::picturesLastSyncTimestamp,
             serverVersionFetcher = { getServerVersionUseCase.invoke() },
             deletedListFetcher = { flowOf() },
-            updatedListFetcher = { getAllProductImagesFromRemoteUseCase.invoke(token, it) },
+            updatedListFetcher = { getAllProductImagesFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(picturesLastSyncTimestamp = it) },
             modelDeleter = { erplyProductImageDao.delete(clientCode, it) },
             modelUpdater = { erplyProductImageDao.upsert(it.toModelList(clientCode)) },

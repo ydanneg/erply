@@ -14,8 +14,8 @@ class GetAllProductGroupsFromRemoteUseCase @Inject constructor(
     private val erplyNetworkDataSource: ErplyNetworkDataSource
 ) : AbstractAuthenticationAwareUseCase(userPreferencesDataSource, userSessionRepository) {
 
-    suspend operator fun invoke(token: String, changedSince: Long?): Flow<List<ErplyProductGroup>> =
-        withAuthenticationAware(flowOf()) {
-            erplyNetworkDataSource.fetchAllProductGroups(token, changedSince)
+    suspend operator fun invoke(changedSince: Long?): Flow<List<ErplyProductGroup>> =
+        withAuthenticationAware(flowOf()) { auth ->
+            erplyNetworkDataSource.fetchAllProductGroups(auth.token!!, changedSince)
         }
 }
