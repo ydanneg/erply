@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.ProductsRepository
@@ -18,22 +19,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-const val GROUP_ID_STATE_KEY = "groupId"
-const val SEARCH_QUERY_KEY = "searchQuery"
-
 data class UiState(
-    val group: ErplyProductGroup?,
-    val isLoading: Boolean,
-    val searchQuery: String?
+    val group: ErplyProductGroup? = null,
+    val products: List<ErplyProduct> = listOf(),
+    val isLoading: Boolean = false,
+    val searchQuery: String? = null
 )
-
-sealed class ProductsScreenUiState {
-    data object Loading : ProductsScreenUiState()
-    data object Success : ProductsScreenUiState()
-
-    fun ProductsScreenUiState.isLoading() = this is Loading
-
-}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -46,26 +37,30 @@ class ProductsScreenViewModel @Inject constructor(
 
     private val groupId: String = checkNotNull(savedStateHandle[GROUP_ID_STATE_KEY])
 
-    val uiState = combine(
-        productGroupsRepository.group(groupId).distinctUntilChanged(),
-        workManagerSyncManager.isSyncing.distinctUntilChanged(),
-        savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
-    ) { group, isSyncing, searchQuery ->
-        UiState(
-            group = group,
-            isLoading = isSyncing,
-            searchQuery = searchQuery
-        )
-    }.toStateFlow(viewModelScope, UiState(null, true, null))
-
-    val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
+    private val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
             if (query?.isNotBlank() == true) {
                 productsRepository.productsByGroupIdAndNameLike(groupId, query)
             } else {
                 productsRepository.productsByGroupId(groupId)
             }
-        }.toStateFlow(viewModelScope, listOf())
+        }
+
+    val uiState = combine(
+        productGroupsRepository.group(groupId).distinctUntilChanged(),
+        workManagerSyncManager.isSyncing.distinctUntilChanged(),
+        savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null),
+        filteredProducts
+    ) { group, isSyncing, searchQuery, products ->
+        UiState(
+            group = group,
+            products = products,
+            isLoading = isSyncing,
+            searchQuery = searchQuery
+        )
+    }.toStateFlow(
+        viewModelScope, UiState(isLoading = true)
+    )
 
     fun setSearchQuery(search: String?) {
         savedStateHandle[SEARCH_QUERY_KEY] = search
@@ -76,5 +71,11 @@ class ProductsScreenViewModel @Inject constructor(
         viewModelScope.launch {
             workManagerSyncManager.requestSync()
         }
+    }
+
+    companion object {
+        private const val GROUP_ID_STATE_KEY = "groupId"
+        private const val SEARCH_QUERY_KEY = "searchQuery"
+
     }
 }

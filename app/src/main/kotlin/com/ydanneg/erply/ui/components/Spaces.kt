@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun VSpace(height: Dp) {
+fun VSpace(height: Dp = 0.dp) {
     Spacer(modifier = Modifier.height(height))
 }
 
 @Composable
-fun HSpace(width: Dp) {
+fun HSpace(width: Dp = 0.dp) {
     Spacer(modifier = Modifier.width(width))
 }
 
@@ -25,7 +26,6 @@ fun ColumnScope.WSpace(weight: Float = 1.0f) {
 }
 
 @Composable
-fun RowScope.WSpace() {
-    Spacer(modifier = Modifier.weight(1.0f))
+fun RowScope.WSpace(weight: Float = 1.0f) {
+    Spacer(modifier = Modifier.weight(weight))
 }
-

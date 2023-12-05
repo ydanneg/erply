@@ -3,21 +3,21 @@ package com.ydanneg.erply.ui.screens.main.catalog
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.sync.WorkManagerSyncManager
 import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class ProductGroupsScreenUiState {
-    data object Loading : ProductGroupsScreenUiState()
-    data object Success : ProductGroupsScreenUiState()
-
-    fun ProductGroupsScreenUiState.isLoading() = this is Loading
-}
+data class UiState(
+    val groups: List<ErplyProductGroup> = listOf(),
+    val isLoading: Boolean = false
+)
 
 @HiltViewModel
 class ProductGroupsScreenViewModel @Inject constructor(
@@ -25,11 +25,15 @@ class ProductGroupsScreenViewModel @Inject constructor(
     private val workManagerSyncManager: WorkManagerSyncManager
 ) : ViewModel() {
 
-    val uiState = workManagerSyncManager.isSyncing
-        .map { if (it) ProductGroupsScreenUiState.Loading else ProductGroupsScreenUiState.Success }
-        .toStateFlow(viewModelScope, ProductGroupsScreenUiState.Loading)
-
-    val groups = productGroupsRepository.productGroups.toStateFlow(viewModelScope, listOf())
+    val uiState = combine(
+        productGroupsRepository.productGroups,
+        workManagerSyncManager.isSyncing.distinctUntilChanged()
+    ) { groups, isSyncing ->
+        UiState(
+            groups = groups,
+            isLoading = isSyncing
+        )
+    }.toStateFlow(viewModelScope, UiState(isLoading = true))
 
     fun loadProductGroups() {
         Log.d(TAG, "loadProducts...")

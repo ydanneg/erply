@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
@@ -33,8 +32,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
+import com.ydanneg.erply.ui.components.Loading
+import com.ydanneg.erply.ui.components.NothingToShow
 import com.ydanneg.erply.ui.screens.main.MainScreenState
-import com.ydanneg.erply.ui.screens.main.catalog.ProductGroupsScreenUiState.Loading.isLoading
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
 
@@ -74,10 +74,9 @@ fun ProductGroupsScreen(
     mainScreenState: MainScreenState,
     viewModel: ProductGroupsScreenViewModel, onGroupSelected: (String) -> Unit = {}
 ) {
-    val groups by viewModel.groups.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading() })
+    val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading })
 
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
@@ -86,15 +85,14 @@ fun ProductGroupsScreen(
         }
     }
 
-    LaunchedEffect(uiState, pullToRefreshState) {
-        when (uiState) {
-            is ProductGroupsScreenUiState.Loading -> pullToRefreshState.startRefresh()
-            else -> pullToRefreshState.endRefresh()
-        }
+    DisposableEffect(uiState) {
+        if (uiState.isLoading) pullToRefreshState.startRefresh() else pullToRefreshState.endRefresh()
+        onDispose { }
     }
 
     ProductGroupsScreenContent(
-        groups = groups,
+        groups = uiState.groups,
+        isLoading = uiState.isLoading,
         onGroupClicked = onGroupSelected,
         pullToRefreshState = pullToRefreshState,
         drawerState = mainScreenState.drawerState
@@ -105,6 +103,7 @@ fun ProductGroupsScreen(
 @Composable
 private fun ProductGroupsScreenContent(
     groups: List<ErplyProductGroup>,
+    isLoading: Boolean = false,
     onGroupClicked: (String) -> Unit = {},
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
@@ -125,32 +124,28 @@ private fun ProductGroupsScreenContent(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                if (groups.isNotEmpty()) {
-                    LazyVerticalGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        columns = GridCells.Adaptive(minSize = 128.dp),
-                        contentPadding = PaddingValues(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(groups, key = { it.id }) {
-                            Box(
-                                modifier = Modifier
-                                    .size(128.dp)
-                                    .clickable { onGroupClicked(it.id) }, contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = it.name.en, textAlign = TextAlign.Center)
-                            }
+                if (groups.isEmpty()) if (isLoading) Loading() else NothingToShow()
+
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Adaptive(minSize = 128.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(groups, key = { it.id }) {
+                        Box(
+                            modifier = Modifier
+                                .size(128.dp)
+                                .clickable { onGroupClicked(it.id) }, contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = it.name.en, textAlign = TextAlign.Center)
                         }
                     }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "syncing...", style = MaterialTheme.typography.titleLarge)
-                    }
                 }
+
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
             }
-        },
-
-        )
+        }
+    )
 }

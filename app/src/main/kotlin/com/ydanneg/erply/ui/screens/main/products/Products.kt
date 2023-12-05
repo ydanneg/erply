@@ -44,6 +44,8 @@ import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.ErplyProductType
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
+import com.ydanneg.erply.ui.components.Loading
+import com.ydanneg.erply.ui.components.NothingToShow
 import com.ydanneg.erply.ui.screens.main.MainScreenState
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
@@ -80,12 +82,37 @@ private fun ProductsScreenContentPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@PreviewThemes
+@Composable
+private fun ProductsScreenContentEmptyLoadingPreview() {
+    ErplyThemePreviewSurface {
+        ProductsScreenContent(
+            isLoading = true,
+            group = null,
+            products = listOf()
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@PreviewThemes
+@Composable
+private fun ProductsScreenContentEmptyPreview() {
+    ErplyThemePreviewSurface {
+        ProductsScreenContent(
+            isLoading = false,
+            group = null,
+            products = listOf()
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
     mainScreenState: MainScreenState,
     viewModel: ProductsScreenViewModel
 ) {
-    val products by viewModel.filteredProducts.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading })
@@ -109,8 +136,9 @@ fun ProductsScreen(
     }
 
     ProductsScreenContent(
+        isLoading = uiState.isLoading,
         group = uiState.group,
-        products = products,
+        products = uiState.products,
         searchQuery = uiState.searchQuery,
         onSearch = viewModel::setSearchQuery,
         navController = mainScreenState.navController,
@@ -121,6 +149,7 @@ fun ProductsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductsScreenContent(
+    isLoading: Boolean = false,
     group: ErplyProductGroup?,
     products: List<ErplyProduct>,
     searchQuery: String? = null,
@@ -147,58 +176,55 @@ private fun ProductsScreenContent(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                if (products.isNotEmpty()) {
-                    LazyVerticalGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        columns = GridCells.Adaptive(minSize = 128.dp),
-                        contentPadding = PaddingValues(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(products, key = { it.id }) {
-                            Card(
+                if (products.isEmpty()) if (isLoading) Loading() else NothingToShow()
+
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Adaptive(minSize = 128.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(products, key = { it.id }) {
+                        Card(
+                            modifier = Modifier
+                                .size(156.dp)
+                                .clickable { },
+                        ) {
+                            Column(
                                 modifier = Modifier
-                                    .size(156.dp)
-                                    .clickable { },
+                                    .fillMaxSize()
+                                    .padding(4.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(4.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    AsyncImage(
-                                        modifier = Modifier.size(64.dp),
-                                        // FIXME
-                                        model = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
-                                        contentDescription = it.name.en,
-                                        placeholder = placeholder
-                                    )
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        text = it.name.en,
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Spacer(Modifier.weight(1.0f))
-                                    Text(
-                                        text = "\$${it.price}",
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                }
+                                AsyncImage(
+                                    modifier = Modifier.size(64.dp),
+                                    // FIXME
+                                    model = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
+                                    contentDescription = it.name.en,
+                                    placeholder = placeholder
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = it.name.en,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Spacer(Modifier.weight(1.0f))
+                                Text(
+                                    text = "\$${it.price}",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                )
                             }
                         }
                     }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "syncing...", style = MaterialTheme.typography.titleLarge)
-                    }
                 }
+
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
             }
         }
