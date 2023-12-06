@@ -1,3 +1,5 @@
+@file:Suppress("HardCodedStringLiteral")
+
 package com.ydanneg.erply.api.client
 
 import com.ydanneg.erply.api.client.util.fetchAllPages
@@ -55,7 +57,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
     private suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> =
         executeOrThrow {
-            val fields = arrayOf("id", "type", "group_id", "name", "price", "changed").joinToString(",")
+            val fields = arrayOf("id", "type", "group_id", "name", "price", "changed", "description").joinToString(",")
             val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let { url ->
                 val filter = displayedInWebShopFilter.let {
                     if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it

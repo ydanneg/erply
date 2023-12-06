@@ -1,11 +1,15 @@
+@file:Suppress("HardCodedStringLiteral")
+
 package com.ydanneg.erply.database.model
 
 import androidx.room.Entity
+import androidx.room.Fts4
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ydanneg.erply.api.model.ErplyProductType
 
 const val PRODUCTS_TABLE_NAME = "products"
+const val PRODUCTS_FTS_TABLE_NAME = "products_fts"
 const val PRODUCT_GROUPS_TABLE_NAME = "product_groups"
 const val PRODUCT_IMAGES_TABLE_NAME = "product_images"
 
@@ -23,7 +27,8 @@ const val PRODUCT_IMAGES_TABLE_NAME = "product_images"
 )
 
 data class ProductEntity(
-    @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val rowId: Long = 0,
     val id: String,
     val clientCode: String,
     val name: String,
@@ -32,6 +37,13 @@ data class ProductEntity(
     val description: String?,
     val price: String,
     val changed: Long
+)
+
+@Fts4(contentEntity = ProductEntity::class)
+@Entity(tableName = PRODUCTS_FTS_TABLE_NAME)
+data class ProductFtsEntity(
+    val name: String,
+    val description: String?
 )
 
 @Entity(
@@ -45,7 +57,8 @@ data class ProductEntity(
     ],
 )
 data class ProductGroupEntity(
-    @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val rowId: Long = 0,
     val id: String,
     val clientCode: String,
     val name: String,
@@ -62,7 +75,8 @@ data class ProductGroupEntity(
     ]
 )
 data class ProductImageEntity(
-    @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val rowId: Long = 0,
     val id: String,
     val clientCode: String,
     val productId: String,

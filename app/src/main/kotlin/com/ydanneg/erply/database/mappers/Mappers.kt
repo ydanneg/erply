@@ -23,7 +23,7 @@ fun ErplyProduct.toEntity(clientCode: String) = ProductEntity(
     groupId = groupId,
     price = price,
     changed = changed,
-    description = description?.en,
+    description = description?.en?.let { value -> value.plain?.takeIf { it.isNotBlank() } ?: value.html },
     clientCode = clientCode
 )
 
@@ -35,7 +35,8 @@ fun ProductEntity.fromEntity() = ErplyProduct(
     groupId = groupId,
     price = price,
     changed = changed,
-    description = description?.let { LocalizedValue(it) }
+    //TODO: don't use API DTOs, use app models instead
+    description = null // this one is never read yet in UI, but stored in DB
 )
 
 

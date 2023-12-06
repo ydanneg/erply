@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+private const val PAGE_SIZE = 60
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductWithImagesRepository @Inject constructor(
     private val erplyProductWithImageDao: ErplyProductWithImageDao,
@@ -21,19 +23,19 @@ class ProductWithImagesRepository @Inject constructor(
     fun productsWithImagesPageable(groupId: String): Flow<PagingData<ProductWithImage>> {
         return userSessionRepository.userSession.map { it.clientCode }.distinctUntilChanged().flatMapLatest { clientCode ->
             Pager(
-                PagingConfig(60)
+                PagingConfig(PAGE_SIZE)
             ) {
                 erplyProductWithImageDao.findAllByGroupIdPageable(clientCode, groupId)
             }.flow
         }
     }
 
-    fun searchProductsWithImagesPageable(groupId: String, search: String): Flow<PagingData<ProductWithImage>> {
+    fun searchProducts(search: String): Flow<PagingData<ProductWithImage>> {
         return userSessionRepository.userSession.map { it.clientCode }.distinctUntilChanged().flatMapLatest { clientCode ->
             Pager(
-                PagingConfig(60)
+                PagingConfig(PAGE_SIZE)
             ) {
-                erplyProductWithImageDao.findAllByGroupIdAndNamePageable(clientCode, groupId, search)
+                erplyProductWithImageDao.fastSearchAllProducts(clientCode, "$search*")
             }.flow
         }
     }

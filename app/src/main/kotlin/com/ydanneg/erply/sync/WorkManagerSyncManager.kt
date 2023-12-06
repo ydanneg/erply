@@ -13,9 +13,6 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-/**
- * [SyncManager] backed by [WorkInfo] from [WorkManager]
- */
 class WorkManagerSyncManager @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
@@ -25,7 +22,7 @@ class WorkManagerSyncManager @Inject constructor(
             .conflate()
 
     fun requestSync() {
-        Log.i(TAG, "Requesting sync...")
+        Log.i(TAG, "Requesting sync...")//NON-NLS
         val workManager = WorkManager.getInstance(context)
         // Run sync on app startup and ensure only one sync worker runs at any time
         workManager.enqueueUniqueWork(

@@ -3,10 +3,12 @@ package com.ydanneg.erply.database.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
+import com.ydanneg.erply.database.model.PRODUCTS_FTS_TABLE_NAME
 import com.ydanneg.erply.database.model.PRODUCTS_TABLE_NAME
 import com.ydanneg.erply.database.model.PRODUCT_IMAGES_TABLE_NAME
 import com.ydanneg.erply.model.ProductWithImage
 
+@Suppress("HardCodedStringLiteral")
 @Dao
 interface ErplyProductWithImageDao {
 
@@ -46,11 +48,15 @@ interface ErplyProductWithImageDao {
             ON product.clientCode = image.clientCode
                 AND product.id = image.productId  
         WHERE product.clientCode = :clientCode
-            AND product.groupId = :groupId
-            AND product.name LIKE '%' || :name || '%'
+            AND product.id in (
+                SELECT product.id
+                FROM $PRODUCTS_TABLE_NAME AS product 
+                JOIN $PRODUCTS_FTS_TABLE_NAME AS fts
+                    ON product.rowId == fts.rowid 
+                WHERE $PRODUCTS_FTS_TABLE_NAME MATCH :search
+            )
         ORDER BY product.changed DESC
         """
     )
-    fun findAllByGroupIdAndNamePageable(clientCode: String, groupId: String, name: String): PagingSource<Int, ProductWithImage>
-
+    fun fastSearchAllProducts(clientCode: String, search: String): PagingSource<Int, ProductWithImage>
 }

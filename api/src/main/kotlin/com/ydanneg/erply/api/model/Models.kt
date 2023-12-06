@@ -46,6 +46,20 @@ data class LocalizedValue(
     val en: String = ""
 )
 
+@Serializable
+data class LocalizedDescriptionValue(
+    @SerialName("en")
+    val en: DescriptionValue? = null
+)
+
+@Serializable
+data class DescriptionValue(
+    @SerialName("plain_text")
+    val plain: String? = null,
+    @SerialName("html")
+    val html: String? = null
+)
+
 enum class ErplyProductType {
     PRODUCT,
     BUNDLE,
@@ -64,7 +78,7 @@ data class ErplyProduct(
     @SerialName("name")
     val name: LocalizedValue,
     @SerialName("description")
-    val description: LocalizedValue? = null,
+    val description: LocalizedDescriptionValue? = null,
     @SerialName("price")
     val price: String,
     @SerialName("changed")

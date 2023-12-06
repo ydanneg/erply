@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.NonNls
 import javax.inject.Inject
 
 data class UiState(
@@ -47,12 +46,13 @@ class ProductsScreenViewModel @Inject constructor(
 
     val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
-            if (query?.isNotBlank() == true) {
-                productWithImagesRepository.searchProductsWithImagesPageable(groupId, query.trim())
+            if (query?.isNotBlank() == true && query.length > 1) {
+                productWithImagesRepository.searchProducts(query.trim())
             } else {
                 productWithImagesRepository.productsWithImagesPageable(groupId)
             }
         }.cachedIn(viewModelScope)
+
 
     val uiState = combine(
         productGroupsRepository.group(groupId).distinctUntilChanged(),
@@ -72,7 +72,6 @@ class ProductsScreenViewModel @Inject constructor(
         savedStateHandle[SEARCH_QUERY_KEY] = search
     }
 
-        @NonNls
     fun loadProducts() {
         Log.d(TAG, "loadProducts...")//NON-NLS
         viewModelScope.launch {

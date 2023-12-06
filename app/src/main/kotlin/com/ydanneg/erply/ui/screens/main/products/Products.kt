@@ -64,6 +64,7 @@ fun ProductsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val products = viewModel.filteredProducts.collectAsLazyPagingItems()
+
     val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading })
 
     LaunchedEffect(uiState) {

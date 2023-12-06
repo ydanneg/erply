@@ -8,6 +8,7 @@ import com.ydanneg.erply.database.dao.ErplyProductGroupDao
 import com.ydanneg.erply.database.dao.ErplyProductImageDao
 import com.ydanneg.erply.database.dao.ErplyProductWithImageDao
 import com.ydanneg.erply.database.model.ProductEntity
+import com.ydanneg.erply.database.model.ProductFtsEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
 import com.ydanneg.erply.database.model.ProductImageEntity
 import com.ydanneg.erply.database.util.InstantConverter
@@ -16,7 +17,8 @@ import com.ydanneg.erply.database.util.InstantConverter
     entities = [
         ProductEntity::class,
         ProductGroupEntity::class,
-        ProductImageEntity::class
+        ProductImageEntity::class,
+        ProductFtsEntity::class
     ],
     version = 1,
     autoMigrations = [],
