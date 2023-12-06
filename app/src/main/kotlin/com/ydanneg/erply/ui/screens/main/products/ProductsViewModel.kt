@@ -5,15 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
-import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.ProductWithImagesRepository
-import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao.ProductWithImage
-import com.ydanneg.erply.database.mappers.fromEntity
-import com.ydanneg.erply.database.model.ProductEntity
-import com.ydanneg.erply.database.model.ProductPictureEntity
+import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.sync.WorkManagerSyncManager
 import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
@@ -34,11 +29,8 @@ data class UiState(
 val UiState.notLoaded
     get() = group == null && !isLoading
 
-data class ProductWithImages(
-    val product: ErplyProduct,
-    val images: List<ErplyProductPicture>
-)
 
+// TODO: delegate to CdnApi
 fun ProductWithImage.imageUrlOrNull(): String? = tenant?.let { tenant -> filename?.let { "https://cdn-sb.erply.com/images/$tenant/$it" } }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -85,9 +77,6 @@ class ProductsScreenViewModel @Inject constructor(
             workManagerSyncManager.requestSync()
         }
     }
-
-    private fun Map<ProductEntity, List<ProductPictureEntity>>.fromEntity(): List<ProductWithImages> =
-        map { item -> ProductWithImages(item.key.fromEntity(), item.value.map { it.fromEntity() }) }
 
     companion object {
         private const val GROUP_ID_STATE_KEY = "groupId"

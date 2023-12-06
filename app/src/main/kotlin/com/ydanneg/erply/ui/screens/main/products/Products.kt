@@ -1,6 +1,5 @@
 package com.ydanneg.erply.ui.screens.main.products
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ImageNotSupported
-import androidx.compose.material.icons.rounded.ImageNotSupported
-import androidx.compose.material.icons.sharp.ImageNotSupported
 import androidx.compose.material.icons.twotone.ImageNotSupported
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +45,7 @@ import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.LocalizedValue
-import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao.ProductWithImage
+import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
 import com.ydanneg.erply.ui.components.Loading
 import com.ydanneg.erply.ui.components.NothingToShow

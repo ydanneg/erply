@@ -1,4 +1,4 @@
-package com.ydanneg.erply.data.repository
+package com.ydanneg.erply.data.model
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

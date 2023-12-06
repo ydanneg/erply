@@ -1,4 +1,4 @@
-package com.ydanneg.erply.data.api
+package com.ydanneg.erply.network.api
 
 import com.ydanneg.erply.api.client.ErplyApiClient
 import com.ydanneg.erply.api.model.ErplyProduct
@@ -22,20 +22,8 @@ class ErplyNetworkDataSource @Inject constructor(
         erplyApiClient.cdn.fetchAllProductPictures(token, changedSince)
     }
 
-    suspend fun listProductGroups(token: String): List<ErplyProductGroup> = withContext(dispatcher) {
-        erplyApiClient.products.listProductGroups(token)
-    }
-
     suspend fun fetchAllProductGroups(token: String, changedSince: Long? = 0): Flow<List<ErplyProductGroup>> = withContext(dispatcher) {
         erplyApiClient.products.fetchAllProductGroups(token, changedSince)
-    }
-
-    suspend fun fetchProductGroups(token: String, changedSince: Long? = 0): List<ErplyProductGroup> = withContext(dispatcher) {
-        erplyApiClient.products.fetchProductGroups(token, changedSince)
-    }
-
-    suspend fun fetchProducts(token: String, changedSince: Long? = 0): List<ErplyProduct> = withContext(dispatcher) {
-        erplyApiClient.products.fetchProducts(token, changedSince)
     }
 
     suspend fun fetchAllProducts(token: String, changedSince: Long? = 0): Flow<List<ErplyProduct>> = withContext(dispatcher) {
@@ -44,14 +32,6 @@ class ErplyNetworkDataSource @Inject constructor(
 
     suspend fun fetchAllDeletedProductIds(token: String, changedSince: Long): Flow<List<String>> = withContext(dispatcher) {
         erplyApiClient.products.fetchAllDeletedProductIds(token, changedSince)
-    }
-
-    suspend fun fetchDeletedProductIds(token: String, changedSince: Long): List<String> = withContext(dispatcher) {
-        erplyApiClient.products.fetchDeletedProductIds(token, changedSince)
-    }
-
-    suspend fun fetchProductsByGroupId(token: String, groupId: String): List<ErplyProduct> = withContext(dispatcher) {
-        erplyApiClient.products.fetchProductsByGroupId(token, groupId)
     }
 
     suspend fun login(clientCode: String, username: String, password: String): ErplyVerifiedUser = withContext(dispatcher) {

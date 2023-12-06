@@ -13,7 +13,6 @@ import io.ktor.client.request.headers
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlin.random.Random
 
 
 class ProductsApi internal constructor(private val httpClient: HttpClient) {
@@ -29,26 +28,12 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
         }
     }
 
-    suspend fun listProductGroups(token: String): List<ErplyProductGroup> = executeOrThrow {
-        val url = "v1/product/group?skip=0&take=$PAGE_SIZE&filter=[$showInWebShopFilter]&withTotalCount=1"
-        httpClient.get(url) {
-            headers {
-                append("jwt", token)
-            }
-        }.body()
-    }
-
-    suspend fun fetchProductsByGroupId(token: String, groupId: String): List<ErplyProduct> = executeOrThrow {
-        fetchProducts(token = token, filter = groupIdFilter(groupId)) //TODO: add more filters (e.g. 'show_in_webshop')
-    }
-
-
     suspend fun fetchAllProductGroups(token: String, changedSince: Long? = null): Flow<List<ErplyProductGroup>> =
         fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchProductGroups(token = token, changedSince = changedSince, skip = skip, take = take)
         }.catch { it.handleError() }
 
-    suspend fun fetchProductGroups(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProductGroup> =
+    private suspend fun fetchProductGroups(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProductGroup> =
         executeOrThrow {
             val url = "v1/product/group?skip=$skip&take=$take&withTotalCount=1".let { url ->
                 val filter = showInWebShopFilter.let {
@@ -68,53 +53,37 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
             fetchProducts(token, changedSince, skip = skip, take = take)
         }.catch { it.handleError() }
 
-    suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> = executeOrThrow {
-        val fields = fields("id", "type", "group_id", "name", "price", "changed")
-        val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let { url ->
-            val filter = displayedInWebShopFilter.let {
-                if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
+    private suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> =
+        executeOrThrow {
+            val fields = arrayOf("id", "type", "group_id", "name", "price", "changed").joinToString(",")
+            val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let { url ->
+                val filter = displayedInWebShopFilter.let {
+                    if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
+                }
+                "$url&filter=[$filter,\"and\",[\"status\",\"=\",\"ACTIVE\"]]"
             }
-            "$url&filter=[$filter,\"and\",[\"status\",\"=\",\"ACTIVE\"]]"
+            httpClient.get(url) {
+                headers {
+                    append("jwt", token)
+                }
+            }.body()
         }
-        httpClient.get(url) {
-            headers {
-                append("jwt", token)
-            }
-        }.body()
-    }
-
 
     suspend fun fetchAllDeletedProductIds(token: String, changedSince: Long): Flow<List<String>> =
         fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchDeletedProductIds(token, changedSince, skip = skip, take = take)
         }.catch { it.handleError() }
 
-    suspend fun fetchDeletedProductIds(token: String, changedSince: Long, skip: Int = 0, take: Int = PAGE_SIZE): List<String> = executeOrThrow {
-        val url = "v1/product/deleted/ids?skip=$skip&take=$take"
-        httpClient.get(url) {
-            headers {
-                append("If-Modified-Since", changedSince.toString())
-                append("jwt", token)
-            }
-        }.body()
-    }
-
-
-    private suspend fun fetchProducts(token: String, filter: String? = null, skip: Int = 0, take: Int = 1000): List<ErplyProduct> = executeOrThrow {
-        val fields = fields("id", "type", "group_id", "name", "price", "changed")
-        val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let {
-            if (filter != null) "$it&filter=$filter" else it
+    private suspend fun fetchDeletedProductIds(token: String, changedSince: Long, skip: Int = 0, take: Int = PAGE_SIZE): List<String> =
+        executeOrThrow {
+            val url = "v1/product/deleted/ids?skip=$skip&take=$take"
+            httpClient.get(url) {
+                headers {
+                    append("If-Modified-Since", changedSince.toString())
+                    append("jwt", token)
+                }
+            }.body()
         }
-        httpClient.get(url) {
-            headers {
-                append("jwt", token)
-            }
-        }.body()
-    }
-
-    private fun groupIdFilter(groupId: String) = """
-        [["group_id","=","$groupId"]]
-        """.trimIndent()
 
     /**
      * For groups
@@ -140,8 +109,6 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     } catch (e: Throwable) {
         e.handleError()
     }
-
-    private fun fields(vararg fields: String) = fields.joinToString(",")
 
     private fun Throwable.handleError(): Nothing {
         throw when (this) {

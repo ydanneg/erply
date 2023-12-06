@@ -3,12 +3,12 @@ package com.ydanneg.erply.data.repository
 import android.util.Log
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
-import com.ydanneg.erply.crypto.EncryptionManager
-import com.ydanneg.erply.data.api.ErplyNetworkDataSource
-import com.ydanneg.erply.data.datastore.UserSessionDataSource
-import com.ydanneg.erply.data.datastore.mapper.toModel
+import com.ydanneg.erply.datastore.UserSessionDataSource
+import com.ydanneg.erply.datastore.mapper.toModel
 import com.ydanneg.erply.datastore.passwordOrNull
 import com.ydanneg.erply.model.UserSession
+import com.ydanneg.erply.network.api.ErplyNetworkDataSource
+import com.ydanneg.erply.security.EncryptionManager
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 
@@ -57,7 +56,7 @@ class UserSessionRepository @Inject constructor(
         } catch (e: ErplyApiException) {
             Log.e(TAG, "tryAuthenticateUnauthorized: $e")
             if (enabled && e.type == ErplyApiError.Unauthorized) {
-            Log.i(TAG, "tryAuthenticateUnauthorized.reLogin()...")
+                Log.i(TAG, "tryAuthenticateUnauthorized.reLogin()...")
                 tryLogin()
                 val first = userSession.first()
                 Log.i(TAG, "tryAuthenticateUnauthorized.block(): $first")
@@ -75,14 +74,6 @@ class UserSessionRepository @Inject constructor(
     fun <T> withClientCode(block: suspend (String) -> Flow<T>): Flow<T> =
         userSession
             .map { it.clientCode }
-            .distinctUntilChanged()
-            .flatMapLatest {
-                block(it)
-            }
-
-    fun <T> withToken(block: suspend (String) -> Flow<T>): Flow<T> =
-        userSession
-            .mapNotNull { it.token }
             .distinctUntilChanged()
             .flatMapLatest {
                 block(it)

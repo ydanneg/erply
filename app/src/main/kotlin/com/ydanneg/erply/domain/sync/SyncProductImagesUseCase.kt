@@ -2,7 +2,7 @@ package com.ydanneg.erply.domain.sync
 
 import android.util.Log
 import com.ydanneg.erply.api.model.ErplyProductPicture
-import com.ydanneg.erply.data.datastore.LastSyncTimestamps
+import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.database.dao.ErplyProductImageDao
 import com.ydanneg.erply.database.mappers.toEntity

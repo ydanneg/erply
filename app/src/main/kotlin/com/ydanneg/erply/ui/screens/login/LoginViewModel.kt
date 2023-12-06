@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
-import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
+import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow

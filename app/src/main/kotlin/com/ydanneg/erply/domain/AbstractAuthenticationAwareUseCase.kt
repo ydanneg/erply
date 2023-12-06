@@ -3,7 +3,7 @@ package com.ydanneg.erply.domain
 import android.util.Log
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
-import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
+import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.util.LogUtils.TAG

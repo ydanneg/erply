@@ -4,7 +4,7 @@ import com.ydanneg.erply.database.ErplyDatabase
 import com.ydanneg.erply.database.dao.ErplyProductDao
 import com.ydanneg.erply.database.dao.ErplyProductGroupDao
 import com.ydanneg.erply.database.dao.ErplyProductImageDao
-import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao
+import com.ydanneg.erply.database.dao.ErplyProductWithImageDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,5 +31,5 @@ object DaoModule {
     @Provides
     fun providesProductWithImagesDao(
         database: ErplyDatabase,
-    ): ErplyProductWithImagesDao = database.productWithImagesDao()
+    ): ErplyProductWithImageDao = database.productWithImagesDao()
 }

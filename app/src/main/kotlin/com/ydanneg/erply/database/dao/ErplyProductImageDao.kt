@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ydanneg.erply.database.model.PRODUCT_IMAGES_TABLE_NAME
-import com.ydanneg.erply.database.model.ProductPictureEntity
+import com.ydanneg.erply.database.model.ProductImageEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,14 +19,14 @@ interface ErplyProductImageDao {
             AND productId = :productId 
         """
     )
-    fun findAllByProductId(clientCode: String, productId: String): Flow<List<ProductPictureEntity>>
+    fun findAllByProductId(clientCode: String, productId: String): Flow<List<ProductImageEntity>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(entities: List<ProductPictureEntity>)
+    suspend fun insertOrUpdate(entities: List<ProductImageEntity>)
 
     @Upsert
-    suspend fun upsert(entities: List<ProductPictureEntity>)
+    suspend fun upsert(entities: List<ProductImageEntity>)
 
     @Query(
         """

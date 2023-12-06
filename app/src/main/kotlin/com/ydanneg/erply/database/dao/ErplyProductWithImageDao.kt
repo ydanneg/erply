@@ -5,9 +5,10 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.ydanneg.erply.database.model.PRODUCTS_TABLE_NAME
 import com.ydanneg.erply.database.model.PRODUCT_IMAGES_TABLE_NAME
+import com.ydanneg.erply.model.ProductWithImage
 
 @Dao
-interface ErplyProductWithImagesDao {
+interface ErplyProductWithImageDao {
 
     @Query(
         """
@@ -23,8 +24,8 @@ interface ErplyProductWithImagesDao {
         LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image
             ON product.clientCode = image.clientCode
                 AND product.id = image.productId  
-        WHERE product.groupId = :groupId
-            AND product.clientCode = :clientCode
+        WHERE product.clientCode = :clientCode
+            AND product.groupId = :groupId
         ORDER BY product.changed DESC
         """
     )
@@ -52,12 +53,4 @@ interface ErplyProductWithImagesDao {
     )
     fun findAllByGroupIdAndNamePageable(clientCode: String, groupId: String, name: String): PagingSource<Int, ProductWithImage>
 
-    data class ProductWithImage(
-        val id: String,
-        val name: String,
-        val description: String?,
-        val price: String,
-        val filename: String?,
-        val tenant: String?
-    )
 }

@@ -1,8 +1,5 @@
 package com.ydanneg.erply.model
 
-import com.ydanneg.erply.data.datastore.LastSyncTimestamps
-import io.ktor.http.content.LastModifiedVersion
-
 
 enum class DarkThemeConfig {
     FOLLOW_SYSTEM, LIGHT, DARK

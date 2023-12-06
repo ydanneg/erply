@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.ydanneg.erply.api.model.ErplyProductType
 
 const val PRODUCTS_TABLE_NAME = "products"
-const val GROUPS_TABLE_NAME = "product_groups"
+const val PRODUCT_GROUPS_TABLE_NAME = "product_groups"
 const val PRODUCT_IMAGES_TABLE_NAME = "product_images"
 
 @Entity(
@@ -35,7 +35,7 @@ data class ProductEntity(
 )
 
 @Entity(
-    tableName = GROUPS_TABLE_NAME,
+    tableName = PRODUCT_GROUPS_TABLE_NAME,
     indices = [
         Index(value = ["clientCode"]),
         Index(value = ["clientCode", "id"], unique = true),
@@ -61,7 +61,7 @@ data class ProductGroupEntity(
         Index(value = ["clientCode", "productId"]),
     ]
 )
-data class ProductPictureEntity(
+data class ProductImageEntity(
     @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
     val id: String,
     val clientCode: String,

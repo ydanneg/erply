@@ -7,15 +7,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkerParameters
-import com.ydanneg.erply.data.datastore.LastSyncTimestamps
-import com.ydanneg.erply.data.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
+import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.di.Dispatcher
 import com.ydanneg.erply.di.ErplyDispatchers
-import com.ydanneg.erply.domain.GetServerVersionUseCase
 import com.ydanneg.erply.domain.sync.SyncProductGroupsUseCase
 import com.ydanneg.erply.domain.sync.SyncProductImagesUseCase
 import com.ydanneg.erply.domain.sync.SyncProductsUseCase
+import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.sync.SyncConstraints
 import com.ydanneg.erply.sync.Synchronizer
 import com.ydanneg.erply.util.LogUtils.TAG
@@ -40,7 +39,6 @@ class SyncWorker @AssistedInject constructor(
     private val syncProductsUseCase: SyncProductsUseCase,
     private val syncProductGroupsUseCase: SyncProductGroupsUseCase,
     private val syncProductImagesUseCase: SyncProductImagesUseCase,
-    private val getServerVersionUseCase: GetServerVersionUseCase,
     private val userPreferencesDataSource: UserPreferencesDataSource,
     private val userSessionRepository: UserSessionRepository,
     @Dispatcher(ErplyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
@@ -76,9 +74,6 @@ class SyncWorker @AssistedInject constructor(
     ) = userPreferencesDataSource.updateChangeListVersion(update)
 
     companion object {
-        /**
-         * Expedited one time work to sync data on app startup
-         */
         fun startUpSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setConstraints(SyncConstraints)

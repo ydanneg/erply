@@ -1,4 +1,4 @@
-package com.ydanneg.erply.crypto
+package com.ydanneg.erply.security
 
 import android.content.Context
 import android.content.pm.PackageManager

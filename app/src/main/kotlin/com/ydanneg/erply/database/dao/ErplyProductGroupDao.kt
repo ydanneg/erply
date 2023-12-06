@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
-import com.ydanneg.erply.database.model.GROUPS_TABLE_NAME
+import com.ydanneg.erply.database.model.PRODUCT_GROUPS_TABLE_NAME
 import com.ydanneg.erply.database.model.ProductGroupEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -14,7 +14,7 @@ interface ErplyProductGroupDao {
 
     @Query(
         """
-        SELECT * FROM $GROUPS_TABLE_NAME 
+        SELECT * FROM $PRODUCT_GROUPS_TABLE_NAME 
         WHERE clientCode = :clientCode
         ORDER BY `order` ASC
         """
@@ -23,7 +23,7 @@ interface ErplyProductGroupDao {
 
     @Query(
         """
-        SELECT * FROM $GROUPS_TABLE_NAME 
+        SELECT * FROM $PRODUCT_GROUPS_TABLE_NAME 
         WHERE clientCode = :clientCode 
             AND id = :productId
         """
@@ -38,7 +38,7 @@ interface ErplyProductGroupDao {
 
     @Query(
         """
-        DELETE FROM $GROUPS_TABLE_NAME 
+        DELETE FROM $PRODUCT_GROUPS_TABLE_NAME 
         WHERE clientCode = :clientCode
             AND id in (:ids) 
         """

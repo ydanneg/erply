@@ -1,4 +1,4 @@
-package com.ydanneg.erply.data.datastore.mapper
+package com.ydanneg.erply.datastore.mapper
 
 import com.ydanneg.erply.datastore.UserSessionProto
 import com.ydanneg.erply.model.UserSession

@@ -6,24 +6,15 @@ import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
-import com.ydanneg.erply.database.model.ProductPictureEntity
+import com.ydanneg.erply.database.model.ProductImageEntity
 
-fun ErplyProductPicture.toEntity(clientCode: String) = ProductPictureEntity(
+fun ErplyProductPicture.toEntity(clientCode: String) = ProductImageEntity(
     id = id,
     clientCode = clientCode,
     productId = productId,
     tenant = tenant,
     filename = filename
 )
-
-
-fun ProductPictureEntity.fromEntity() = ErplyProductPicture(
-    id = id,
-    productId = productId,
-    tenant = tenant,
-    filename = filename,
-)
-
 
 fun ErplyProduct.toEntity(clientCode: String) = ProductEntity(
     id = id,

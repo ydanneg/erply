@@ -14,7 +14,6 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 
 class AuthApi internal constructor(private val httpClient: HttpClient) {
-
     suspend fun login(clientCode: String, username: String, password: String): ErplyVerifiedUser {
         return httpClient.post("https://$clientCode.erply.com/api/") {
             contentType(ContentType.Application.FormUrlEncoded)

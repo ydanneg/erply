@@ -1,11 +1,9 @@
-package com.ydanneg.erply.data.datastore
+package com.ydanneg.erply.datastore
 
 import android.util.Log
 import androidx.datastore.core.DataStore
-import com.ydanneg.erply.datastore.DarkThemeConfigProto
-import com.ydanneg.erply.datastore.UserPreferencesProto
-import com.ydanneg.erply.datastore.copy
 import com.ydanneg.erply.model.DarkThemeConfig
+import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.distinctUntilChanged

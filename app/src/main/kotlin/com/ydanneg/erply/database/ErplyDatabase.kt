@@ -6,17 +6,17 @@ import androidx.room.TypeConverters
 import com.ydanneg.erply.database.dao.ErplyProductDao
 import com.ydanneg.erply.database.dao.ErplyProductGroupDao
 import com.ydanneg.erply.database.dao.ErplyProductImageDao
-import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao
+import com.ydanneg.erply.database.dao.ErplyProductWithImageDao
 import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
-import com.ydanneg.erply.database.model.ProductPictureEntity
+import com.ydanneg.erply.database.model.ProductImageEntity
 import com.ydanneg.erply.database.util.InstantConverter
 
 @Database(
     entities = [
         ProductEntity::class,
         ProductGroupEntity::class,
-        ProductPictureEntity::class
+        ProductImageEntity::class
     ],
     version = 1,
     autoMigrations = [],
@@ -29,5 +29,5 @@ abstract class ErplyDatabase : RoomDatabase() {
     abstract fun productDao(): ErplyProductDao
     abstract fun groupDao(): ErplyProductGroupDao
     abstract fun imageDao(): ErplyProductImageDao
-    abstract fun productWithImagesDao(): ErplyProductWithImagesDao
+    abstract fun productWithImagesDao(): ErplyProductWithImageDao
 }
