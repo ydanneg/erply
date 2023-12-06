@@ -1,18 +1,20 @@
 package com.ydanneg.erply.ui.screens.main.catalog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
@@ -125,20 +127,21 @@ private fun ProductGroupsScreenContent(
             ) {
                 if (groups.isEmpty()) if (isLoading) Loading() else NothingToShow()
 
-                LazyVerticalGrid(
+                LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    columns = GridCells.Adaptive(minSize = 128.dp),
                     contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(groups, key = { it.id }) {
                         Box(
                             modifier = Modifier
-                                .size(128.dp)
-                                .clickable { onGroupClicked(it.id) }, contentAlignment = Alignment.Center
+                                .fillMaxWidth()
+                                .defaultMinSize(minHeight = 56.dp)
+                                .clickable { onGroupClicked(it.id) }
+                                .background(MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(text = it.name.en, textAlign = TextAlign.Center)
+                            Text(text = it.name.en.uppercase(), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSecondaryContainer)
                         }
                     }
                 }

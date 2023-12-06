@@ -1,5 +1,6 @@
 package com.ydanneg.erply.ui.screens.main.products
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ImageNotSupported
+import androidx.compose.material.icons.rounded.ImageNotSupported
+import androidx.compose.material.icons.sharp.ImageNotSupported
+import androidx.compose.material.icons.twotone.ImageNotSupported
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,6 +34,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -104,7 +112,7 @@ private fun ProductsScreenContent(
     navController: NavController = rememberNavController(),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
-    val placeholder = rememberVectorPainter(Icons.Filled.ImageNotSupported)
+    val placeholder = rememberVectorPainter(Icons.TwoTone.ImageNotSupported)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -141,6 +149,7 @@ private fun ProductsScreenContent(
                             modifier = Modifier
                                 .size(156.dp)
                                 .clickable { },
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                         ) {
                             if (item != null) {
                                 Column(
@@ -150,6 +159,7 @@ private fun ProductsScreenContent(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
                                     AsyncImage(
+//                                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer, BlendMode.SrcAtop),
                                         modifier = Modifier.size(64.dp),
                                         model = item.imageUrlOrNull(),
                                         error = placeholder,
