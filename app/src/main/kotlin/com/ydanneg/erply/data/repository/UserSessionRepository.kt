@@ -50,17 +50,14 @@ class UserSessionRepository @Inject constructor(
 
     suspend fun <T> tryAuthenticateUnauthorized(enabled: Boolean = true, block: suspend (UserSession) -> T): T {
         return try {
-            val first = userSession.first()
-            Log.i(TAG, "tryAuthenticateUnauthorized.executing: $first")
-            block(first)
+            block(userSession.first())
         } catch (e: ErplyApiException) {
-            Log.e(TAG, "tryAuthenticateUnauthorized: $e")
+            Log.e(TAG, "API Error", e)
             if (enabled && e.type == ErplyApiError.Unauthorized) {
-                Log.i(TAG, "tryAuthenticateUnauthorized.reLogin()...")
+                Log.i(TAG, "trying to re-authenticate...")
                 tryLogin()
-                val first = userSession.first()
-                Log.i(TAG, "tryAuthenticateUnauthorized.block(): $first")
-                block(first)
+                Log.i(TAG, "re-trying operation...")
+                block(userSession.first())
             } else {
                 throw e
             }

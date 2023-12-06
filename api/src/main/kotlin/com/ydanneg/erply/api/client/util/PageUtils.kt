@@ -14,12 +14,12 @@ fun <T> fetchAllPages(pageSize: Int, fetchPage: PageFetcher<T>): Flow<List<T>> {
             if (products.isEmpty()) {
                 break
             }
+            emit(products)
             if (products.size < pageSize) {
                 break
             }
-            emit(products)
-            yield()
             skip += pageSize
+            yield()
         }
     }
 }

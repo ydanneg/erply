@@ -12,26 +12,33 @@ import kotlinx.coroutines.yield
 
 class CdnApi internal constructor(private val httpClient: HttpClient, private val configuration: ErplyApiClientConfiguration) {
 
-    fun fetchAllProductPictures(token: String, changedSince: Long? = null): Flow<List<ErplyProductPicture>> {
-        return flow {
-            var page = 0
-            while (true) {
-                val response = fetchProductPictures(token, changedSince, page)
-                if (response.images.isEmpty()) {
-                    break
-                }
-                emit(response.images)
-                if (response.recordsReturned < response.recordsPerPage) {
-                    break
-                }
-                yield()
-                page++
-            }
+    fun fetchAllProductPictures(token: String, changedSince: Long? = null): Flow<List<ErplyProductPicture>> =
+        fetchAllPages { page ->
+            fetchProductPictures(
+                token = token,
+                page = page,
+                changedSince = changedSince,
+                isDeleted = false
+            )
         }
-    }
 
-    private suspend fun fetchProductPictures(token: String, changedSince: Long? = null, page: Int = 0): ErplyProductPicturesResponse {
-        val url = "images?page=$page&isDeleted=false".let {
+    fun fetchAllDeletedProductPictures(token: String, changedSince: Long? = null): Flow<List<ErplyProductPicture>> =
+        fetchAllPages { page ->
+            fetchProductPictures(
+                token = token,
+                page = page,
+                changedSince = changedSince,
+                isDeleted = true
+            )
+        }
+
+    private suspend fun fetchProductPictures(
+        token: String,
+        page: Int,
+        changedSince: Long? = null,
+        isDeleted: Boolean = false
+    ): ErplyProductPicturesResponse {
+        val url = "images?page=$page&isDeleted=$isDeleted".let {
             if (changedSince != null) "$it&changedSince=$changedSince" else it
         }
         return httpClient.get(url) {
@@ -39,6 +46,22 @@ class CdnApi internal constructor(private val httpClient: HttpClient, private va
                 append("jwt", token)
             }
         }.body()
+    }
+
+    private fun fetchAllPages(fetchPage: suspend (Int) -> ErplyProductPicturesResponse): Flow<List<ErplyProductPicture>> = flow {
+        var page = 0
+        while (true) {
+            val response = fetchPage(page)
+            if (response.images.isEmpty()) {
+                break
+            }
+            emit(response.images)
+            if (response.recordsReturned < response.recordsPerPage) {
+                break
+            }
+            page++
+            yield()
+        }
     }
 
     @Suppress("unused")

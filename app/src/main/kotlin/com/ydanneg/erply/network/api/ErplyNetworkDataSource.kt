@@ -21,6 +21,9 @@ class ErplyNetworkDataSource @Inject constructor(
     suspend fun fetchAllImages(token: String, changedSince: Long? = 0) = withContext(dispatcher) {
         erplyApiClient.cdn.fetchAllProductPictures(token, changedSince)
     }
+    suspend fun fetchDeletedImageIds(token: String, changedSince: Long? = 0) = withContext(dispatcher) {
+        erplyApiClient.cdn.fetchAllDeletedProductPictures(token, changedSince)
+    }
 
     suspend fun fetchAllProductGroups(token: String, changedSince: Long? = 0): Flow<List<ErplyProductGroup>> = withContext(dispatcher) {
         erplyApiClient.products.fetchAllProductGroups(token, changedSince)

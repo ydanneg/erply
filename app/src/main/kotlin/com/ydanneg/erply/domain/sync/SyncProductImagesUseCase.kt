@@ -2,24 +2,25 @@ package com.ydanneg.erply.domain.sync
 
 import android.util.Log
 import com.ydanneg.erply.api.model.ErplyProductPicture
-import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.database.dao.ErplyProductImageDao
 import com.ydanneg.erply.database.mappers.toEntity
+import com.ydanneg.erply.domain.GetAllDeletedProductImageIdsFromRemoteUseCase
 import com.ydanneg.erply.domain.GetAllProductImagesFromRemoteUseCase
 import com.ydanneg.erply.domain.GetServerVersionUseCase
+import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.sync.Syncable
 import com.ydanneg.erply.sync.Synchronizer
 import com.ydanneg.erply.sync.changeListSync
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class SyncProductImagesUseCase @Inject constructor(
     private val erplyProductImageDao: ErplyProductImageDao,
     private val userSessionRepository: UserSessionRepository,
     private val getAllProductImagesFromRemoteUseCase: GetAllProductImagesFromRemoteUseCase,
+    private val getAllDeletedProductImageIdsFromRemoteUseCase: GetAllDeletedProductImageIdsFromRemoteUseCase,
     private val getServerVersionUseCase: GetServerVersionUseCase
 ) : Syncable {
 
@@ -34,7 +35,7 @@ class SyncProductImagesUseCase @Inject constructor(
         return synchronizer.changeListSync(
             versionReader = LastSyncTimestamps::picturesLastSyncTimestamp,
             serverVersionFetcher = { getServerVersionUseCase.invoke() },
-            deletedListFetcher = { flowOf() },
+            deletedListFetcher = { getAllDeletedProductImageIdsFromRemoteUseCase.invoke(it) },
             updatedListFetcher = { getAllProductImagesFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(picturesLastSyncTimestamp = it) },
             modelDeleter = { erplyProductImageDao.delete(clientCode, it) },
