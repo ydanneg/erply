@@ -2,6 +2,7 @@ package com.ydanneg.erply.database.model
 
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.ydanneg.erply.api.model.ErplyProductType
 
 const val PRODUCTS_TABLE_NAME = "products"
@@ -9,14 +10,20 @@ const val GROUPS_TABLE_NAME = "product_groups"
 const val PRODUCT_IMAGES_TABLE_NAME = "product_images"
 
 @Entity(
+    tableName = PRODUCTS_TABLE_NAME,
     indices = [
+        Index(value = ["clientCode"]),
+        Index(value = ["clientCode", "id"], unique = true),
+        Index(value = ["clientCode", "groupId"]),
+        Index(value = ["id"]),
+        Index(value = ["name"]),
         Index(value = ["groupId"]),
         Index(value = ["changed"])
-    ],
-    tableName = PRODUCTS_TABLE_NAME,
-    primaryKeys = ["id", "clientCode"]
+    ]
 )
+
 data class ProductEntity(
+    @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
     val id: String,
     val clientCode: String,
     val name: String,
@@ -28,15 +35,17 @@ data class ProductEntity(
 )
 
 @Entity(
+    tableName = GROUPS_TABLE_NAME,
     indices = [
-        Index(value = ["parentId"]),
+        Index(value = ["clientCode"]),
+        Index(value = ["clientCode", "id"], unique = true),
+        Index(value = ["id"]),
         Index(value = ["changed"]),
         Index(value = ["order"])
     ],
-    tableName = GROUPS_TABLE_NAME,
-    primaryKeys = ["id", "clientCode"]
 )
 data class ProductGroupEntity(
+    @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
     val id: String,
     val clientCode: String,
     val name: String,
@@ -47,13 +56,13 @@ data class ProductGroupEntity(
 )
 
 @Entity(
-    indices = [
-        Index(value = ["productId", "clientCode"])
-    ],
     tableName = PRODUCT_IMAGES_TABLE_NAME,
-    primaryKeys = ["id", "clientCode"]
+    indices = [
+        Index(value = ["clientCode", "productId"]),
+    ]
 )
 data class ProductPictureEntity(
+    @PrimaryKey(autoGenerate = true) val rowId: Long = 0,
     val id: String,
     val clientCode: String,
     val productId: String,

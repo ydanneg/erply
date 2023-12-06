@@ -12,12 +12,28 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ErplyProductImageDao {
 
-    @Query("SELECT * FROM $PRODUCT_IMAGES_TABLE_NAME WHERE id = :productId AND clientCode = :clientCode")
-    fun findByProductId(clientCode: String, productId: String): Flow<List<ProductPictureEntity>>
+    @Query(
+        """
+        SELECT * FROM $PRODUCT_IMAGES_TABLE_NAME 
+        WHERE clientCode = :clientCode
+            AND productId = :productId 
+        """
+    )
+    fun findAllByProductId(clientCode: String, productId: String): Flow<List<ProductPictureEntity>>
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(entities: List<ProductPictureEntity>)
 
     @Upsert
     suspend fun upsert(entities: List<ProductPictureEntity>)
 
-    @Query("DELETE FROM $PRODUCT_IMAGES_TABLE_NAME WHERE id in (:ids) AND clientCode = :clientCode")
+    @Query(
+        """
+        DELETE FROM $PRODUCT_IMAGES_TABLE_NAME 
+        WHERE clientCode = :clientCode
+            AND id in (:ids) 
+        """
+    )
     suspend fun delete(clientCode: String, ids: List<String>)
 }

@@ -1,6 +1,8 @@
 package com.ydanneg.erply.database.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ydanneg.erply.database.model.GROUPS_TABLE_NAME
@@ -10,18 +12,36 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ErplyProductGroupDao {
 
-    @Query(value = "SELECT * FROM $GROUPS_TABLE_NAME WHERE clientCode = :clientCode")
+    @Query(
+        """
+        SELECT * FROM $GROUPS_TABLE_NAME 
+        WHERE clientCode = :clientCode
+        ORDER BY `order` ASC
+        """
+    )
     fun getAll(clientCode: String): Flow<List<ProductGroupEntity>>
 
-    @Query("SELECT * FROM $GROUPS_TABLE_NAME WHERE id = :productId AND clientCode = :clientCode")
+    @Query(
+        """
+        SELECT * FROM $GROUPS_TABLE_NAME 
+        WHERE clientCode = :clientCode 
+            AND id = :productId
+        """
+    )
     fun getById(clientCode: String, productId: String): Flow<ProductGroupEntity?>
 
-    @Query("SELECT * FROM $GROUPS_TABLE_NAME WHERE parentId = :parentId AND clientCode = :clientCode")
-    fun getAllByParentId(clientCode: String, parentId: String): Flow<List<ProductGroupEntity>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(entities: List<ProductGroupEntity>)
 
     @Upsert
     suspend fun upsert(entities: List<ProductGroupEntity>)
 
-    @Query("DELETE FROM $GROUPS_TABLE_NAME WHERE id in (:ids) AND clientCode = :clientCode")
+    @Query(
+        """
+        DELETE FROM $GROUPS_TABLE_NAME 
+        WHERE clientCode = :clientCode
+            AND id in (:ids) 
+        """
+    )
     suspend fun delete(clientCode: String, ids: List<String>)
 }

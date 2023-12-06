@@ -38,7 +38,7 @@ class SyncProductImagesUseCase @Inject constructor(
             updatedListFetcher = { getAllProductImagesFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(picturesLastSyncTimestamp = it) },
             modelDeleter = { erplyProductImageDao.delete(clientCode, it) },
-            modelUpdater = { erplyProductImageDao.upsert(it.toModelList(clientCode)) },
+            modelUpdater = { erplyProductImageDao.insertOrUpdate(it.toModelList(clientCode)) },
         )
     }
 

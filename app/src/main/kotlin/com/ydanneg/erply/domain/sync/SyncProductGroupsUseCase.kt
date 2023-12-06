@@ -36,7 +36,7 @@ class SyncProductGroupsUseCase @Inject constructor(
             updatedListFetcher = { getAllProductGroupsFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(productGroupsLastSyncTimestamp = it) },
             modelDeleter = { erplyProductGroupDao.delete(clientCode, it) },
-            modelUpdater = { erplyProductGroupDao.upsert(it.toModelList(clientCode)) },
+            modelUpdater = { erplyProductGroupDao.insertOrUpdate(it.toModelList(clientCode)) },
         )
     }
 

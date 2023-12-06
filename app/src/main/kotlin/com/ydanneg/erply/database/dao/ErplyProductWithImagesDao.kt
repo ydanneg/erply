@@ -5,24 +5,9 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.ydanneg.erply.database.model.PRODUCTS_TABLE_NAME
 import com.ydanneg.erply.database.model.PRODUCT_IMAGES_TABLE_NAME
-import com.ydanneg.erply.database.model.ProductEntity
-import com.ydanneg.erply.database.model.ProductPictureEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ErplyProductWithImagesDao {
-
-    @Query(
-        """
-        SELECT * FROM $PRODUCTS_TABLE_NAME AS product 
-        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image 
-            ON product.id = image.productId 
-        WHERE product.clientCode = :clientCode 
-            AND product.groupId = :groupId
-        ORDER BY product.changed DESC
-        """
-    )
-    fun findAllByGroupId(clientCode: String, groupId: String): Flow<Map<ProductEntity, List<ProductPictureEntity>>>
 
     @Query(
         """
@@ -36,8 +21,8 @@ interface ErplyProductWithImagesDao {
             image.tenant AS tenant 
         FROM $PRODUCTS_TABLE_NAME AS product
         LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image
-            ON product.id = image.productId  
-            AND product.clientCode = image.clientCode
+            ON product.clientCode = image.clientCode
+                AND product.id = image.productId  
         WHERE product.groupId = :groupId
             AND product.clientCode = :clientCode
         ORDER BY product.changed DESC
@@ -57,10 +42,10 @@ interface ErplyProductWithImagesDao {
             image.tenant AS tenant 
         FROM $PRODUCTS_TABLE_NAME AS product
         LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image
-            ON product.id = image.productId  
-            AND product.clientCode = image.clientCode
-        WHERE product.groupId = :groupId
-            AND product.clientCode = :clientCode
+            ON product.clientCode = image.clientCode
+                AND product.id = image.productId  
+        WHERE product.clientCode = :clientCode
+            AND product.groupId = :groupId
             AND product.name LIKE '%' || :name || '%'
         ORDER BY product.changed DESC
         """
@@ -75,18 +60,4 @@ interface ErplyProductWithImagesDao {
         val filename: String?,
         val tenant: String?
     )
-
-    @Query(
-        """
-        SELECT * FROM $PRODUCTS_TABLE_NAME AS product 
-        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image 
-            ON product.id = image.productId 
-        WHERE product.clientCode = :clientCode 
-            AND product.groupId = :groupId
-            AND name LIKE '%' || :name || '%'
-        ORDER BY product.changed DESC
-        """
-    )
-    fun findAllByGroupIdAndName(clientCode: String, groupId: String, name: String): Flow<Map<ProductEntity, List<ProductPictureEntity>>>
-
 }
