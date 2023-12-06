@@ -16,6 +16,7 @@ fun ErplyProductPicture.toEntity(clientCode: String) = ProductPictureEntity(
     filename = filename
 )
 
+
 fun ProductPictureEntity.fromEntity() = ErplyProductPicture(
     id = id,
     productId = productId,

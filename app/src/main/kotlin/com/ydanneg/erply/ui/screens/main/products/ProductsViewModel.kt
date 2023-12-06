@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.ProductWithImagesRepository
+import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao.ProductWithImage
 import com.ydanneg.erply.database.mappers.fromEntity
 import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductPictureEntity
@@ -36,6 +38,7 @@ data class ProductWithImages(
 )
 
 fun ProductWithImages.imageUrl(): String? = images.firstOrNull()?.let { "https://cdn-sb.erply.com/images/${it.tenant}/${it.filename}" }
+fun ProductWithImage.imageUrl(): String? = tenant?.let { tenant -> filename?.let { "https://cdn-sb.erply.com/images/$tenant/$it" } }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -48,24 +51,23 @@ class ProductsScreenViewModel @Inject constructor(
 
     private val groupId: String = checkNotNull(savedStateHandle[GROUP_ID_STATE_KEY])
 
-    private val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
+    val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
             if (query?.isNotBlank() == true) {
-                productWithImagesRepository.productsWithImagesByName(groupId, query)
+                productWithImagesRepository.searchProductsWithImagesPageable(groupId, query.trim())
             } else {
-                productWithImagesRepository.productsWithImages(groupId)
+                productWithImagesRepository.productsWithImagesPageable(groupId)
             }
-        }
+        }.cachedIn(viewModelScope)
 
     val uiState = combine(
         productGroupsRepository.group(groupId).distinctUntilChanged(),
         workManagerSyncManager.isSyncing.distinctUntilChanged(),
         savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null),
-        filteredProducts
-    ) { group, isSyncing, searchQuery, products ->
+    ) { group, isSyncing, searchQuery ->
         UiState(
             group = group,
-            products = products.fromEntity(),
+            products = listOf(),
             isLoading = isSyncing,
             searchQuery = searchQuery
         )

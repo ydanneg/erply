@@ -39,7 +39,7 @@ fun SearchBar(
             .padding(vertical = 2.dp)
             .focusRequester(focusRequester),
         value = searchText,
-        onValueChange = { onSearchTextChanged(it.trim()) },
+        onValueChange = { onSearchTextChanged(it) },
         placeholder = { Text(text = "Search") },
         trailingIcon = {
             IconButton(onClick = { onCloseClick() }) {

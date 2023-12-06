@@ -1,5 +1,6 @@
 package com.ydanneg.erply.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
@@ -12,6 +13,9 @@ interface ErplyProductDao {
 
     @Query(value = "SELECT * FROM $PRODUCTS_TABLE_NAME WHERE clientCode = :clientCode")
     fun getAll(clientCode: String): Flow<List<ProductEntity>>
+
+    @Query(value = "SELECT * FROM $PRODUCTS_TABLE_NAME WHERE clientCode = :clientCode")
+    fun getAllPageable(clientCode: String): PagingSource<Int, ProductEntity>
 
     @Query("SELECT * FROM $PRODUCTS_TABLE_NAME WHERE id = :productId AND clientCode = :clientCode")
     fun getById(clientCode: String, productId: String): Flow<ProductEntity?>

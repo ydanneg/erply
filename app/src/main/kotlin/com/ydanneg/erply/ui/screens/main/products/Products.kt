@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material3.Card
@@ -38,11 +37,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.ErplyProductType
 import com.ydanneg.erply.api.model.LocalizedValue
+import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao.ProductWithImage
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
 import com.ydanneg.erply.ui.components.Loading
 import com.ydanneg.erply.ui.components.NothingToShow
@@ -50,6 +54,7 @@ import com.ydanneg.erply.ui.screens.main.MainScreenState
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
 import com.ydanneg.erply.ui.util.generateAlphanumeric
+import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewThemes
@@ -76,7 +81,8 @@ private fun ProductsScreenContentPreview() {
                 description = null,
                 changed = 0
             ),
-            products = products.map { ProductWithImages(it, listOf()) }
+            products = products.map { ProductWithImages(it, listOf()) },
+            pagingProducts = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
         )
     }
 }
@@ -89,7 +95,8 @@ private fun ProductsScreenContentEmptyLoadingPreview() {
         ProductsScreenContent(
             isLoading = true,
             group = null,
-            products = listOf()
+            products = listOf(),
+            pagingProducts = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
         )
     }
 }
@@ -102,7 +109,8 @@ private fun ProductsScreenContentEmptyPreview() {
         ProductsScreenContent(
             isLoading = false,
             group = null,
-            products = listOf()
+            products = listOf(),
+            pagingProducts = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
         )
     }
 }
@@ -114,7 +122,7 @@ fun ProductsScreen(
     viewModel: ProductsScreenViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val products = viewModel.filteredProducts.collectAsLazyPagingItems()
     val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading })
 
     LaunchedEffect(uiState) {
@@ -125,6 +133,7 @@ fun ProductsScreen(
 
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
+            pullToRefreshState.endRefresh()
             viewModel.loadProducts()
             onDispose { }
         }
@@ -139,6 +148,7 @@ fun ProductsScreen(
         isLoading = uiState.isLoading,
         group = uiState.group,
         products = uiState.products,
+        pagingProducts = products,
         searchQuery = uiState.searchQuery,
         onSearch = viewModel::setSearchQuery,
         navController = mainScreenState.navController,
@@ -152,6 +162,7 @@ private fun ProductsScreenContent(
     isLoading: Boolean = false,
     group: ErplyProductGroup?,
     products: List<ProductWithImages>,
+    pagingProducts: LazyPagingItems<ProductWithImage>,
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
     navController: NavController = rememberNavController(),
@@ -176,7 +187,7 @@ private fun ProductsScreenContent(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                if (products.isEmpty()) if (isLoading) Loading() else NothingToShow()
+                if (pagingProducts.itemCount == 0) if (isLoading) Loading() else NothingToShow()
 
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
@@ -185,41 +196,51 @@ private fun ProductsScreenContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(products, key = { it.product.id }) {
+                    items(
+                        pagingProducts.itemCount,
+                        key = pagingProducts.itemKey { it.id }
+                    ) { index ->
+                        val item = pagingProducts[index]
                         Card(
                             modifier = Modifier
                                 .size(156.dp)
                                 .clickable { },
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(4.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                AsyncImage(
-                                    modifier = Modifier.size(64.dp),
-                                    // FIXME
-                                    model = it.imageUrl() ?: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
-                                    contentDescription = it.product.name.en,
-                                    placeholder = placeholder
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = it.product.name.en,
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Spacer(Modifier.weight(1.0f))
-                                Text(
-                                    text = "\$${it.product.price}",
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                )
+                            if (item != null) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(4.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    AsyncImage(
+                                        modifier = Modifier.size(64.dp),
+                                        // FIXME
+                                        model = item.imageUrl(),
+//                                            ?: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
+                                        error = placeholder,
+                                        contentDescription = item.name,
+                                        placeholder = placeholder
+                                    )
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        text = item.name,
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Spacer(Modifier.weight(1.0f))
+                                    Text(
+                                        text = "\$${item.price}",
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                            } else {
+                                Text(text = "Placeholder")
                             }
                         }
                     }

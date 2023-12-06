@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.paging.compose)
 
     // AndroidX Room
     implementation(libs.bundles.androidx.room)

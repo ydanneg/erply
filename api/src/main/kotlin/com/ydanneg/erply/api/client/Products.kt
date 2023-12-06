@@ -63,11 +63,6 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
             }.body()
         }
 
-    suspend fun fetchDeletedProductGroups(token: String, changedSince: Long? = null): List<String> {
-        TODO("PIM has no such functionality?")
-    }
-
-    //
     suspend fun fetchAllProducts(token: String, changedSince: Long? = null): Flow<List<ErplyProduct>> =
         fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchProducts(token, changedSince, skip = skip, take = take)
