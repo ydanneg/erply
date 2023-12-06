@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.NonNls
 import javax.inject.Inject
 
 data class UiState(
@@ -71,8 +72,9 @@ class ProductsScreenViewModel @Inject constructor(
         savedStateHandle[SEARCH_QUERY_KEY] = search
     }
 
+        @NonNls
     fun loadProducts() {
-        Log.d(TAG, "loadProducts...")
+        Log.d(TAG, "loadProducts...")//NON-NLS
         viewModelScope.launch {
             workManagerSyncManager.requestSync()
         }

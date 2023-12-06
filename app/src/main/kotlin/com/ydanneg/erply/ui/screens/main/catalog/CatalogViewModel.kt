@@ -36,7 +36,7 @@ class ProductGroupsScreenViewModel @Inject constructor(
     }.toStateFlow(viewModelScope, UiState(isLoading = true))
 
     fun loadProductGroups() {
-        Log.d(TAG, "loadProducts...")
+        Log.d(TAG, "loadProducts...")//NON-NLS
         viewModelScope.launch {
             workManagerSyncManager.requestSync()
         }

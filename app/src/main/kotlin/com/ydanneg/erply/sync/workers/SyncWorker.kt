@@ -59,7 +59,7 @@ class SyncWorker @AssistedInject constructor(
             val deferredProducts = async { syncProductsUseCase.sync() }
             awaitAll(deferredGroups, deferredImages, deferredProducts).all { it }
         }
-        Log.i(TAG, "doWork complete: $syncedSuccessfully")
+        Log.i(TAG, "doWork complete: $syncedSuccessfully")//NON-NLS
 
         if (syncedSuccessfully) Result.success() else Result.retry()
     }

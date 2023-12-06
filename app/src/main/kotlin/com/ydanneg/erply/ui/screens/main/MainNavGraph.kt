@@ -1,5 +1,6 @@
 package com.ydanneg.erply.ui.screens.main
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -30,12 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ydanneg.erply.R
 import com.ydanneg.erply.ui.screens.main.catalog.ProductGroupsScreen
 import com.ydanneg.erply.ui.screens.main.products.ProductsScreen
 import com.ydanneg.erply.ui.screens.main.settings.SettingsScreen
@@ -52,13 +55,14 @@ private val drawerItems = listOf(Screen.TopLevel.Catalog, Screen.TopLevel.Settin
 }
 
 private data class DrawerItem(
-    val label: String,
+    @StringRes val label: Int,
     val icon: ImageVector,
     val route: Screen
 )
 
 @PreviewThemes
 @Composable
+@Suppress("HardCodedStringLiteral")
 private fun DrawerContentPreview() {
     ErplyThemePreviewSurface {
         DrawerContent(username = "ydanneg@gmail.com", items = drawerItems, selectedItem = drawerItems.first(), onItemClick = {})
@@ -102,7 +106,7 @@ private fun DrawerContent(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = onLogout) {
-                Text(text = "Sign out")
+                Text(text = stringResource(R.string.button_sign_out))
             }
         }
 
@@ -110,7 +114,7 @@ private fun DrawerContent(
 
         items.forEach { item ->
             NavigationDrawerItem(
-                label = { Text(text = item.label) },
+                label = { Text(text = stringResource(item.label)) },
                 icon = { Icon(imageVector = item.icon, contentDescription = null) },
                 selected = item == selectedItem,
                 onClick = { onItemClick(item) }
@@ -133,7 +137,7 @@ fun ErplyMainNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
                 DrawerContent(
-                    username = state.appState.userData.session?.username ?: "Guest",
+                    username = state.appState.userData.session?.username ?: stringResource(R.string.guest),
                     items = drawerItems,
                     selectedItem = navBackStackEntry?.destination?.route?.let { route -> drawerItems.find { it.route.route == route } },
                     onItemClick = { item ->

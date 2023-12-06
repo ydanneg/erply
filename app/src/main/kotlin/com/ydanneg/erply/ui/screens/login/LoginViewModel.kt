@@ -22,11 +22,11 @@ sealed class LoginUIState {
     data object Loading : LoginUIState()
     data object Success : LoginUIState()
 
-    data class Error(val message: String?) : LoginUIState()
+    data class Error(val error: ErplyApiError) : LoginUIState()
 }
 
 fun LoginUIState.isLoading() = this is LoginUIState.Loading
-fun LoginUIState.getError() = if (this is LoginUIState.Error) message else null
+fun LoginUIState.getError() = if (this is LoginUIState.Error) error else null
 
 
 @HiltViewModel
@@ -58,19 +58,10 @@ class LoginScreenViewModel @Inject constructor(
                 userSessionRepository.login(clientId, username, password)
                 _uiState.value = LoginUIState.Success
             } catch (e: ErplyApiException) {
-                Log.e(TAG, "error", e)
-                _uiState.value = LoginUIState.Error(e.type.message())
+                Log.e(TAG, "error", e)//NON-NLS
+                _uiState.value = LoginUIState.Error(e.type)
             }
         }
     }
 
-    private fun ErplyApiError.message(): String = when (this) {
-        ErplyApiError.ConnectionError -> "Connection error"
-        ErplyApiError.WrongCredentials -> "Wrong credentials"
-        ErplyApiError.Unauthorized -> "Session expired"
-        ErplyApiError.RequestLimitReached -> "Request limit reached"
-        ErplyApiError.AccountNotFound -> "Account not found"
-        ErplyApiError.AccessDenied -> "Access denied"
-        ErplyApiError.Unknown -> "Unknown error. Try again later."
-    }
 }

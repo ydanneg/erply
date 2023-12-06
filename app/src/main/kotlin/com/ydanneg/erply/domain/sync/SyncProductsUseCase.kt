@@ -27,7 +27,7 @@ class SyncProductsUseCase @Inject constructor(
     override suspend operator fun invoke(synchronizer: Synchronizer): Boolean {
         val userSession = userSessionRepository.userSession.firstOrNull()
         if (userSession?.token == null) {
-            Log.d(TAG, "Sync Products skipped. Not logged in.")
+            Log.d(TAG, "Sync Products skipped. Not logged in.")//NON-NLS
             return false
         }
 

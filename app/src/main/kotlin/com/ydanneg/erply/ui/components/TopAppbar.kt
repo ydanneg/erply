@@ -19,8 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.ydanneg.erply.R
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
 import kotlinx.coroutines.CoroutineScope
@@ -28,12 +30,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 @PreviewThemes
+@Suppress("HardCodedStringLiteral")
 private fun ErplyDrawerTopAppbarPreview() = ErplyThemePreviewSurface {
     ErplyDrawerTopAppbar("This is a title")
 }
 
 @Composable
 @PreviewThemes
+@Suppress("HardCodedStringLiteral")
 private fun ErplyNavTopAppbarPreview() = ErplyThemePreviewSurface {
     ErplyNavTopAppbar("This is a title")
 }
@@ -78,7 +82,7 @@ private fun ErplySearchableTopAppbar(
                 )
             } else {
                 IconButton(onClick = { searching = true }) {
-                    Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = stringResource(R.string.top_bar_search_icon_description))
                 }
             }
         }

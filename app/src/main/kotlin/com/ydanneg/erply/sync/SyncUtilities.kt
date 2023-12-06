@@ -43,11 +43,7 @@ private suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> = 
 } catch (cancellationException: CancellationException) {
     throw cancellationException
 } catch (exception: Exception) {
-    Log.i(
-        "suspendRunCatching",
-        "Failed to evaluate a suspendRunCatchingBlock. Returning failure Result",
-        exception,
-    )
+    Log.w("suspendRunCatching", "Failed to evaluate a suspendRunCatchingBlock. Returning failure Result", exception)//NON-NLS
     Result.failure(exception)
 }
 

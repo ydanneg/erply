@@ -32,7 +32,7 @@ class EncryptionManager @Inject constructor(
                 init(Cipher.ENCRYPT_MODE, getOrCreateSecretKey(keyAlias))
                 EncryptedData(
                     iv = iv,
-                    data = doFinal(data.toByteArray(charset))
+                    data = doFinal(data.toByteArray(Charsets.UTF_8))
                 )
             }
         }
@@ -41,7 +41,7 @@ class EncryptionManager @Inject constructor(
         withContext(Dispatchers.IO) {
             Cipher.getInstance(TRANSFORMATION).run {
                 init(Cipher.DECRYPT_MODE, getOrCreateSecretKey(keyAlias), IvParameterSpec(iv))
-                doFinal(encryptedData).toString(charset)
+                doFinal(encryptedData).toString(Charsets.UTF_8)
             }
         }
 
@@ -74,9 +74,7 @@ class EncryptionManager @Inject constructor(
         private const val ALGORITHM = KEY_ALGORITHM_AES
         private const val BLOCK_MODE = BLOCK_MODE_CBC
         private const val PADDING = ENCRYPTION_PADDING_PKCS7
-        private const val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"
+        private const val TRANSFORMATION = "$ALGORITHM/$BLOCK_MODE/$PADDING"//NON-NLS
         private const val KEY_SIZE = 256
-
-        private val charset = charset("UTF-8")
     }
 }

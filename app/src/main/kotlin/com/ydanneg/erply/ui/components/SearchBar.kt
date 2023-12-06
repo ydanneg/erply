@@ -17,8 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.ydanneg.erply.R
 
 @Composable
 fun SearchBar(
@@ -40,7 +42,7 @@ fun SearchBar(
             .focusRequester(focusRequester),
         value = searchText,
         onValueChange = { onSearchTextChanged(it) },
-        placeholder = { Text(text = "Search") },
+        placeholder = { Text(text = stringResource(R.string.search_bar_placeholder)) },
         trailingIcon = {
             IconButton(onClick = { onCloseClick() }) {
                 Icon(

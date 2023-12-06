@@ -1,4 +1,35 @@
 <resources>
     <string name="app_name">Erply</string>
     <string name="exit_confirmation">repeat to exit!</string>
+    <string name="account_login_title">Account Login</string>
+    <string name="login_client_code_label">Client Code</string>
+    <string name="login_username_label">Username</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_hint_hide_password">Hide password</string>
+    <string name="login_hint_show_password">Show password</string>
+    <string name="login_keep_me_signed_in_text">Keep me signed in</string>
+    <string name="button_sign_in">Sign in</string>
+    <string name="button_sign_out">Sign out</string>
+    <string name="guest">Guest</string>
+    <string name="catalog_top_bar_title">Catalog</string>
+    <string name="loading">Loading…</string>
+    <string name="nothing_to_show_title">Nothing to show here</string>
+    <string name="nothing_to_show_subtitle">Pull down to refresh</string>
+    <string name="search_bar_placeholder">Search</string>
+    <string name="top_bar_search_icon_description">Search</string>
+    <string name="route_catalog_label">Catalog</string>
+    <string name="route_settings_label">Settings</string>
+    <string name="route_group_label">Product</string>
+    <string name="screen_settings_title">Settings</string>
+    <string name="screen_settings_theme_title">Select theme</string>
+    <string name="screen_settings_theme_system_default">System default</string>
+    <string name="screen_settings_theme_dark">Dark</string>
+    <string name="screen_settings_theme_light">Light</string>
+    <string name="screen_login_error_connection">Connection error</string>
+    <string name="screen_login_error_wrong_credentials">Wrong credentials</string>
+    <string name="screen_login_error_session_expired">Session expired</string>
+    <string name="screen_login_error_limit_reached">Request limit reached</string>
+    <string name="screen_login_error_account_not_found">Account not found</string>
+    <string name="screen_login_error_access_denied">Access denied</string>
+    <string name="screen_login_error_unknown">Unknown error. Try again later.</string>
 </resources>

@@ -27,9 +27,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ydanneg.erply.R
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
@@ -47,7 +49,7 @@ private fun ProductGroupPreview() {
     val groups = (1L..15L).mapIndexed { index, item ->
         ErplyProductGroup(
             id = item.toString(),
-            name = LocalizedValue("name$item"),
+            name = LocalizedValue("name$item"),//NON-NLS
             parentId = "0",
             order = index,
             description = LocalizedValue("description$item"),
@@ -113,7 +115,7 @@ private fun ProductGroupsScreenContent(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             ErplyDrawerTopAppbar(
-                title = "Catalog",
+                title = stringResource(R.string.catalog_top_bar_title),
                 drawerState = drawerState
             )
         },

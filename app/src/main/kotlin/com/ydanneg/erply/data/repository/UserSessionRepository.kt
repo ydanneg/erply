@@ -52,11 +52,11 @@ class UserSessionRepository @Inject constructor(
         return try {
             block(userSession.first())
         } catch (e: ErplyApiException) {
-            Log.e(TAG, "API Error", e)
+            Log.e(TAG, "API Error", e)//NON-NLS
             if (enabled && e.type == ErplyApiError.Unauthorized) {
-                Log.i(TAG, "trying to re-authenticate...")
+                Log.i(TAG, "trying to re-authenticate...")//NON-NLS
                 tryLogin()
-                Log.i(TAG, "re-trying operation...")
+                Log.i(TAG, "re-trying operation...")//NON-NLS
                 block(userSession.first())
             } else {
                 throw e

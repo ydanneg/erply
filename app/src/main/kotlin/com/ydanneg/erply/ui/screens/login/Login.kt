@@ -25,12 +25,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ydanneg.erply.R
+import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.ui.components.ErplyTextField
 import com.ydanneg.erply.ui.components.ExitConfirmation
 import com.ydanneg.erply.ui.components.FadedProgressIndicator
@@ -47,6 +50,7 @@ private fun LoginScreenPreview() {
 
 @PreviewThemes
 @Composable
+@Suppress("HardCodedStringLiteral")
 private fun LoginScreenWithErrorPreview() {
     ErplyThemePreviewSurface {
         LoginScreenContent(isLoading = false, error = "Bad credentials! Try again!")
@@ -73,7 +77,7 @@ fun LoginScreen(
 
     LoginScreenContent(
         isLoading = uiState.isLoading(),
-        error = uiState.getError(),
+        error = uiState.getError()?.message(),
         onLoginClicked = { client, user, pass ->
             viewModel.doLogin(client, user, pass)
         },
@@ -92,6 +96,7 @@ private fun LoginScreenContent(
     keepMeSignedIn: Boolean = false,
     onKeepMeSignedInChanged: (Boolean) -> Unit = {}
 ) {
+    // TODO: remove credentials
     var clientCode by rememberSaveable { mutableStateOf("") }
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -105,7 +110,7 @@ private fun LoginScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = "Account Login",
+                    text = stringResource(R.string.account_login_title),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center
                 )
@@ -115,7 +120,7 @@ private fun LoginScreenContent(
                     singleLine = true,
                     onValueChange = { value: String -> clientCode = value },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    labelText = "Client Code",
+                    labelText = stringResource(R.string.login_client_code_label),
                     maxLength = 10
                 )
                 ErplyTextField(
@@ -124,7 +129,7 @@ private fun LoginScreenContent(
                     singleLine = true,
                     onValueChange = { value: String -> username = value },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    labelText = "Username",
+                    labelText = stringResource(R.string.login_username_label),
                     maxLength = 50
                 )
                 ErplyTextField(
@@ -132,12 +137,12 @@ private fun LoginScreenContent(
                     singleLine = true,
                     enabled = !isLoading,
                     onValueChange = { value: String -> password = value },
-                    labelText = "Password",
+                    labelText = stringResource(R.string.login_password_label),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description = if (passwordVisible) "Hide password" else "Show password"
+                        val description = if (passwordVisible) stringResource(R.string.login_hint_hide_password) else stringResource(R.string.login_hint_show_password)
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
                         }
@@ -146,13 +151,13 @@ private fun LoginScreenContent(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = keepMeSignedIn, onCheckedChange = onKeepMeSignedInChanged)
-                    Text(text = "Keep me signed in", modifier = Modifier.wrapContentWidth())
+                    Text(text = stringResource(R.string.login_keep_me_signed_in_text), modifier = Modifier.wrapContentWidth())
                 }
                 Button(
                     enabled = !isLoading,
                     onClick = { onLoginClicked?.invoke(clientCode, username, password) }
                 ) {
-                    Text(text = "Sign in")
+                    Text(text = stringResource(R.string.button_sign_in))
                 }
                 if (!error.isNullOrBlank()) {
                     Text(text = error, color = MaterialTheme.colorScheme.error)
@@ -162,4 +167,16 @@ private fun LoginScreenContent(
         FadedProgressIndicator(isLoading)
     }
 
+}
+
+
+@Composable
+private fun ErplyApiError.message(): String = when (this) {
+    ErplyApiError.ConnectionError -> stringResource(R.string.screen_login_error_connection)
+    ErplyApiError.WrongCredentials -> stringResource(R.string.screen_login_error_wrong_credentials)
+    ErplyApiError.Unauthorized -> stringResource(R.string.screen_login_error_session_expired)
+    ErplyApiError.RequestLimitReached -> stringResource(R.string.screen_login_error_limit_reached)
+    ErplyApiError.AccountNotFound -> stringResource(R.string.screen_login_error_account_not_found)
+    ErplyApiError.AccessDenied -> stringResource(R.string.screen_login_error_access_denied)
+    ErplyApiError.Unknown -> stringResource(R.string.screen_login_error_unknown)
 }

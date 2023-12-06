@@ -24,7 +24,7 @@ object ErplyApiModule {
                 logger = { Log.v("HTTP", it) },
                 logLevel = valueOrNull<ErplyApiClientLogLevel>(BuildConfig.CLIENT_LOG_LEVEL) ?: ErplyApiClientLogLevel.NONE,
                 baseUrl = BuildConfig.CLIENT_PIM_BASE_URL,
-                userAgent = "${BuildConfig.CLIENT_USER_AGENT}/${BuildConfig.VERSION_NAME}.{${BuildConfig.VERSION_CODE}} (Android SDK ${Build.VERSION.SDK_INT}; ${Build.DEVICE})",
+                userAgent = "${BuildConfig.CLIENT_USER_AGENT}/${BuildConfig.VERSION_NAME}.{${BuildConfig.VERSION_CODE}} (Android SDK ${Build.VERSION.SDK_INT}; ${Build.DEVICE})",//NON-NLS
                 connectionTimeoutSeconds = BuildConfig.CLIENT_CONNECT_TIMEOUT_SECONDS.toLong(),
                 readTimeoutSeconds = BuildConfig.CLIENT_READ_TIMEOUT_SECONDS.toLong(),
                 writeTimeoutSeconds = BuildConfig.CLIENT_WRITE_TIMEOUT_SECONDS.toLong()

@@ -20,6 +20,6 @@ object DatabaseModule {
     ): ErplyDatabase = Room.databaseBuilder(
         context,
         ErplyDatabase::class.java,
-        "erply-db",
+        "erply-db",//NON-NLS
     ).build()
 }

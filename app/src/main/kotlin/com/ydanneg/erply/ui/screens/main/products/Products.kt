@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -138,48 +139,7 @@ private fun ProductsScreenContent(
                         key = pagingProducts.itemKey { it.id }
                     ) { index ->
                         val item = pagingProducts[index]
-                        Card(
-                            modifier = Modifier
-                                .size(156.dp)
-                                .clickable { },
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                        ) {
-                            if (item != null) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(4.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    AsyncImage(
-//                                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer, BlendMode.SrcAtop),
-                                        modifier = Modifier.size(64.dp),
-                                        model = item.imageUrlOrNull(),
-                                        error = placeholder,
-                                        contentDescription = item.name,
-                                        placeholder = placeholder
-                                    )
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        text = item.name,
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Spacer(Modifier.weight(1.0f))
-                                    Text(
-                                        text = "\$${item.price}",
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                }
-                            } else {
-                                Text(text = "Placeholder")
-                            }
-                        }
+                        ProductCard(item, placeholder)
                     }
                 }
 
@@ -189,9 +149,51 @@ private fun ProductsScreenContent(
     )
 }
 
+@Composable
+private fun ProductCard(item: ProductWithImage?, placeholder: VectorPainter) {
+    Card(
+        modifier = Modifier
+            .size(156.dp)
+            .clickable { },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AsyncImage(
+                modifier = Modifier.size(64.dp),
+                model = item?.imageUrlOrNull(),
+                error = placeholder,
+                contentDescription = item?.name,
+                placeholder = placeholder
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = item?.name ?: "",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.weight(1.0f))
+            Text(
+                text = "\$${item?.price ?: ""}",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewThemes
 @Composable
+@Suppress("HardCodedStringLiteral")
 private fun ProductsScreenContentPreview() {
     val products = (1L..15L).map {
         ProductWithImage(

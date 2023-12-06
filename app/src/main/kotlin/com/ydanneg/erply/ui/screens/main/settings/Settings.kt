@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ydanneg.erply.R
 import com.ydanneg.erply.model.DarkThemeConfig
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
@@ -59,26 +61,26 @@ private fun SettingsScreenContent(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             ErplyDrawerTopAppbar(
-                title = "Settings",
+                title = stringResource(R.string.screen_settings_title),
                 drawerState = mainScreenState.drawerState
             )
         },
         content = { paddingValues ->
             Column(Modifier.padding(paddingValues), horizontalAlignment = Alignment.CenterHorizontally) {
-                SettingsSectionTitle("Select theme")
+                SettingsSectionTitle(stringResource(R.string.screen_settings_theme_title))
                 Column(Modifier.selectableGroup()) {
                     SettingsThemeChooserRow(
-                        text = "System default",
+                        text = stringResource(R.string.screen_settings_theme_system_default),
                         selected = userPreferences.darkThemeConfig == DarkThemeConfig.FOLLOW_SYSTEM,
                         onClick = { onDarkThemeConfigChange(DarkThemeConfig.FOLLOW_SYSTEM) }
                     )
                     SettingsThemeChooserRow(
-                        text = "Dark",
+                        text = stringResource(R.string.screen_settings_theme_dark),
                         selected = userPreferences.darkThemeConfig == DarkThemeConfig.DARK,
                         onClick = { onDarkThemeConfigChange(DarkThemeConfig.DARK) }
                     )
                     SettingsThemeChooserRow(
-                        text = "Light",
+                        text = stringResource(R.string.screen_settings_theme_light),
                         selected = userPreferences.darkThemeConfig == DarkThemeConfig.LIGHT,
                         onClick = { onDarkThemeConfigChange(DarkThemeConfig.LIGHT) }
                     )
