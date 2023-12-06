@@ -27,18 +27,19 @@ import javax.inject.Inject
 
 data class UiState(
     val group: ErplyProductGroup? = null,
-    val products: List<ProductWithImages> = listOf(),
     val isLoading: Boolean = false,
     val searchQuery: String? = null
 )
+
+val UiState.notLoaded
+    get() = group == null && !isLoading
 
 data class ProductWithImages(
     val product: ErplyProduct,
     val images: List<ErplyProductPicture>
 )
 
-fun ProductWithImages.imageUrl(): String? = images.firstOrNull()?.let { "https://cdn-sb.erply.com/images/${it.tenant}/${it.filename}" }
-fun ProductWithImage.imageUrl(): String? = tenant?.let { tenant -> filename?.let { "https://cdn-sb.erply.com/images/$tenant/$it" } }
+fun ProductWithImage.imageUrlOrNull(): String? = tenant?.let { tenant -> filename?.let { "https://cdn-sb.erply.com/images/$tenant/$it" } }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -67,7 +68,6 @@ class ProductsScreenViewModel @Inject constructor(
     ) { group, isSyncing, searchQuery ->
         UiState(
             group = group,
-            products = listOf(),
             isLoading = isSyncing,
             searchQuery = searchQuery
         )

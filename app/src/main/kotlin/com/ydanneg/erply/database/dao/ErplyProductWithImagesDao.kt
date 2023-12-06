@@ -14,10 +14,12 @@ interface ErplyProductWithImagesDao {
 
     @Query(
         """
-        SELECT * FROM $PRODUCTS_TABLE_NAME product 
-        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME image ON product.id = image.productId 
+        SELECT * FROM $PRODUCTS_TABLE_NAME AS product 
+        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image 
+            ON product.id = image.productId 
         WHERE product.clientCode = :clientCode 
             AND product.groupId = :groupId
+        ORDER BY product.changed DESC
         """
     )
     fun findAllByGroupId(clientCode: String, groupId: String): Flow<Map<ProductEntity, List<ProductPictureEntity>>>
@@ -25,19 +27,20 @@ interface ErplyProductWithImagesDao {
     @Query(
         """
         SELECT 
-            products.id as id, 
-            products.name as name, 
-            products.description as description, 
-            products.price as price, 
-            products.price as price, 
-            product_images.filename as filename,
-            product_images.tenant as tenant 
-        FROM products
-        LEFT JOIN product_images 
-            ON products.id = product_images.productId  
-            AND products.clientCode = product_images.clientCode
-        WHERE products.groupId = :groupId
-            AND products.clientCode = :clientCode
+            product.id AS id, 
+            product.name AS name, 
+            product.description AS description, 
+            product.price AS price, 
+            product.price AS price, 
+            image.filename AS filename,
+            image.tenant AS tenant 
+        FROM $PRODUCTS_TABLE_NAME AS product
+        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image
+            ON product.id = image.productId  
+            AND product.clientCode = image.clientCode
+        WHERE product.groupId = :groupId
+            AND product.clientCode = :clientCode
+        ORDER BY product.changed DESC
         """
     )
     fun findAllByGroupIdPageable(clientCode: String, groupId: String): PagingSource<Int, ProductWithImage>
@@ -45,20 +48,21 @@ interface ErplyProductWithImagesDao {
     @Query(
         """
         SELECT 
-            products.id as id, 
-            products.name as name, 
-            products.description as description, 
-            products.price as price, 
-            products.price as price, 
-            product_images.filename as filename,
-            product_images.tenant as tenant 
-        FROM products
-        LEFT JOIN product_images 
-            ON products.id = product_images.productId  
-            AND products.clientCode = product_images.clientCode
-        WHERE products.groupId = :groupId
-            AND products.clientCode = :clientCode
-            AND products.name LIKE '%' || :name || '%'
+            product.id AS id, 
+            product.name AS name, 
+            product.description AS description, 
+            product.price AS price, 
+            product.price AS price, 
+            image.filename AS filename,
+            image.tenant AS tenant 
+        FROM $PRODUCTS_TABLE_NAME AS product
+        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image
+            ON product.id = image.productId  
+            AND product.clientCode = image.clientCode
+        WHERE product.groupId = :groupId
+            AND product.clientCode = :clientCode
+            AND product.name LIKE '%' || :name || '%'
+        ORDER BY product.changed DESC
         """
     )
     fun findAllByGroupIdAndNamePageable(clientCode: String, groupId: String, name: String): PagingSource<Int, ProductWithImage>
@@ -74,11 +78,13 @@ interface ErplyProductWithImagesDao {
 
     @Query(
         """
-        SELECT * FROM $PRODUCTS_TABLE_NAME product 
-        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME image ON product.id = image.productId 
+        SELECT * FROM $PRODUCTS_TABLE_NAME AS product 
+        LEFT JOIN $PRODUCT_IMAGES_TABLE_NAME AS image 
+            ON product.id = image.productId 
         WHERE product.clientCode = :clientCode 
             AND product.groupId = :groupId
             AND name LIKE '%' || :name || '%'
+        ORDER BY product.changed DESC
         """
     )
     fun findAllByGroupIdAndName(clientCode: String, groupId: String, name: String): Flow<Map<ProductEntity, List<ProductPictureEntity>>>

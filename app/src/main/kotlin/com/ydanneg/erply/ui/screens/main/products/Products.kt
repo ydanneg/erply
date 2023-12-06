@@ -42,9 +42,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
-import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
-import com.ydanneg.erply.api.model.ErplyProductType
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.database.dao.ErplyProductWithImagesDao.ProductWithImage
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
@@ -57,65 +55,6 @@ import com.ydanneg.erply.ui.util.generateAlphanumeric
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
-@PreviewThemes
-@Composable
-private fun ProductsScreenContentPreview() {
-    val products = (1L..15L).map {
-        ErplyProduct(
-            id = it.toString(),
-            name = LocalizedValue("$it ${generateAlphanumeric()}"),
-            groupId = it.toString(),
-            price = "19.99",
-            type = ErplyProductType.PRODUCT,
-            description = LocalizedValue("description$it"),
-            changed = System.currentTimeMillis() / 100
-        )
-    }
-    ErplyThemePreviewSurface {
-        ProductsScreenContent(
-            group = ErplyProductGroup(
-                id = "",
-                parentId = "",
-                order = 1,
-                name = LocalizedValue("Very long group name, da, da, dadadada"),
-                description = null,
-                changed = 0
-            ),
-            products = products.map { ProductWithImages(it, listOf()) },
-            pagingProducts = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@PreviewThemes
-@Composable
-private fun ProductsScreenContentEmptyLoadingPreview() {
-    ErplyThemePreviewSurface {
-        ProductsScreenContent(
-            isLoading = true,
-            group = null,
-            products = listOf(),
-            pagingProducts = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@PreviewThemes
-@Composable
-private fun ProductsScreenContentEmptyPreview() {
-    ErplyThemePreviewSurface {
-        ProductsScreenContent(
-            isLoading = false,
-            group = null,
-            products = listOf(),
-            pagingProducts = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
     mainScreenState: MainScreenState,
@@ -126,14 +65,13 @@ fun ProductsScreen(
     val pullToRefreshState = rememberPullToRefreshState(enabled = { !uiState.isLoading })
 
     LaunchedEffect(uiState) {
-        if (uiState.group == null && !uiState.isLoading) {
+        if (uiState.notLoaded) {
             mainScreenState.navController.popBackStack()
         }
     }
 
     if (pullToRefreshState.isRefreshing) {
         DisposableEffect(Unit) {
-            pullToRefreshState.endRefresh()
             viewModel.loadProducts()
             onDispose { }
         }
@@ -147,7 +85,6 @@ fun ProductsScreen(
     ProductsScreenContent(
         isLoading = uiState.isLoading,
         group = uiState.group,
-        products = uiState.products,
         pagingProducts = products,
         searchQuery = uiState.searchQuery,
         onSearch = viewModel::setSearchQuery,
@@ -160,9 +97,8 @@ fun ProductsScreen(
 @Composable
 private fun ProductsScreenContent(
     isLoading: Boolean = false,
-    group: ErplyProductGroup?,
-    products: List<ProductWithImages>,
-    pagingProducts: LazyPagingItems<ProductWithImage>,
+    group: ErplyProductGroup? = null,
+    pagingProducts: LazyPagingItems<ProductWithImage> = emptyLazyPagingItems(),
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
     navController: NavController = rememberNavController(),
@@ -215,9 +151,7 @@ private fun ProductsScreenContent(
                                 ) {
                                     AsyncImage(
                                         modifier = Modifier.size(64.dp),
-                                        // FIXME
-                                        model = item.imageUrl(),
-//                                            ?: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png",
+                                        model = item.imageUrlOrNull(),
                                         error = placeholder,
                                         contentDescription = item.name,
                                         placeholder = placeholder
@@ -251,3 +185,62 @@ private fun ProductsScreenContent(
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@PreviewThemes
+@Composable
+private fun ProductsScreenContentPreview() {
+    val products = (1L..15L).map {
+        ProductWithImage(
+            id = it.toString(),
+            name = "$it ${generateAlphanumeric()}",
+            price = "19.99",
+            description = "description$it",
+            filename = null,
+            tenant = null
+        )
+    }
+    ErplyThemePreviewSurface {
+        ProductsScreenContent(
+            group = ErplyProductGroup(
+                id = "",
+                parentId = "",
+                order = 1,
+                name = LocalizedValue("Very long group name, da, da, dadadada"),
+                description = null,
+                changed = 0
+            ),
+            pagingProducts = lazyPagingItems(products)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@PreviewThemes
+@Composable
+private fun ProductsScreenContentEmptyLoadingPreview() {
+    ErplyThemePreviewSurface {
+        ProductsScreenContent(
+            isLoading = true,
+            pagingProducts = emptyLazyPagingItems()
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@PreviewThemes
+@Composable
+private fun ProductsScreenContentEmptyPreview() {
+    ErplyThemePreviewSurface {
+        ProductsScreenContent(
+            isLoading = false,
+            pagingProducts = emptyLazyPagingItems()
+        )
+    }
+}
+
+@Composable
+private fun emptyLazyPagingItems() = flowOf(PagingData.empty<ProductWithImage>()).collectAsLazyPagingItems()
+
+@Composable
+private fun <T : Any> lazyPagingItems(items: List<T>): LazyPagingItems<T> = flowOf(PagingData.from(items)).collectAsLazyPagingItems()
