@@ -44,8 +44,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
-import com.ydanneg.erply.api.model.ErplyProductGroup
-import com.ydanneg.erply.api.model.LocalizedValue
+import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
 import com.ydanneg.erply.ui.components.FadedLinerProgressIndicator
@@ -102,7 +101,7 @@ fun ProductsScreen(
 @Composable
 private fun ProductsScreenContent(
     isLoading: Boolean = false,
-    group: ErplyProductGroup? = null,
+    group: ProductGroup? = null,
     pagingProducts: LazyPagingItems<ProductWithImage> = emptyLazyPagingItems(),
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
@@ -118,7 +117,7 @@ private fun ProductsScreenContent(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ErplyNavTopAppbar(
-                title = group?.name?.en ?: "",
+                title = group?.name ?: "",
                 searchQuery = searchQuery,
                 onSearch = onSearch,
                 navController = navController,
@@ -217,11 +216,11 @@ private fun ProductsScreenContentPreview() {
     }
     ErplyThemePreviewSurface {
         ProductsScreenContent(
-            group = ErplyProductGroup(
+            group = ProductGroup(
                 id = "",
                 parentId = "",
                 order = 1,
-                name = LocalizedValue("Very long group name, da, da, dadadada"),
+                name = "Very long group name, da, da, dadadada",
                 description = null,
                 changed = 0
             ),

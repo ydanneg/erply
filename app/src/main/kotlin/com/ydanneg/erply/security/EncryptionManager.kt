@@ -23,9 +23,7 @@ class EncryptedData(
     val data: ByteArray
 )
 
-class EncryptionManager @Inject constructor(
-    @ApplicationContext val context: Context
-) {
+class EncryptionManager @Inject constructor(@ApplicationContext val context: Context) {
     suspend fun encryptText(keyAlias: String, data: String): EncryptedData =
         withContext(Dispatchers.IO) {
             Cipher.getInstance(TRANSFORMATION).run {

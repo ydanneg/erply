@@ -68,13 +68,13 @@ private fun SettingsScreenContent(
             )
         },
         content = { paddingValues ->
-            Column(Modifier.padding(paddingValues), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.padding(paddingValues).padding(16.dp)) {
                 SettingsSectionTitle(stringResource(R.string.screen_settings_theme_title))
                 Column(Modifier.selectableGroup()) {
                     SettingsThemeChooserRow(
-                        text = stringResource(R.string.screen_settings_theme_system_default),
-                        selected = userPreferences.darkThemeConfig == DarkThemeConfig.FOLLOW_SYSTEM,
-                        onClick = { onDarkThemeConfigChange(DarkThemeConfig.FOLLOW_SYSTEM) }
+                        text = stringResource(R.string.screen_settings_theme_light),
+                        selected = userPreferences.darkThemeConfig == DarkThemeConfig.LIGHT,
+                        onClick = { onDarkThemeConfigChange(DarkThemeConfig.LIGHT) }
                     )
                     SettingsThemeChooserRow(
                         text = stringResource(R.string.screen_settings_theme_dark),
@@ -82,9 +82,9 @@ private fun SettingsScreenContent(
                         onClick = { onDarkThemeConfigChange(DarkThemeConfig.DARK) }
                     )
                     SettingsThemeChooserRow(
-                        text = stringResource(R.string.screen_settings_theme_light),
-                        selected = userPreferences.darkThemeConfig == DarkThemeConfig.LIGHT,
-                        onClick = { onDarkThemeConfigChange(DarkThemeConfig.LIGHT) }
+                        text = stringResource(R.string.screen_settings_theme_system_default),
+                        selected = userPreferences.darkThemeConfig == DarkThemeConfig.FOLLOW_SYSTEM,
+                        onClick = { onDarkThemeConfigChange(DarkThemeConfig.FOLLOW_SYSTEM) }
                     )
                 }
             }

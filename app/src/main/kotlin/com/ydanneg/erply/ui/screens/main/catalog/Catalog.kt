@@ -33,8 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ydanneg.erply.R
-import com.ydanneg.erply.api.model.ErplyProductGroup
-import com.ydanneg.erply.api.model.LocalizedValue
+import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
 import com.ydanneg.erply.ui.components.FadedLinerProgressIndicator
 import com.ydanneg.erply.ui.components.Loading
@@ -50,12 +49,12 @@ import com.ydanneg.erply.ui.theme.PreviewThemes
 @Composable
 private fun ProductGroupPreview() {
     val groups = (1L..15L).mapIndexed { index, item ->
-        ErplyProductGroup(
+        ProductGroup(
             id = item.toString(),
-            name = LocalizedValue("name$item"),//NON-NLS
+            name = "name$item",//NON-NLS
             parentId = "0",
             order = index,
-            description = LocalizedValue("description$item"),
+            description = "description$item",
             changed = System.currentTimeMillis() / 1000
         )
     }
@@ -92,7 +91,6 @@ fun ProductGroupsScreen(
     }
 
     DisposableEffect(uiState) {
-//        if (uiState.isLoading) pullToRefreshState.startRefresh() else pullToRefreshState.endRefresh()
         if (!uiState.isLoading) pullToRefreshState.endRefresh()
         onDispose { }
     }
@@ -109,7 +107,7 @@ fun ProductGroupsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductGroupsScreenContent(
-    groups: List<ErplyProductGroup>,
+    groups: List<ProductGroup>,
     isLoading: Boolean = false,
     onGroupClicked: (String) -> Unit = {},
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
@@ -155,7 +153,7 @@ private fun ProductGroupsScreenContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = it.name.en.uppercase(),
+                                    text = it.name.uppercase(),
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )

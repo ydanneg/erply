@@ -3,8 +3,11 @@ package com.ydanneg.erply.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 
 
 private val LightColors = lightColorScheme(
@@ -75,12 +78,18 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun ErplyTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
+//    val colors = when {
+//        darkTheme -> dynamicDarkColorScheme(LocalContext.current)
+//        dynamicColor && !darkTheme -> dynamicLightColorScheme(LocalContext.current)
+//        darkTheme -> DarkColorScheme
+//        else -> LightColorScheme
+//    }
     val colors = if (!useDarkTheme) {
-        LightColors
+        dynamicLightColorScheme(LocalContext.current)
     } else {
-        DarkColors
+        dynamicDarkColorScheme(LocalContext.current)
     }
 
     MaterialTheme(

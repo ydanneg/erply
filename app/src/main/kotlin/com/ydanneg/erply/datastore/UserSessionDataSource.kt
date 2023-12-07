@@ -1,47 +1,50 @@
 package com.ydanneg.erply.datastore
 
-import android.util.Log
 import androidx.datastore.core.DataStore
-import com.google.protobuf.kotlin.toByteString
-import com.ydanneg.erply.api.model.ErplyVerifiedUser
-import com.ydanneg.erply.security.EncryptedData
-import com.ydanneg.erply.util.LogUtils.TAG
-import java.io.IOException
+import com.ydanneg.erply.datastore.mapper.toModel
+import com.ydanneg.erply.datastore.mapper.toProto
+import com.ydanneg.erply.model.UserSession
+import com.ydanneg.erply.security.EncryptionManager
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+private const val ENCRYPTION_KEY_ALIAS = "userPasswordKey"
+
 class UserSessionDataSource @Inject constructor(
-    private val userSessionDataStore: DataStore<UserSessionProto>
+    private val userSessionDataStore: DataStore<UserSessionProto>,
+    private val encryptionManager: EncryptionManager
 ) {
 
-    val userSession = userSessionDataStore.data
+    val userSession = userSessionDataStore.data.map {
+        val password = it.passwordOrNull?.let { encryptedData ->
+            encryptionManager.decryptText(
+                keyAlias = ENCRYPTION_KEY_ALIAS,
+                encryptedData = encryptedData.value.toByteArray(),
+                iv = encryptedData.iv.toByteArray()
+            )
+        }
+        it.toModel(password)
+    }
 
-    suspend fun setVerifiedUser(clientCode: String, encryptedPassword: EncryptedData, verifiedUser: ErplyVerifiedUser) {
-        try {
+    suspend fun updateUserSession(userSession: UserSession) {
+        runCatching {
+            val encryptedPasswordData = userSession.password?.let { encryptionManager.encryptText(ENCRYPTION_KEY_ALIAS, it) }
             userSessionDataStore.updateData {
-                it.copy {
-                    userId = verifiedUser.userId
-                    username = verifiedUser.username
-                    token = verifiedUser.token
-                    this.clientCode = clientCode
-                    password = UserSessionProto.EncryptedPasswordProto.getDefaultInstance().copy {
-                        value = encryptedPassword.data.toByteString()
-                        iv = encryptedPassword.iv.toByteString()
-                    }
-                }
+                userSession.toProto(it, encryptedPasswordData)
             }
-        } catch (e: IOException) {
-            Log.e(TAG, "Failed to update user session", e)
         }
     }
 
     suspend fun clear() {
-        userSessionDataStore.updateData {
-            it.copy {
-                clearUserId()
-                clearUsername()
-                clearToken()
-                clearClientCode()
-                clearPassword()
+        runCatching {
+            userSessionDataStore.updateData {
+                it.copy {
+                    clearUserId()
+                    clearUsername()
+                    clearToken()
+                    clearClientCode()
+                    clearPassword()
+                }
             }
         }
     }

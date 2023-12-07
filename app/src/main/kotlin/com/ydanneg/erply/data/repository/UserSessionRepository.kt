@@ -4,11 +4,9 @@ import android.util.Log
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.datastore.UserSessionDataSource
-import com.ydanneg.erply.datastore.mapper.toModel
-import com.ydanneg.erply.datastore.passwordOrNull
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.network.api.ErplyNetworkDataSource
-import com.ydanneg.erply.security.EncryptionManager
+import com.ydanneg.erply.network.api.toModel
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -19,29 +17,16 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
-private const val ENCRYPTION_KEY_ALIAS = "userPasswordKey"
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserSessionRepository @Inject constructor(
     private val erplyNetworkDataSource: ErplyNetworkDataSource,
-    private val userSessionDataSource: UserSessionDataSource,
-    private val encryptionManager: EncryptionManager
+    private val userSessionDataSource: UserSessionDataSource
 ) {
-    val userSession: Flow<UserSession> = userSessionDataSource.userSession.map { userSessionProto ->
-        val encryptedPassword = userSessionProto.passwordOrNull?.let {
-            encryptionManager.decryptText(
-                keyAlias = ENCRYPTION_KEY_ALIAS,
-                encryptedData = it.value.toByteArray(),
-                iv = it.iv.toByteArray()
-            )
-        }
-        userSessionProto.toModel(encryptedPassword)
-    }
+    val userSession: Flow<UserSession> = userSessionDataSource.userSession
 
     suspend fun login(clientCode: String, username: String, password: String) {
-        val verifiedUser = erplyNetworkDataSource.login(clientCode, username, password)
-        val encryptedPassword = encryptionManager.encryptText(ENCRYPTION_KEY_ALIAS, password)
-        userSessionDataSource.setVerifiedUser(clientCode, encryptedPassword, verifiedUser)
+        val userSession = erplyNetworkDataSource.login(clientCode, username, password).toModel(clientCode, password)
+        userSessionDataSource.updateUserSession(userSession)
     }
 
     suspend fun tryLogin() {

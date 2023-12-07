@@ -60,19 +60,10 @@ data class DescriptionValue(
     val html: String? = null
 )
 
-enum class ErplyProductType {
-    PRODUCT,
-    BUNDLE,
-    MATRIX,
-    ASSEMBLY
-}
-
 @Serializable
 data class ErplyProduct(
     @SerialName("id")
     val id: String,
-    @SerialName("type")
-    val type: ErplyProductType = ErplyProductType.PRODUCT,
     @SerialName("group_id")
     val groupId: String,
     @SerialName("name")

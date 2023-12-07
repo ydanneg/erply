@@ -21,7 +21,7 @@
     <string name="route_settings_label">Settings</string>
     <string name="route_group_label">Product</string>
     <string name="screen_settings_title">Settings</string>
-    <string name="screen_settings_theme_title">Select theme</string>
+    <string name="screen_settings_theme_title">Theme</string>
     <string name="screen_settings_theme_system_default">System default</string>
     <string name="screen_settings_theme_dark">Dark</string>
     <string name="screen_settings_theme_light">Light</string>

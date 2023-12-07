@@ -1,12 +1,11 @@
 package com.ydanneg.erply.domain.sync
 
 import android.util.Log
-import com.ydanneg.erply.api.model.ErplyProductGroup
-import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.database.dao.ErplyProductGroupDao
 import com.ydanneg.erply.database.mappers.toEntity
 import com.ydanneg.erply.domain.GetAllProductGroupsFromRemoteUseCase
+import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.sync.Syncable
 import com.ydanneg.erply.sync.Synchronizer
 import com.ydanneg.erply.sync.changeListSync
@@ -36,9 +35,7 @@ class SyncProductGroupsUseCase @Inject constructor(
             updatedListFetcher = { getAllProductGroupsFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(productGroupsLastSyncTimestamp = it) },
             modelDeleter = { erplyProductGroupDao.delete(clientCode, it) },
-            modelUpdater = { erplyProductGroupDao.insertOrUpdate(it.toModelList(clientCode)) },
+            modelUpdater = { erplyProductGroupDao.insertOrUpdate(it.map { group -> group.toEntity(clientCode) }) },
         )
     }
-
-    private fun List<ErplyProductGroup>.toModelList(clientCode: String) = map { it.toEntity(clientCode) }
 }

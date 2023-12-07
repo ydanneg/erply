@@ -5,9 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.ProductWithImagesRepository
+import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.sync.WorkManagerSyncManager
 import com.ydanneg.erply.util.LogUtils.TAG
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class UiState(
-    val group: ErplyProductGroup? = null,
+    val group: ProductGroup? = null,
     val isLoading: Boolean = false,
     val searchQuery: String? = null
 )

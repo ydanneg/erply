@@ -3,8 +3,8 @@ package com.ydanneg.erply.ui.screens.main.catalog
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
+import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.sync.WorkManagerSyncManager
 import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class UiState(
-    val groups: List<ErplyProductGroup> = listOf(),
+    val groups: List<ProductGroup> = listOf(),
     val isLoading: Boolean = false
 )
 

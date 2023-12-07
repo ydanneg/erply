@@ -1,14 +1,13 @@
 package com.ydanneg.erply.database.mappers
 
-import com.ydanneg.erply.api.model.ErplyProduct
-import com.ydanneg.erply.api.model.ErplyProductGroup
-import com.ydanneg.erply.api.model.ErplyProductPicture
-import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
 import com.ydanneg.erply.database.model.ProductImageEntity
+import com.ydanneg.erply.model.Product
+import com.ydanneg.erply.model.ProductGroup
+import com.ydanneg.erply.model.ProductImage
 
-fun ErplyProductPicture.toEntity(clientCode: String) = ProductImageEntity(
+fun ProductImage.toEntity(clientCode: String) = ProductImageEntity(
     id = id,
     clientCode = clientCode,
     productId = productId,
@@ -16,45 +15,42 @@ fun ErplyProductPicture.toEntity(clientCode: String) = ProductImageEntity(
     filename = filename
 )
 
-fun ErplyProduct.toEntity(clientCode: String) = ProductEntity(
+fun Product.toEntity(clientCode: String) = ProductEntity(
     id = id,
-    name = name.en,
-    type = type,
+    name = name,
     groupId = groupId,
     price = price,
     changed = changed,
-    description = description?.en?.let { value -> value.plain?.takeIf { it.isNotBlank() } ?: value.html },
+    description = description,
     clientCode = clientCode
 )
 
 
-fun ProductEntity.fromEntity() = ErplyProduct(
+fun ProductEntity.fromEntity() = Product(
     id = id,
-    name = LocalizedValue(name),
-    type = type,
+    name = name,
     groupId = groupId,
     price = price,
     changed = changed,
-    //TODO: don't use API DTOs, use app models instead
-    description = null // this one is never read yet in UI, but stored in DB
+    description = description
 )
 
 
-fun ErplyProductGroup.toEntity(clientCode: String) = ProductGroupEntity(
+fun ProductGroup.toEntity(clientCode: String) = ProductGroupEntity(
     id = id,
     parentId = parentId,
-    name = name.en,
-    description = description?.en,
+    name = name,
+    description = description,
     changed = changed,
     order = order,
     clientCode = clientCode
 )
 
-fun ProductGroupEntity.fromEntity() = ErplyProductGroup(
+fun ProductGroupEntity.fromEntity() = ProductGroup(
     id = id,
     parentId = parentId,
-    name = LocalizedValue(name),
-    description = description?.let { LocalizedValue(it) },
+    name = name,
+    description = description,
     changed = changed,
     order = order
 )

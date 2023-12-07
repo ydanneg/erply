@@ -1,7 +1,6 @@
 package com.ydanneg.erply.domain.sync
 
 import android.util.Log
-import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.database.dao.ErplyProductImageDao
 import com.ydanneg.erply.database.mappers.toEntity
@@ -39,9 +38,7 @@ class SyncProductImagesUseCase @Inject constructor(
             updatedListFetcher = { getAllProductImagesFromRemoteUseCase.invoke(it) },
             versionUpdater = { copy(picturesLastSyncTimestamp = it) },
             modelDeleter = { erplyProductImageDao.delete(clientCode, it) },
-            modelUpdater = { erplyProductImageDao.insertOrUpdate(it.toModelList(clientCode)) },
+            modelUpdater = { erplyProductImageDao.insertOrUpdate(it.map { image -> image.toEntity(clientCode) }) },
         )
     }
-
-    private fun List<ErplyProductPicture>.toModelList(clientCode: String) = map { it.toEntity(clientCode) }
 }
