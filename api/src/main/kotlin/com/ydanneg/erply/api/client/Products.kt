@@ -3,6 +3,7 @@
 package com.ydanneg.erply.api.client
 
 import com.ydanneg.erply.api.client.util.fetchAllPages
+import com.ydanneg.erply.api.client.util.apiFilter
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.api.model.ErplyProduct
@@ -37,12 +38,13 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
 
     private suspend fun fetchProductGroups(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProductGroup> =
         executeOrThrow {
-            val url = "v1/product/group?skip=$skip&take=$take&withTotalCount=1".let { url ->
-                val filter = showInWebShopFilter.let {
-                    if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
+            val filter = apiFilter {
+                eq("show_in_webshop", 1)
+                if (changedSince != null) {
+                    gte("changed", changedSince)
                 }
-                "$url&filter=[$filter]"
             }
+            val url = "v1/product/group?skip=$skip&take=$take&withTotalCount=1&filter=$filter"
             httpClient.get(url) {
                 headers {
                     append("jwt", token)
@@ -58,12 +60,14 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     private suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> =
         executeOrThrow {
             val fields = arrayOf("id", "type", "group_id", "name", "price", "changed", "description").joinToString(",")
-            val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take".let { url ->
-                val filter = displayedInWebShopFilter.let {
-                    if (changedSince != null) "$it,\"and\",${changedFilter(changedSince)}" else it
+            val filter = apiFilter {
+                eq("displayed_in_webshop", 1)
+                eq("status", "ACTIVE")
+                if (changedSince != null) {
+                    gte("changed", changedSince)
                 }
-                "$url&filter=[$filter,\"and\",[\"status\",\"=\",\"ACTIVE\"]]"
             }
+            val url = "v1/product?fields=$fields&withTotalCount=true&skip=$skip&take=$take&filter=$filter"
             httpClient.get(url) {
                 headers {
                     append("jwt", token)
@@ -86,25 +90,6 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
                 }
             }.body()
         }
-
-    /**
-     * For groups
-     */
-    private val showInWebShopFilter = """
-        ["show_in_webshop","=","1"]
-        """.trimIndent()
-
-    /**
-     * For products
-     */
-    private val displayedInWebShopFilter = """
-        ["displayed_in_webshop","=","1"]
-        """.trimIndent()
-
-    private fun changedFilter(changedSince: Long) = """
-        ["changed",">=","$changedSince"]
-        """.trimIndent()
-
 
     private suspend fun <T> executeOrThrow(block: suspend () -> T): T = try {
         block()
