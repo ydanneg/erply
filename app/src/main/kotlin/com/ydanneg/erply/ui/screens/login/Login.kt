@@ -164,7 +164,7 @@ private fun LoginScreenContent(
                 }
             }
         }
-        FadedProgressIndicator(isLoading)
+        FadedProgressIndicator(visible = isLoading)
     }
 
 }

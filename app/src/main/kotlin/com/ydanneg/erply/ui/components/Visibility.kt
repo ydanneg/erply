@@ -5,10 +5,16 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
-fun FadedVisibility(visible: Boolean = false, content: @Composable AnimatedVisibilityScope.() -> Unit) {
+fun FadedVisibility(
+    modifier: Modifier = Modifier,
+    visible: Boolean = false,
+    content: @Composable AnimatedVisibilityScope.() -> Unit
+) {
     AnimatedVisibility(
+        modifier = modifier,
         visible = visible,
         enter = fadeIn(),
         exit = fadeOut()

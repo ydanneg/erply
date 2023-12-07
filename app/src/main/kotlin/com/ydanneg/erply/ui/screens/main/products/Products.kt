@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -20,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -48,8 +48,10 @@ import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.ui.components.ErplyNavTopAppbar
+import com.ydanneg.erply.ui.components.FadedLinerProgressIndicator
 import com.ydanneg.erply.ui.components.Loading
 import com.ydanneg.erply.ui.components.NothingToShow
+import com.ydanneg.erply.ui.components.VSpace
 import com.ydanneg.erply.ui.screens.main.MainScreenState
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
@@ -81,7 +83,7 @@ fun ProductsScreen(
     }
 
     DisposableEffect(uiState) {
-        if (uiState.isLoading) pullToRefreshState.startRefresh() else pullToRefreshState.endRefresh()
+        if (!uiState.isLoading) pullToRefreshState.endRefresh()
         onDispose { }
     }
 
@@ -108,42 +110,49 @@ private fun ProductsScreenContent(
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
     val placeholder = rememberVectorPainter(Icons.TwoTone.ImageNotSupported)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ErplyNavTopAppbar(
                 title = group?.name?.en ?: "",
                 searchQuery = searchQuery,
                 onSearch = onSearch,
-                navController = navController
+                navController = navController,
+                scrollBehavior = scrollBehavior
             )
         },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .nestedScroll(pullToRefreshState.nestedScrollConnection)
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 if (pagingProducts.itemCount == 0) if (isLoading) Loading() else NothingToShow()
 
-                LazyVerticalGrid(
-                    modifier = Modifier.fillMaxSize(),
-                    columns = GridCells.Adaptive(minSize = 128.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        pagingProducts.itemCount,
-                        key = pagingProducts.itemKey { it.id }
-                    ) { index ->
-                        val item = pagingProducts[index]
-                        ProductCard(item, placeholder)
+                Column(Modifier.padding(16.dp)) {
+                    FadedLinerProgressIndicator(2.dp, visible = isLoading)
+                    VSpace(4.dp)
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        columns = GridCells.Adaptive(minSize = 128.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(
+                            pagingProducts.itemCount,
+                            key = pagingProducts.itemKey { it.id }
+                        ) { index ->
+                            val item = pagingProducts[index]
+                            ProductCard(item, placeholder)
+                        }
                     }
                 }
-
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
             }
         }

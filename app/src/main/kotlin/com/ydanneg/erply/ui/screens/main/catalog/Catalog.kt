@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -35,8 +36,10 @@ import com.ydanneg.erply.R
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import com.ydanneg.erply.api.model.LocalizedValue
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
+import com.ydanneg.erply.ui.components.FadedLinerProgressIndicator
 import com.ydanneg.erply.ui.components.Loading
 import com.ydanneg.erply.ui.components.NothingToShow
+import com.ydanneg.erply.ui.components.VSpace
 import com.ydanneg.erply.ui.screens.main.MainScreenState
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
@@ -58,7 +61,7 @@ private fun ProductGroupPreview() {
     }
 
     ErplyThemePreviewSurface {
-        ProductGroupsScreenContent(groups = groups)
+        ProductGroupsScreenContent(groups = groups, isLoading = true)
     }
 }
 
@@ -89,7 +92,8 @@ fun ProductGroupsScreen(
     }
 
     DisposableEffect(uiState) {
-        if (uiState.isLoading) pullToRefreshState.startRefresh() else pullToRefreshState.endRefresh()
+//        if (uiState.isLoading) pullToRefreshState.startRefresh() else pullToRefreshState.endRefresh()
+        if (!uiState.isLoading) pullToRefreshState.endRefresh()
         onDispose { }
     }
 
@@ -111,12 +115,17 @@ private fun ProductGroupsScreenContent(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(enabled = { true })
 ) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ErplyDrawerTopAppbar(
                 title = stringResource(R.string.catalog_top_bar_title),
-                drawerState = drawerState
+                drawerState = drawerState,
+                scrollBehavior = scrollBehavior
             )
         },
         content = { paddingValues ->
@@ -129,25 +138,31 @@ private fun ProductGroupsScreenContent(
             ) {
                 if (groups.isEmpty()) if (isLoading) Loading() else NothingToShow()
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(groups, key = { it.id }) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .defaultMinSize(minHeight = 56.dp)
-                                .clickable { onGroupClicked(it.id) }
-                                .background(MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = it.name.en.uppercase(), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Column(Modifier.padding(16.dp)) {
+                    FadedLinerProgressIndicator(2.dp, visible = isLoading)
+                    VSpace(4.dp)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(groups, key = { it.id }) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 56.dp)
+                                    .clickable { onGroupClicked(it.id) }
+                                    .background(MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = it.name.en.uppercase(),
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
                         }
                     }
                 }
-
                 PullToRefreshContainer(state = pullToRefreshState, modifier = Modifier.align(Alignment.TopCenter))
             }
         }

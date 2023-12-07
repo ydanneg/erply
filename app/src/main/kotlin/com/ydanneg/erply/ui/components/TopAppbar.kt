@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.ydanneg.erply.ui.components
 
 import androidx.activity.compose.BackHandler
@@ -12,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,7 +54,8 @@ private fun ErplySearchableTopAppbar(
     title: String,
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
-    navigationIcon: @Composable () -> Unit = {}
+    navigationIcon: @Composable () -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
 
     var searching by rememberSaveable {
@@ -85,7 +89,8 @@ private fun ErplySearchableTopAppbar(
                     Icon(imageVector = Icons.Filled.Search, contentDescription = stringResource(R.string.top_bar_search_icon_description))
                 }
             }
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }
 
@@ -94,19 +99,23 @@ private fun ErplySearchableTopAppbar(
 @Composable
 private fun ErplyTopAppbar(
     title: String,
-    navigationIcon: @Composable () -> Unit = {}
+    navigationIcon: @Composable () -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     CenterAlignedTopAppBar(
         navigationIcon = navigationIcon,
-        title = { TopAppbarTitle(title) }
+        title = { TopAppbarTitle(title) },
+        scrollBehavior = scrollBehavior
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ErplyDrawerTopAppbar(
     title: String,
     scope: CoroutineScope = rememberCoroutineScope(),
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     ErplyTopAppbar(
         title = title,
@@ -116,7 +125,8 @@ fun ErplyDrawerTopAppbar(
             ) {
                 Icon(Icons.Filled.Menu, contentDescription = "")
             }
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }
 
@@ -125,7 +135,8 @@ fun ErplyNavTopAppbar(
     title: String,
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
-    navController: NavController = rememberNavController()
+    navController: NavController = rememberNavController(),
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     ErplySearchableTopAppbar(
         title = title,
@@ -137,6 +148,7 @@ fun ErplyNavTopAppbar(
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "")
             }
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }
