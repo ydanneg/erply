@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ydanneg.erply.BuildConfig
 import com.ydanneg.erply.R
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.ui.components.ErplyTextField
@@ -96,10 +97,10 @@ private fun LoginScreenContent(
     keepMeSignedIn: Boolean = false,
     onKeepMeSignedInChanged: (Boolean) -> Unit = {}
 ) {
-    // TODO: remove credentials
-    var clientCode by rememberSaveable { mutableStateOf("") }
-    var username by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    var clientCode by rememberSaveable { mutableStateOf(BuildConfig.ERPLY_CLIENT_CODE) }
+    var username by rememberSaveable { mutableStateOf(BuildConfig.ERPLY_USERNAME) }
+    var password by rememberSaveable { mutableStateOf(BuildConfig.ERPLY_PASSWORD) }
+
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -142,7 +143,8 @@ private fun LoginScreenContent(
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description = if (passwordVisible) stringResource(R.string.login_hint_hide_password) else stringResource(R.string.login_hint_show_password)
+                        val description =
+                            if (passwordVisible) stringResource(R.string.login_hint_hide_password) else stringResource(R.string.login_hint_show_password)
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
                         }

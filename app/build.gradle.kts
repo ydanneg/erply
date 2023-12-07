@@ -1,4 +1,8 @@
 import com.android.build.api.dsl.VariantDimension
+import java.io.FileInputStream
+import java.util.Properties
+
+val localProperties = readLocalProperties()
 
 plugins {
     alias(libs.plugins.android.application)
@@ -27,6 +31,9 @@ android {
         }
 
         configureErplyClient()
+        stringBuildConfig("ERPLY_CLIENT_CODE", localProperties.getProperty("ERPLY_CLIENT_CODE", ""))
+        stringBuildConfig("ERPLY_USERNAME", localProperties.getProperty("ERPLY_USERNAME", ""))
+        stringBuildConfig("ERPLY_PASSWORD", localProperties.getProperty("ERPLY_PASSWORD", ""))
     }
 
     buildTypes {
@@ -204,3 +211,11 @@ fun VariantDimension.stringBuildConfig(name: String, value: String) {
 }
 
 fun String.quoted(): String = "\"$this\""
+
+fun readLocalProperties(): Properties =
+    Properties().apply {
+        val file = file("../local.properties")
+        if (file.exists()) {
+            load(FileInputStream(file))
+        }
+    }
