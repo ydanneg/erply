@@ -41,6 +41,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += "-Xjsr305=strict"
     }
     buildFeatures {
         compose = true
@@ -59,6 +60,7 @@ android {
 kapt {
     correctErrorTypes = true
 }
+
 // Setup protobuf configuration, generating lite Java and Kotlin classes
 protobuf {
     protoc {
@@ -77,14 +79,6 @@ protobuf {
         }
     }
 }
-
-//androidComponents.beforeVariants {
-//    android.sourceSets.register(it.name) {
-//        val buildDir = layout.buildDirectory.get().asFile
-////        java.srcDir(buildDir.resolve("generated/source/proto/${it.name}/java"))
-//        kotlin.srcDir(buildDir.resolve("generated/source/proto/${it.name}/kotlin"))
-//    }
-//}
 
 dependencies {
     implementation(projects.api)
