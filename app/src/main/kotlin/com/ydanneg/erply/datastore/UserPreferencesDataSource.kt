@@ -4,31 +4,38 @@ import androidx.datastore.core.DataStore
 import com.ydanneg.erply.datastore.mapper.toModel
 import com.ydanneg.erply.model.DarkThemeConfig
 import com.ydanneg.erply.model.LastSyncTimestamps
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UserPreferencesDataSource @Inject constructor(
-    private val dataStore: DataStore<UserPreferencesProto>
+    private val dataStore: DataStore<UserPreferencesProto>,
+    userSessionDataSource: UserSessionDataSource
 ) {
 
-    val userPreferences = dataStore.data.map { it.toModel() }.distinctUntilChanged()
+    val userPreferences = userSessionDataSource.userSession.flatMapLatest { session ->
+        dataStore.data.map { it.toModel(session.clientCode) }
+            .distinctUntilChanged()
+    }
 
-    suspend fun updateChangeListVersion(update: LastSyncTimestamps.() -> LastSyncTimestamps) {
+    suspend fun updateChangeListVersion(clientCode: String, update: LastSyncTimestamps.() -> LastSyncTimestamps) {
         runCatching {
             dataStore.updateData {
                 val updatedLastSyncTimestamps = update(
                     LastSyncTimestamps(
-                        productsLastSyncTimestamp = it.productsLastSyncTimestamp,
-                        productGroupsLastSyncTimestamp = it.productGroupsLastSyncTimestamp,
-                        picturesLastSyncTimestamp = it.imagesLastSyncTimestamp
+                        productsLastSyncTimestamp = it.getProductsLastSyncTimestampOrDefault(clientCode, 0),
+                        productGroupsLastSyncTimestamp = it.getGroupsLastSyncTimestampOrDefault(clientCode, 0),
+                        picturesLastSyncTimestamp = it.getImagesLastSyncTimestampOrDefault(clientCode, 0)
                     )
                 )
-                it.copy {
-                    productsLastSyncTimestamp = updatedLastSyncTimestamps.productsLastSyncTimestamp
-                    productGroupsLastSyncTimestamp = updatedLastSyncTimestamps.productGroupsLastSyncTimestamp
-                    imagesLastSyncTimestamp = updatedLastSyncTimestamps.picturesLastSyncTimestamp
-                }
+                it.toBuilder()
+                    .putProductsLastSyncTimestamp(clientCode, updatedLastSyncTimestamps.productsLastSyncTimestamp)
+                    .putGroupsLastSyncTimestamp(clientCode, updatedLastSyncTimestamps.productGroupsLastSyncTimestamp)
+                    .putImagesLastSyncTimestamp(clientCode, updatedLastSyncTimestamps.picturesLastSyncTimestamp)
+                    .build()
             }
         }
     }

@@ -43,8 +43,8 @@ fun UserSession.toProto(proto: UserSessionProto, passwordEncryptedData: Encrypte
     }
 }
 
-fun UserPreferencesProto.toModel(): UserPreferences =
-    UserPreferences(
+fun UserPreferencesProto.toModel(clientCode: String?): UserPreferences {
+    return UserPreferences(
         darkThemeConfig = when (darkThemeConfig) {
             DarkThemeConfigProto.DARK_THEME_CONFIG_DARK -> DarkThemeConfig.DARK
             DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT -> DarkThemeConfig.LIGHT
@@ -52,9 +52,10 @@ fun UserPreferencesProto.toModel(): UserPreferences =
         },
         isKeepMeSignedIn = keepMeSignedIn,
         lastSyncTimestamps = LastSyncTimestamps(
-            productsLastSyncTimestamp = productsLastSyncTimestamp,
-            productGroupsLastSyncTimestamp = productGroupsLastSyncTimestamp,
-            picturesLastSyncTimestamp = imagesLastSyncTimestamp
+            productsLastSyncTimestamp = clientCode?.let { getProductsLastSyncTimestampOrDefault(it, 0) } ?: 0,
+            productGroupsLastSyncTimestamp = clientCode?.let { getGroupsLastSyncTimestampOrDefault(clientCode, 0) } ?: 0,
+            picturesLastSyncTimestamp = clientCode?.let { getImagesLastSyncTimestampOrDefault(clientCode, 0) } ?: 0
 
         )
     )
+}

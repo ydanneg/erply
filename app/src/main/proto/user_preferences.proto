@@ -13,7 +13,8 @@ enum DarkThemeConfigProto {
 message UserPreferencesProto {
   DarkThemeConfigProto dark_theme_config = 1;
   bool keep_me_signed_in = 2;
-  int64 product_groups_last_sync_timestamp = 3;
-  int64 products_last_sync_timestamp = 4;
-  int64 images_last_sync_timestamp = 5;
+  // sync prefs per client
+  map<string, int64> groups_last_sync_timestamp = 3;
+  map<string, int64> products_last_sync_timestamp = 4;
+  map<string, int64> images_last_sync_timestamp = 5;
 }

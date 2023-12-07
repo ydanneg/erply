@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -71,7 +72,10 @@ class SyncWorker @AssistedInject constructor(
 
     override suspend fun updateChangeListVersions(
         update: LastSyncTimestamps.() -> LastSyncTimestamps,
-    ) = userPreferencesDataSource.updateChangeListVersion(update)
+    ) {
+        val clientCode = userSessionRepository.userSession.first().clientCode
+        userPreferencesDataSource.updateChangeListVersion(clientCode, update)
+    }
 
     companion object {
         fun startUpSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()

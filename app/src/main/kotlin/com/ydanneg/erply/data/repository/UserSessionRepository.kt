@@ -50,6 +50,7 @@ class UserSessionRepository @Inject constructor(
     }
 
     suspend fun logout() {
+        // TODO: should we clear DB? Probably not, no sensitive info there and next login will use fast sync.
         userSessionDataSource.clear()
     }
 
