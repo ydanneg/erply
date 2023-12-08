@@ -70,8 +70,8 @@ class ProductGroupsRepositoryImplTest {
 
         productGroupsRepository.group(groupId).first() shouldBe expectedGroupModels.first()
 
-        coVerify { erplyProductGroupDao.getById(testSession.clientCode, groupId) }
-        coVerify { userSessionDataSource.userSession }
+        coVerify(exactly = 1) { erplyProductGroupDao.getById(testSession.clientCode, groupId) }
+        coVerify(exactly = 1) { userSessionDataSource.userSession }
 
         confirmVerified(erplyProductGroupDao, erplyNetworkDataSource, userSessionDataSource)
     }

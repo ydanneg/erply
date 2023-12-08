@@ -37,7 +37,7 @@ class ProductsRepositoryImplTest {
         )
         val productsRepository = ProductsRepositoryImpl(erplyProductDao, userSessionRepository)
 
-        productsRepository.products.first() shouldBe testModels
+        productsRepository.products.first() shouldBe expectedModels
 
         coVerify(exactly = 1) { erplyProductDao.getAll(testSession.clientCode) }
         coVerify(exactly = 1) { userSessionDataSource.userSession }
@@ -65,6 +65,6 @@ class ProductsRepositoryImplTest {
                 changed = 0
             )
         )
-        private val testModels = testEntities.map { it.fromEntity() }
+        private val expectedModels = testEntities.map { it.fromEntity() }
     }
 }

@@ -53,7 +53,7 @@ class UserSessionRepositoryImplTest {
 
         userSessionRepository.userSession.first() shouldBe userSession
 
-        coVerify { userSessionDataSourceMock.userSession }
+        coVerify(exactly = 1) { userSessionDataSourceMock.userSession }
 
         confirmVerified(userSessionDataSourceMock, networkDataSourceMock)
     }
@@ -77,7 +77,7 @@ class UserSessionRepositoryImplTest {
         userSessionRepository.login(userSession.clientCode, userSession.username, userSession.password!!)
         userSessionRepository.userSession.first() shouldBe userSession
 
-        coVerify { networkDataSource.login(userSession.clientCode, userSession.username, userSession.password!!) }
+        coVerify(exactly = 1) { networkDataSource.login(userSession.clientCode, userSession.username, userSession.password!!) }
         confirmVerified(networkDataSource)
     }
 
@@ -103,7 +103,7 @@ class UserSessionRepositoryImplTest {
         userSessionRepository.tryLogin()
 
         // verify networkDataSource is called correctly
-        coVerify {
+        coVerify(exactly = 1) {
             networkDataSource.login(
                 userSession.clientCode,
                 userSession.username,
@@ -131,9 +131,9 @@ class UserSessionRepositoryImplTest {
             if (attempts++ == 0) throw ErplyApiException(ErplyApiError.Unauthorized)
         }
 
-        coVerify { networkDataSource.login(userSession.clientCode, userSession.username, userSession.password!!) }
-        coVerify { userSessionDataSource.userSession }
-        coVerify { userSessionDataSource.updateUserSession(userSession) }
+        coVerify(exactly = 1) { networkDataSource.login(userSession.clientCode, userSession.username, userSession.password!!) }
+        coVerify(exactly = 1) { userSessionDataSource.userSession }
+        coVerify(exactly = 1) { userSessionDataSource.updateUserSession(userSession) }
 
         confirmVerified(networkDataSource, userSessionDataSource)
     }
@@ -150,8 +150,8 @@ class UserSessionRepositoryImplTest {
 
         userSessionRepository.logout()
 
-        coVerify { userSessionDataSource.userSession }
-        coVerify { userSessionDataSource.clear() }
+        coVerify(exactly = 1) { userSessionDataSource.userSession }
+        coVerify(exactly = 1) { userSessionDataSource.clear() }
 
         confirmVerified(userSessionDataSource, networkDataSource)
     }
@@ -174,7 +174,7 @@ class UserSessionRepositoryImplTest {
 
         withClientCode.first() shouldBe userSession.clientCode
 
-        coVerify { userSessionDataSource.userSession }
+        coVerify(exactly = 1) { userSessionDataSource.userSession }
         confirmVerified(networkDataSource, userSessionDataSource)
     }
 

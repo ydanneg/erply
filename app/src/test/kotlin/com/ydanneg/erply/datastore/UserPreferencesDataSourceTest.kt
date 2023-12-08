@@ -25,7 +25,7 @@ class UserPreferencesDataSourceTest {
     private lateinit var userSessionDataSource: UserSessionDataSource
 
     @TempDir
-    lateinit var tmpFolder: File
+    private lateinit var tmpFolder: File
 
 
     @BeforeEach

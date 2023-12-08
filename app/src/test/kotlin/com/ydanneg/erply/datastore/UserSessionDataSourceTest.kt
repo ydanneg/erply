@@ -20,7 +20,7 @@ class UserSessionDataSourceTest {
     private lateinit var dataStore: UserSessionDataSource
 
     @TempDir
-    lateinit var tmpFolder: File
+    private lateinit var tmpFolder: File
 
     @BeforeEach
     fun setup() {
