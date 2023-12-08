@@ -8,16 +8,14 @@ import com.ydanneg.erply.datastore.UserSessionDataSource
 import com.ydanneg.erply.datastore.testUserSessionDataStore
 import com.ydanneg.erply.network.api.ErplyNetworkDataSource
 import com.ydanneg.erply.network.api.toModel
+import com.ydanneg.erply.test.testScope
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
@@ -25,10 +23,9 @@ import java.io.File
 import kotlin.test.Test
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class UserSessionRepositoryImplTest {
 
-    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val testScope = testScope()
 
     private lateinit var userSessionDataSource: UserSessionDataSource
 

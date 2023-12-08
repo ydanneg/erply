@@ -4,23 +4,20 @@ import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.model.UserData
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.model.UserSession
+import com.ydanneg.erply.test.testScope
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class UserDataRepositoryImplTest {
 
-    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val testScope = testScope()
 
     @Test
     fun `userData should combine userSession and userPreferences`() = testScope.runTest {

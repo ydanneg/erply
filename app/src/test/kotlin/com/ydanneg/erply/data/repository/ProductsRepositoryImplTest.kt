@@ -6,27 +6,54 @@ import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.datastore.UserSessionDataSource
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.network.api.ErplyNetworkDataSource
+import com.ydanneg.erply.test.testScope
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ProductsRepositoryImplTest {
 
-    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val testScope = testScope()
 
     @Test
     fun `should provide products from DB filtered by current session clientCode`() = testScope.runTest {
-        val entities = listOf(
+        val networkDataSource = mockk<ErplyNetworkDataSource>(relaxed = true)
+        val erplyProductDao = mockk<ErplyProductDao>(relaxed = true) {
+            coEvery { getAll(testSession.clientCode) } returns flowOf(testEntities)
+        }
+        val userSessionDataSource = mockk<UserSessionDataSource>(relaxed = true) {
+            coEvery { userSession } returns flowOf(testSession)
+        }
+
+        val userSessionRepository = UserSessionRepositoryImpl(
+            erplyNetworkDataSource = networkDataSource,
+            userSessionDataSource = userSessionDataSource
+        )
+        val productsRepository = ProductsRepositoryImpl(erplyProductDao, userSessionRepository)
+
+        productsRepository.products.first() shouldBe testModels
+
+        coVerify(exactly = 1) { erplyProductDao.getAll(testSession.clientCode) }
+        coVerify(exactly = 1) { userSessionDataSource.userSession }
+
+        confirmVerified(erplyProductDao, userSessionDataSource, networkDataSource)
+    }
+
+    companion object {
+        private val testSession = UserSession(
+            clientCode = "clientCode",
+            userId = "userId",
+            username = "username",
+            token = "token",
+            password = "password"
+        )
+        private val testEntities = listOf(
             ProductEntity(
                 rowId = 0,
                 id = "id",
@@ -38,33 +65,6 @@ class ProductsRepositoryImplTest {
                 changed = 0
             )
         )
-        val models = entities.map { it.fromEntity() }
-        val userSession = UserSession(
-            clientCode = "clientCode",
-            userId = "userId",
-            username = "username",
-            token = "token",
-            password = "password"
-        )
-
-        val networkDataSource = mockk<ErplyNetworkDataSource>(relaxed = true)
-        val erplyProductDao = mockk<ErplyProductDao>(relaxed = true)
-        coEvery { erplyProductDao.getAll(userSession.clientCode) } returns flowOf(entities)
-
-        val userSessionDataSource = mockk<UserSessionDataSource>(relaxed = true)
-        coEvery { userSessionDataSource.userSession } returns flowOf(userSession)
-
-        val userSessionRepository = UserSessionRepositoryImpl(
-            erplyNetworkDataSource = networkDataSource,
-            userSessionDataSource = userSessionDataSource
-        )
-
-        val productsRepository = ProductsRepositoryImpl(erplyProductDao, userSessionRepository)
-        productsRepository.products.first() shouldBe models
-
-        coVerify(exactly = 1) { erplyProductDao.getAll(userSession.clientCode) }
-        coVerify(exactly = 1) { userSessionDataSource.userSession }
-
-        confirmVerified(erplyProductDao, userSessionDataSource, networkDataSource)
+        private val testModels = testEntities.map { it.fromEntity() }
     }
 }

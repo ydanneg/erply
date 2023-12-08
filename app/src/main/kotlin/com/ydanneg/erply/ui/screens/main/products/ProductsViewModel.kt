@@ -47,9 +47,9 @@ class ProductsScreenViewModel @Inject constructor(
     val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
             if (query?.isNotBlank() == true && query.length > 1) {
-                productWithImagesRepository.searchProducts(query.trim())
+                productWithImagesRepository.searchAllProducts(query.trim())
             } else {
-                productWithImagesRepository.productsWithImagesPageable(groupId)
+                productWithImagesRepository.getAllProductsByGroupId(groupId)
             }
         }.cachedIn(viewModelScope)
 
