@@ -26,7 +26,7 @@ class UserSessionDataSourceTest {
     fun setup() {
         dataStore = UserSessionDataSource(
             tmpFolder.testUserSessionDataStore(testScope),
-            TestDataStoreModule.encryptionManager()
+            TestDataStoreModule.fakeEncryptionManager()
         )
     }
 

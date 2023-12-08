@@ -38,6 +38,9 @@ android {
         stringBuildConfig("ERPLY_PASSWORD", localProperties.getProperty("ERPLY_PASSWORD", ""))
     }
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -149,6 +152,8 @@ dependencies {
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.mockk)
+    testImplementation(libs.slf4j.simple)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

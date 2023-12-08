@@ -30,7 +30,7 @@ class UserPreferencesDataSourceTest {
 
     @BeforeEach
     fun setup() {
-        userSessionDataSource = UserSessionDataSource(tmpFolder.testUserSessionDataStore(testScope), TestDataStoreModule.encryptionManager())
+        userSessionDataSource = UserSessionDataSource(tmpFolder.testUserSessionDataStore(testScope), TestDataStoreModule.fakeEncryptionManager())
         dataStore = UserPreferencesDataSource(
             tmpFolder.testUserPreferencesDataStore(testScope),
             userSessionDataSource

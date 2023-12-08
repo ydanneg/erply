@@ -1,8 +1,8 @@
 package com.ydanneg.erply.domain
 
-import com.ydanneg.erply.network.api.ErplyNetworkDataSource
-import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
+import com.ydanneg.erply.datastore.UserPreferencesDataSource
+import com.ydanneg.erply.network.api.ErplyNetworkDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject

@@ -38,7 +38,7 @@ object TestDataStoreModule {
 
     @Provides
     @Singleton
-    fun encryptionManager(): EncryptionManager {
+    fun fakeEncryptionManager(): EncryptionManager {
         return object : EncryptionManager {
             private lateinit var encryptedData: EncryptedData
 
