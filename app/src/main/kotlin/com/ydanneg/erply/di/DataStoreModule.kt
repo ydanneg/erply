@@ -5,14 +5,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import com.ydanneg.erply.datastore.UserPreferencesProto
+import com.ydanneg.erply.datastore.UserPreferencesSerializer
 import com.ydanneg.erply.datastore.UserSessionProto
+import com.ydanneg.erply.datastore.UserSessionSerializer
+import com.ydanneg.erply.security.AndroidEncryptionManager
+import com.ydanneg.erply.security.EncryptionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import com.ydanneg.erply.datastore.UserPreferencesSerializer
-import com.ydanneg.erply.datastore.UserSessionSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
@@ -20,6 +22,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
+
+    @Provides
+    @Singleton
+    fun providesAndroidEncryptionManager(@ApplicationContext context: Context): EncryptionManager = AndroidEncryptionManager(context)
 
     @Provides
     @Singleton

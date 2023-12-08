@@ -19,7 +19,7 @@ class UserSessionDataSource @Inject constructor(
         val password = it.passwordOrNull?.let { encryptedData ->
             encryptionManager.decryptText(
                 keyAlias = ENCRYPTION_KEY_ALIAS,
-                encryptedData = encryptedData.value.toByteArray(),
+                encrypted = encryptedData.value.toByteArray(),
                 iv = encryptedData.iv.toByteArray()
             )
         }

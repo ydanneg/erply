@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import com.android.build.api.dsl.VariantDimension
 import java.io.FileInputStream
 import java.util.Properties
@@ -35,7 +37,6 @@ android {
         stringBuildConfig("ERPLY_USERNAME", localProperties.getProperty("ERPLY_USERNAME", ""))
         stringBuildConfig("ERPLY_PASSWORD", localProperties.getProperty("ERPLY_PASSWORD", ""))
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -49,6 +50,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
         freeCompilerArgs += "-Xjsr305=strict"
+    }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
     }
     buildFeatures {
         compose = true
@@ -137,11 +143,18 @@ dependencies {
     // Coil (async image loader)
     implementation(libs.coil.compose)
 
+    // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotest.assertions.core)
+
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
+
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
 }

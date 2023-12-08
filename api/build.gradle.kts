@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -42,14 +40,5 @@ tasks {
             javaParameters = true
         }
 
-    }
-
-    test {
-        useJUnitPlatform()
-        testLogging {
-            showStandardStreams = true
-            exceptionFormat = TestExceptionFormat.FULL
-            events("skipped", "failed", "passed")
-        }
     }
 }
