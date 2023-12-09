@@ -1,13 +1,14 @@
 package com.ydanneg.erply.data.repository
 
-import com.ydanneg.erply.database.dao.ErplyProductDao
-import com.ydanneg.erply.database.mappers.fromEntity
-import com.ydanneg.erply.database.model.ProductEntity
+import androidx.paging.PagingData
+import androidx.paging.testing.asPagingSourceFactory
+import com.ydanneg.erply.database.dao.ErplyProductWithImageDao
 import com.ydanneg.erply.datastore.UserSessionDataSource
+import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.network.api.ErplyNetworkDataSource
 import com.ydanneg.erply.test.testScope
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
@@ -23,9 +24,12 @@ class ProductsRepositoryImplTest {
 
     @Test
     fun `should provide products from DB filtered by current session clientCode`() = testScope.runTest {
+        val groupId = "groupId"
         val networkDataSource = mockk<ErplyNetworkDataSource>(relaxed = true)
-        val erplyProductDao = mockk<ErplyProductDao>(relaxed = true) {
-            coEvery { getAll(testSession.clientCode) } returns flowOf(testEntities)
+        val erplyProductWithImageDao = mockk<ErplyProductWithImageDao>(relaxed = true) {
+            coEvery {
+                findAllByGroupIdPageable(testSession.clientCode, groupId)
+            } returns flowOf(testEntities).asPagingSourceFactory(testScope).invoke()
         }
         val userSessionDataSource = mockk<UserSessionDataSource>(relaxed = true) {
             coEvery { userSession } returns flowOf(testSession)
@@ -35,14 +39,44 @@ class ProductsRepositoryImplTest {
             erplyNetworkDataSource = networkDataSource,
             userSessionDataSource = userSessionDataSource
         )
-        val productsRepository = ProductsRepositoryImpl(erplyProductDao, userSessionRepository)
+        val productsRepository = ProductRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
 
-        productsRepository.products.first() shouldBe expectedModels
+        productsRepository.getAllProductsByGroupId(groupId).first()
+            .shouldBeInstanceOf<PagingData<ProductWithImage>>()
 
-        coVerify(exactly = 1) { erplyProductDao.getAll(testSession.clientCode) }
-        coVerify(exactly = 1) { userSessionDataSource.userSession }
+        coVerify(exactly = 1) { erplyProductWithImageDao.findAllByGroupIdPageable(testSession.clientCode, groupId) }
+        coVerify { userSessionDataSource.userSession }
 
-        confirmVerified(erplyProductDao, userSessionDataSource, networkDataSource)
+        confirmVerified(userSessionDataSource, networkDataSource)
+    }
+
+
+    @Test
+    fun `should return products from DB filtered by current sessions clientCode and search query`() = testScope.runTest {
+        val groupId = "groupId"
+        val networkDataSource = mockk<ErplyNetworkDataSource>(relaxed = true)
+        val erplyProductWithImageDao = mockk<ErplyProductWithImageDao>(relaxed = true) {
+            coEvery {
+                fastSearchAllProducts(testSession.clientCode, groupId)
+            } returns flowOf(testEntities).asPagingSourceFactory(testScope).invoke()
+        }
+        val userSessionDataSource = mockk<UserSessionDataSource>(relaxed = true) {
+            coEvery { userSession } returns flowOf(testSession)
+        }
+
+        val userSessionRepository = UserSessionRepositoryImpl(
+            erplyNetworkDataSource = networkDataSource,
+            userSessionDataSource = userSessionDataSource
+        )
+        val productsRepository = ProductRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
+
+        productsRepository.searchAllProducts("searchstring").first()
+            .shouldBeInstanceOf<PagingData<ProductWithImage>>()
+
+        coVerify(exactly = 1) { erplyProductWithImageDao.fastSearchAllProducts(testSession.clientCode, "searchstring*") }
+        coVerify { userSessionDataSource.userSession }
+
+        confirmVerified(userSessionDataSource, networkDataSource)
     }
 
     companion object {
@@ -54,17 +88,14 @@ class ProductsRepositoryImplTest {
             password = "password"
         )
         private val testEntities = listOf(
-            ProductEntity(
-                rowId = 0,
+            ProductWithImage(
                 id = "id",
-                clientCode = "client",
                 name = "name",
-                groupId = "groupId",
                 description = null,
                 price = "99.99",
-                changed = 0
+                filename = "",
+                tenant = "tenant"
             )
         )
-        private val expectedModels = testEntities.map { it.fromEntity() }
     }
 }

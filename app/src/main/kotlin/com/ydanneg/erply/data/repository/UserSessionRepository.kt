@@ -18,6 +18,7 @@ interface UserSessionRepository {
     suspend fun login(clientCode: String, username: String, password: String)
 
     suspend fun logout()
+
     suspend fun <T> tryAuthenticateUnauthorized(enabled: Boolean = true, block: suspend (UserSession) -> T): T {
         return try {
             block(userSession.first())

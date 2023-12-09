@@ -8,8 +8,6 @@ import com.ydanneg.erply.datastore.UserPreferencesProto
 import com.ydanneg.erply.datastore.UserPreferencesSerializer
 import com.ydanneg.erply.datastore.UserSessionProto
 import com.ydanneg.erply.datastore.UserSessionSerializer
-import com.ydanneg.erply.security.AndroidEncryptionManager
-import com.ydanneg.erply.security.EncryptionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,12 +21,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
 
-    @Provides
     @Singleton
-    fun providesAndroidEncryptionManager(@ApplicationContext context: Context): EncryptionManager = AndroidEncryptionManager(context)
-
     @Provides
-    @Singleton
     fun providesUserSessionDataStore(
         @ApplicationContext context: Context,
         @Dispatcher(ErplyDispatchers.IO) dispatcher: CoroutineDispatcher,
@@ -41,7 +35,6 @@ object DataStoreModule {
         ) {
             context.dataStoreFile("user_session.pb")
         }
-
 
     @Provides
     @Singleton
