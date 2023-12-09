@@ -2,8 +2,8 @@ package com.ydanneg.erply.ui.screens.login
 
 import app.cash.turbine.test
 import com.ydanneg.erply.test.CoroutinesTestExtension
-import com.ydanneg.erply.test.FakeUserPreferencesDataSource
-import com.ydanneg.erply.test.FakeUserSessionRepository
+import com.ydanneg.erply.test.doubles.FakeUserPreferencesDataSource
+import com.ydanneg.erply.test.doubles.FakeUserSessionRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.test.runTest

@@ -13,6 +13,7 @@ import com.ydanneg.erply.sync.Synchronizer
 import com.ydanneg.erply.sync.changeListSync
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.firstOrNull
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 class SyncProductImagesUseCase @Inject constructor(
@@ -22,11 +23,12 @@ class SyncProductImagesUseCase @Inject constructor(
     private val getAllDeletedProductImageIdsFromRemoteUseCase: GetAllDeletedProductImageIdsFromRemoteUseCase,
     private val getServerVersionUseCase: GetServerVersionUseCase
 ) : Syncable {
+    private val log = LoggerFactory.getLogger("SyncProductImagesUseCase")
 
     override suspend operator fun invoke(synchronizer: Synchronizer): Boolean {
         val userSession = userSessionRepository.userSession.firstOrNull()
         if (userSession?.token == null) {
-            Log.d(TAG, "Sync Products skipped. Not logged in.")//NON-NLS
+            log.debug("Sync Products skipped. Not logged in.")//NON-NLS
             return false
         }
 

@@ -9,11 +9,14 @@ import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.slf4j.LoggerFactory
 
 abstract class AbstractAuthenticationAwareUseCase(
     userPreferencesDataSource: UserPreferencesDataSource,
     private val userSessionRepository: UserSessionRepository,
 ) {
+    val log = LoggerFactory.getLogger("AbstractAuthenticationAwareUseCase")
+
     private val isKeepMeSignedIn = userPreferencesDataSource.userPreferences
         .map { it.isKeepMeSignedIn }
 
@@ -22,7 +25,7 @@ abstract class AbstractAuthenticationAwareUseCase(
         try {
             return userSessionRepository.tryAuthenticateUnauthorized(keepMeSignedIn, block)
         } catch (e: ErplyApiException) {
-            Log.e(TAG, "withAuthenticationAware", e)
+            log.error("withAuthenticationAware", e)
             if (e.type == ErplyApiError.Unauthorized) {
                 // still 401? log out now!
                 userSessionRepository.logout()

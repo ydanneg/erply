@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 data class UiState(
@@ -25,6 +26,8 @@ class ProductGroupsScreenViewModel @Inject constructor(
     private val workManagerSyncManager: WorkManagerSyncManager
 ) : ViewModel() {
 
+    private val log = LoggerFactory.getLogger("ProductGroupsScreenViewModel")
+
     val uiState = combine(
         productGroupsRepository.productGroups,
         workManagerSyncManager.isSyncing.distinctUntilChanged()
@@ -36,7 +39,7 @@ class ProductGroupsScreenViewModel @Inject constructor(
     }.toStateFlow(viewModelScope, UiState(isLoading = true))
 
     fun loadProductGroups() {
-        Log.d(TAG, "loadProducts...")//NON-NLS
+        log.debug("loadProducts...")//NON-NLS
         viewModelScope.launch {
             workManagerSyncManager.requestSync()
         }

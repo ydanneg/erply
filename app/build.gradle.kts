@@ -146,6 +146,8 @@ dependencies {
     // Coil (async image loader)
     implementation(libs.coil.compose)
 
+    implementation(libs.slf4j.android)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -156,6 +158,7 @@ dependencies {
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.turbine)
+
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.jupiter.api)
 

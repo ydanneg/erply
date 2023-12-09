@@ -1,13 +1,11 @@
 package com.ydanneg.erply.ui.screens.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.datastore.UserPreferencesDataSource
-import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -15,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 sealed class LoginUIState {
@@ -35,6 +34,8 @@ class LoginScreenViewModel @Inject constructor(
     private val userPreferencesDataSource: UserPreferencesDataSource
 ) : ViewModel() {
 
+    private val log = LoggerFactory.getLogger(LoginScreenViewModel::class.java)
+
     private var loginJob: Job? = null
 
     private var _uiState = MutableStateFlow<LoginUIState>(LoginUIState.Idle)
@@ -51,6 +52,7 @@ class LoginScreenViewModel @Inject constructor(
     }
 
     fun doLogin(clientId: String, username: String, password: String) {
+        log.debug("doLogin: $clientId, $username")
         loginJob?.cancel()
         loginJob = viewModelScope.launch {
             try {
@@ -58,7 +60,7 @@ class LoginScreenViewModel @Inject constructor(
                 userSessionRepository.login(clientId, username, password)
                 _uiState.value = LoginUIState.Success
             } catch (e: ErplyApiException) {
-                Log.e(TAG, "error", e)//NON-NLS
+                log.error("error", e)//NON-NLS
                 _uiState.value = LoginUIState.Error(e.type)
             }
         }

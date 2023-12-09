@@ -21,7 +21,8 @@ protobufPlugin = "0.9.4"
 dataStore = "1.0.0"
 room = "2.6.1"
 coil = "2.5.0"
-slf4jSimple = "2.0.9"
+slf4j-simple = "2.0.9"
+slf4j-android = "1.7.36"
 workRuntimeKtx = "2.9.0"
 hiltWork = "1.1.0"
 hiltExt = "1.1.0"
@@ -82,7 +83,8 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = "io.mockk:mockk-android:1.13.8"
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }
+slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j-android" }
 turbine = { module = "app.cash.turbine:turbine", version = "1.0.0" }
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.8.2"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.8.2"

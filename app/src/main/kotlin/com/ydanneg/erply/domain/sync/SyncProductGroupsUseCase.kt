@@ -12,6 +12,7 @@ import com.ydanneg.erply.sync.changeListSync
 import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 class SyncProductGroupsUseCase @Inject constructor(
@@ -19,11 +20,12 @@ class SyncProductGroupsUseCase @Inject constructor(
     private val userSessionRepository: UserSessionRepository,
     private val getAllProductGroupsFromRemoteUseCase: GetAllProductGroupsFromRemoteUseCase
 ) : Syncable {
+    private val log = LoggerFactory.getLogger("SyncProductGroupsUseCase")
 
     override suspend operator fun invoke(synchronizer: Synchronizer): Boolean {
         val userSession = userSessionRepository.userSession.firstOrNull()
         if (userSession?.token == null) {
-            Log.d(TAG, "Sync Product groups skipped. Not logged in.")//NON-NLS
+            log.debug("Sync Product groups skipped. Not logged in.")//NON-NLS
             return false
         }
 

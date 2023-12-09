@@ -5,7 +5,7 @@ import com.ydanneg.erply.model.UserData
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.test.CoroutinesTestExtension
-import com.ydanneg.erply.test.FakeUserDataRepository
+import com.ydanneg.erply.test.doubles.FakeUserDataRepository
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
@@ -24,7 +24,7 @@ class ErplyAppViewModelTest {
     }
 
     @Test
-    fun test() = runTest {
+    fun `should produce user data from repository`() = runTest {
         viewModel.userData.test {
             awaitItem() shouldBe fakeUserData
         }

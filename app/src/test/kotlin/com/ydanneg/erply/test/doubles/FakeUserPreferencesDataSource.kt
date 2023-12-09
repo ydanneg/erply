@@ -1,4 +1,4 @@
-package com.ydanneg.erply.test
+package com.ydanneg.erply.test.doubles
 
 import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.model.DarkThemeConfig

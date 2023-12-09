@@ -1,9 +1,7 @@
-package com.ydanneg.erply.test
+package com.ydanneg.erply.test.doubles
 
 import com.ydanneg.erply.data.repository.UserDataRepository
 import com.ydanneg.erply.model.UserData
-import com.ydanneg.erply.model.UserPreferences
-import com.ydanneg.erply.model.UserSession
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

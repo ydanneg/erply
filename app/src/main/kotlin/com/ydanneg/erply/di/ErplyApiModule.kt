@@ -10,18 +10,20 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object ErplyApiModule {
 
+    private val log = LoggerFactory.getLogger("HTTP")
     @Provides
     @Singleton
     fun providesErplyApi(): ErplyApiClient =
         ErplyApiClient(
             ErplyApiClientConfiguration(
-                logger = { Log.v("HTTP", it) },
+                logger = { log.trace(it) },
                 logLevel = valueOrNull<ErplyApiClientLogLevel>(BuildConfig.CLIENT_LOG_LEVEL) ?: ErplyApiClientLogLevel.NONE,
                 baseUrl = BuildConfig.CLIENT_PIM_BASE_URL,
                 userAgent = "${BuildConfig.CLIENT_USER_AGENT}/${BuildConfig.VERSION_NAME}.{${BuildConfig.VERSION_CODE}} (Android SDK ${Build.VERSION.SDK_INT}; ${Build.DEVICE})",//NON-NLS

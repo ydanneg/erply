@@ -1,6 +1,5 @@
 package com.ydanneg.erply.ui.screens.main.products
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +9,6 @@ import com.ydanneg.erply.data.repository.ProductRepository
 import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.sync.WorkManagerSyncManager
-import com.ydanneg.erply.util.LogUtils.TAG
 import com.ydanneg.erply.util.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +16,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 data class UiState(
@@ -41,6 +40,8 @@ class ProductsScreenViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     private val workManagerSyncManager: WorkManagerSyncManager
 ) : ViewModel() {
+
+    private val log = LoggerFactory.getLogger("ProductsScreenViewModel")
 
     private val groupId: String = checkNotNull(savedStateHandle[GROUP_ID_STATE_KEY])
 
@@ -73,7 +74,7 @@ class ProductsScreenViewModel @Inject constructor(
     }
 
     fun loadProducts() {
-        Log.d(TAG, "loadProducts...")//NON-NLS
+        log.debug("loadProducts...")//NON-NLS
         viewModelScope.launch {
             workManagerSyncManager.requestSync()
         }

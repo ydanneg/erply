@@ -1,7 +1,6 @@
 package com.ydanneg.erply.sync.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
@@ -17,7 +16,6 @@ import com.ydanneg.erply.domain.sync.SyncProductsUseCase
 import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.sync.SyncConstraints
 import com.ydanneg.erply.sync.Synchronizer
-import com.ydanneg.erply.util.LogUtils.TAG
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.slf4j.LoggerFactory
 
 /**
  * Syncs the data layer by delegating to the appropriate repository instances with
@@ -45,8 +44,7 @@ class SyncWorker @AssistedInject constructor(
     @Dispatcher(ErplyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(appContext, workerParams), Synchronizer {
 
-//    override suspend fun getForegroundInfo(): ForegroundInfo =
-//        appContext.syncForegroundInfo()
+    private val log = LoggerFactory.getLogger("SyncWorker")
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         // Login to be sure token is not expired within a sync job
@@ -60,7 +58,7 @@ class SyncWorker @AssistedInject constructor(
             val deferredProducts = async { syncProductsUseCase.sync() }
             awaitAll(deferredGroups, deferredImages, deferredProducts).all { it }
         }
-        Log.i(TAG, "doWork complete: $syncedSuccessfully")//NON-NLS
+        log.info("doWork complete: $syncedSuccessfully")//NON-NLS
 
         if (syncedSuccessfully) Result.success() else Result.retry()
     }

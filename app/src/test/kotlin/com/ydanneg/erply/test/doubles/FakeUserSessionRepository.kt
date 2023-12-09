@@ -1,4 +1,4 @@
-package com.ydanneg.erply.test
+package com.ydanneg.erply.test.doubles
 
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.model.UserSession
