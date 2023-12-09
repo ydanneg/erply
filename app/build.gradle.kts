@@ -155,6 +155,9 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.androidx.paging.testing)
+    testImplementation(libs.turbine)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.api)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

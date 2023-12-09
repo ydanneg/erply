@@ -83,6 +83,9 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = "io.mockk:mockk-android:1.13.8"
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
+turbine = { module = "app.cash.turbine:turbine", version = "1.0.0" }
+junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.8.2"
+junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 
 [bundles]
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx", "androidx-room-paging"]

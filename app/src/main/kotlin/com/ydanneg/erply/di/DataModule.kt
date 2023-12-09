@@ -8,6 +8,8 @@ import com.ydanneg.erply.data.repository.UserDataRepository
 import com.ydanneg.erply.data.repository.UserDataRepositoryImpl
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.data.repository.UserSessionRepositoryImpl
+import com.ydanneg.erply.datastore.UserPreferencesDataSource
+import com.ydanneg.erply.datastore.UserPreferencesDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,4 +35,8 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindUserDataRepository(impl: UserDataRepositoryImpl): UserDataRepository
+
+    @Singleton
+    @Binds
+    fun bindUSerPreferences(impl: UserPreferencesDataSourceImpl): UserPreferencesDataSource
 }
