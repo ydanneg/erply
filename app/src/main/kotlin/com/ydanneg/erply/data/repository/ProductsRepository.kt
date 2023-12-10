@@ -4,7 +4,7 @@ import androidx.paging.PagingData
 import com.ydanneg.erply.model.ProductWithImage
 import kotlinx.coroutines.flow.Flow
 
-interface ProductRepository {
+interface ProductsRepository {
     fun getAllProductsByGroupId(groupId: String): Flow<PagingData<ProductWithImage>>
     fun searchAllProducts(search: String): Flow<PagingData<ProductWithImage>>
 }

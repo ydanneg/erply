@@ -15,10 +15,10 @@ import javax.inject.Inject
 private const val PAGE_SIZE = 60
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ProductRepositoryImpl @Inject constructor(
+class ProductsRepositoryImpl @Inject constructor(
     private val erplyProductWithImageDao: ErplyProductWithImageDao,
     private val userSessionRepository: UserSessionRepository
-) : ProductRepository {
+) : ProductsRepository {
 
     override fun getAllProductsByGroupId(groupId: String): Flow<PagingData<ProductWithImage>> {
         return userSessionRepository.userSession.map { it.clientCode }.distinctUntilChanged().flatMapLatest { clientCode ->

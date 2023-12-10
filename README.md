@@ -105,45 +105,46 @@ Data is synchronized automatically on app start (logged-in) or triggered manuall
 
 User credentials are securely persisted so that synchronization can do re-login to acquire new fresh token before synchronization
 
-Synchronization is automatically retries if failed.
+Synchronization job is automatically scheduled to retry if failed.
 
 ## Main application components
 ### Repositories
-- ProductsRepository
-- ProductGroupsRepository
-- UserDataRepository
-- UserSessionRepository
+- ProductsRepository - Exposes paging products filtered by group and search results from DB
+- ProductGroupsRepository - Exposes product groups from DB
+- UserDataRepository - Exposes UserData from multiple data stores
+- UserSessionRepository - Exposes UserSession from data store, handles login and logout operations 
 ### Data sources
-- UserSessionDataSource
-- UserPreferencesDataSource
-- ErplyNetworkDataSource
+- UserSessionDataSource - Proto DataStore keeping user session persisted
+- UserPreferencesDataSource - Proto DataStore keeping user preferences persisted
+- ErplyNetworkDataSource - DataSource to Erply API, maps Erply DTOs to app models
 ### DAOs
-- ErplyProductDao
-- ErplyProductGroupDao
-- ErplyProductImageDao
-- ErplyProductWithImageDao
+- ErplyProductDao - Simple CRUD Product DAO
+- ErplyProductGroupDao - Simple CRUD Product Group DAO
+- ErplyProductImageDao - Simple CRUD Product Image DAO
+- ErplyProductWithImageDao - DAO that combines product and it's image if exists, returns pageable data
 ### Domain use-cases
-- GetServerVersionUseCase
-- GetAllProductsFromRemoteUseCase
-- GetAllProductImagesFromRemoteUseCase
-- GetAllProductGroupsFromRemoteUseCase
-- GetAllDeletedProductImageIdsFromRemoteUseCase
-- SyncProductsUseCase
-- SyncProductImagesUseCase
-- SyncProductGroupsUseCase
+- GetServerVersionUseCase - Returns last server timestamp
+- GetAllProductsFromRemoteUseCase -  Returns products from API, Flow of pages
+- GetAllProductImagesFromRemoteUseCase - Returns images from API, flow of pages 
+- GetAllProductGroupsFromRemoteUseCase - Returns groups from API, flow of pages
+- GetAllDeletedProductsFromRemoteUseCase - Returns deleted product ids from API, since provided date
+- GetAllDeletedProductImageIdsFromRemoteUseCase - Returns deleted image ids from API, since provided date
+- SyncProductsUseCase - Starts products synchronization using provided Synchronizer 
+- SyncProductImagesUseCase - Starts product images synchronization using provided Synchronizer. Returns boolean result: Success or Failure.
+- SyncProductGroupsUseCase - Starts product images synchronization using provided Synchronizer, Returns boolean result: Success or Failure.
 ### Sync
-- SyncWorker
-- WorkManagerSyncManager
+- SyncWorker - Implements Synchronizer implementation. Logic of a synchronization. A CoroutineWorker.
+- WorkManagerSyncManager - Manages sync status and provides 'requestSync' operation
 ### UI
-- MainActivity
-- ErplyApp
-- Login
-- MainScreen (NavHost)
-  - CatalogScreen
-  - ProductListScreen
-  - SettingsScreen
+- MainActivity - Main Activity of the application. ViewModel: MainActivityViewModel
+- ErplyApp - Main composable who decides what flow to start: Login or Main. ViewModel: ErplyAppViewModel 
+- LoginScreen - Login screen composable. ViewModel: LoginScreenViewModel
+- MainScreen (NavHost) - Main navigation host. ViewModel: MainScreenViewModel
+  - CatalogScreen - Composable screen that renders all product groups. ViewModel: CatalogScreenModelView
+  - ProductsScreen - Composable screen that lists products of a specified group ID. Allows global product search. ViewModel: ProductsScreenViewModel
+  - SettingsScreen - Settings screen. Allows to switch theme between Dark, Light and System Default
 
-## Test
+## Tests
 NB! Test are added for demonstration purpose. Code coverage is low. 
 ### Unit tests
 Data:

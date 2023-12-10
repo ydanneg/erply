@@ -2,8 +2,8 @@ package com.ydanneg.erply.di
 
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.ProductGroupsRepositoryImpl
-import com.ydanneg.erply.data.repository.ProductRepository
-import com.ydanneg.erply.data.repository.ProductRepositoryImpl
+import com.ydanneg.erply.data.repository.ProductsRepository
+import com.ydanneg.erply.data.repository.ProductsRepositoryImpl
 import com.ydanneg.erply.data.repository.UserDataRepository
 import com.ydanneg.erply.data.repository.UserDataRepositoryImpl
 import com.ydanneg.erply.data.repository.UserSessionRepository
@@ -26,7 +26,7 @@ interface DataModule {
 
     @Singleton
     @Binds
-    fun bindProductRepository(impl: ProductRepositoryImpl): ProductRepository
+    fun bindProductRepository(impl: ProductsRepositoryImpl): ProductsRepository
 
     @Singleton
     @Binds

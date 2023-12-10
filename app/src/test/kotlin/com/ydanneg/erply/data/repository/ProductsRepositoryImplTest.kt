@@ -39,7 +39,7 @@ class ProductsRepositoryImplTest {
             erplyNetworkDataSource = networkDataSource,
             userSessionDataSource = userSessionDataSource
         )
-        val productsRepository = ProductRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
+        val productsRepository = ProductsRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
 
         productsRepository.getAllProductsByGroupId(groupId).first()
             .shouldBeInstanceOf<PagingData<ProductWithImage>>()
@@ -68,7 +68,7 @@ class ProductsRepositoryImplTest {
             erplyNetworkDataSource = networkDataSource,
             userSessionDataSource = userSessionDataSource
         )
-        val productsRepository = ProductRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
+        val productsRepository = ProductsRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
 
         productsRepository.searchAllProducts("searchstring").first()
             .shouldBeInstanceOf<PagingData<ProductWithImage>>()

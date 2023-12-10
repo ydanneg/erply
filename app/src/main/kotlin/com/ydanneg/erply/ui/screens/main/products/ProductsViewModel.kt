@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
-import com.ydanneg.erply.data.repository.ProductRepository
+import com.ydanneg.erply.data.repository.ProductsRepository
 import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.sync.WorkManagerSyncManager
@@ -37,7 +37,7 @@ fun ProductWithImage.imageUrlOrNull(): String? = tenant?.let { tenant -> filenam
 class ProductsScreenViewModel @Inject constructor(
     productGroupsRepository: ProductGroupsRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val productRepository: ProductRepository,
+    private val productsRepository: ProductsRepository,
     private val workManagerSyncManager: WorkManagerSyncManager
 ) : ViewModel() {
 
@@ -48,9 +48,9 @@ class ProductsScreenViewModel @Inject constructor(
     val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
         .flatMapLatest { query ->
             if (query?.isNotBlank() == true && query.length > 1) {
-                productRepository.searchAllProducts(query.trim())
+                productsRepository.searchAllProducts(query.trim())
             } else {
-                productRepository.getAllProductsByGroupId(groupId)
+                productsRepository.getAllProductsByGroupId(groupId)
             }
         }.cachedIn(viewModelScope)
 
