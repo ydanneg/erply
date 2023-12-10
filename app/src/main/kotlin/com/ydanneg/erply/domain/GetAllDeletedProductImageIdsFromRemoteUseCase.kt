@@ -15,7 +15,7 @@ class GetAllDeletedProductImageIdsFromRemoteUseCase @Inject constructor(
 ) : AbstractAuthenticationAwareUseCase(userPreferencesDataSource, userSessionRepository) {
 
     suspend operator fun invoke(changedSince: Long? = null): Flow<List<String>> =
-        withAuthenticationAware(flowOf()) { auth ->
+        ensureAuthenticated(flowOf()) { auth ->
             erplyNetworkDataSource.fetchDeletedImageIds(auth.token!!, changedSince)
                 .map { image -> image.map { it.id } }
         }

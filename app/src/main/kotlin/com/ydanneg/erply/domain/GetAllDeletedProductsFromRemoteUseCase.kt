@@ -14,7 +14,7 @@ class GetAllDeletedProductsFromRemoteUseCase @Inject constructor(
 ) : AbstractAuthenticationAwareUseCase(userPreferencesDataSource, userSessionRepository) {
 
     suspend operator fun invoke(changedSince: Long): Flow<List<String>> {
-        return withAuthenticationAware(flowOf()) { auth ->
+        return ensureAuthenticated(flowOf()) { auth ->
             erplyNetworkDataSource.fetchAllDeletedProductIds(auth.token!!, changedSince)
         }
     }

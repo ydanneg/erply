@@ -12,7 +12,7 @@ class GetServerVersionUseCase @Inject constructor(
 ) : AbstractAuthenticationAwareUseCase(userPreferencesDataSource, userSessionRepository) {
 
     suspend operator fun invoke(): Long {
-        return withAuthenticationAware(0) { auth ->
+        return ensureAuthenticated(0) { auth ->
             erplyNetworkDataSource.fetchServerTimestamp(auth.token!!)
         }
     }
