@@ -87,6 +87,7 @@ androidx-paging-testing = { module = "androidx.paging:paging-testing", version.r
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 mockk = "io.mockk:mockk-android:1.13.8"
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }
 slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j-android" }

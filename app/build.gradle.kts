@@ -146,24 +146,33 @@ dependencies {
     // Coil (async image loader)
     implementation(libs.coil.compose)
 
+    // Logging
     implementation(libs.slf4j.android)
 
-    // Testing
+    // Local Testing
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.property)
     testImplementation(libs.mockk)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.turbine)
 
+    // Instrumented testing
+    androidTestImplementation(libs.kotlin.test)
+    androidTestImplementation(libs.kotest.assertions.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.slf4j.simple)
+    androidTestImplementation(libs.androidx.paging.testing)
+    androidTestImplementation(libs.turbine)
 
+    // Dev tools
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
 }
