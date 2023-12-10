@@ -1,12 +1,10 @@
 package com.ydanneg.erply.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.ydanneg.erply.sync.workers.SyncWorker
-import com.ydanneg.erply.util.LogUtils.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate

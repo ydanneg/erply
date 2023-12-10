@@ -1,6 +1,5 @@
 package com.ydanneg.erply.domain.sync
 
-import android.util.Log
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.database.dao.ErplyProductDao
 import com.ydanneg.erply.database.mappers.toEntity
@@ -11,7 +10,6 @@ import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.sync.Syncable
 import com.ydanneg.erply.sync.Synchronizer
 import com.ydanneg.erply.sync.changeListSync
-import com.ydanneg.erply.util.LogUtils.TAG
 import kotlinx.coroutines.flow.firstOrNull
 import org.slf4j.LoggerFactory
 import javax.inject.Inject

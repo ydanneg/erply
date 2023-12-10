@@ -1,7 +1,6 @@
 package com.ydanneg.erply.di
 
 import android.os.Build
-import android.util.Log
 import com.ydanneg.erply.BuildConfig
 import com.ydanneg.erply.api.client.ErplyApiClient
 import com.ydanneg.erply.api.client.ErplyApiClientConfiguration
