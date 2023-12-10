@@ -81,30 +81,67 @@ Layers:
 - Domain, see [Domain Layer](https://developer.android.com/topic/architecture/data-layer)
 
 ## Functionality
-### Startup
-LoginScreen is shown if user is not logged-in (UserSession.token is not available from datastore).
-If login operation completes successfully and UserSession.isLoggedIn is true then ErplyApp renders MainScreen
-MainScreen is shown if UserSession.token exists in a datastore.
-### Main 
-#### Catalog
-Catalog is a root navigation route
-Catalog screen shows the list of available Product groups downloaded (synced) from Erply PIM API. The list is shown immediately even if initial sync is not completed yet. List is bound to DB.
-Clicking on a group item user is navigated to ProductsScreen by passing an argument 'groupId'.
-Default sorting order is 'change, desc' for easy testing changes.
-#### Product list
-ProductsScreen is a child navigation route
-Product list by groupId is fetched from DB as a PagingSource to support large amount of data.
-ProductsScreen supports fast/advanced (fts4) full-text search that actually searches for all products, not just within a current group (see [#1](https://github.com/ydanneg/erply/issues/1)).
-Default sorting order is 'change, desc' for easy testing changes.
-#### Settings
-SettingsScreen is a root navigation route
-A simple Settings screen that only has Theme setting that allows to switch theme between Dark, Light and System Default modes
-### Data Synchronization
-Sync is currently triggered when MainScreenViewModel is initialized.
-First login will trigger full sync that will download all clientCode related data from Erply PIM API.
-Next sync will be a fast sync that downloads only changed data since last sync.
-Worker job is used for synchronization. If Sync is failed it will be retried automatically.
+Application consists of the following screens:
+- Splash
+- Login
+- MainScreen (navHost)
+  - Catalog 
+  - ProductList
+  - Settings
 
+Catalog shows a list of product groups available for the logged in client.
+
+User can click on a group to see it's products.
+
+User can search products using full-text search.
+
+Groups and Products are sorted by last change date by default desc.
+
+User can logout and login again.
+
+Synchronized data is preserved for fast sync on next login.
+
+Data is synchronized automatically on app start (logged-in) or triggered manually by pulling lists down.
+
+User credentials are securely persisted so that synchronization can do re-login to acquire new fresh token before synchronization
+
+Synchronization is automatically retries if failed.
+
+## Main application components
+### Repositories
+- ProductsRepository
+- ProductGroupsRepository
+- UserDataRepository
+- UserSessionRepository
+### Data sources
+- UserSessionDataSource
+- UserPreferencesDataSource
+- ErplyNetworkDataSource
+### DAOs
+- ErplyProductDao
+- ErplyProductGroupDao
+- ErplyProductImageDao
+- ErplyProductWithImageDao
+### Domain use-cases
+- GetServerVersionUseCase
+- GetAllProductsFromRemoteUseCase
+- GetAllProductImagesFromRemoteUseCase
+- GetAllProductGroupsFromRemoteUseCase
+- GetAllDeletedProductImageIdsFromRemoteUseCase
+- SyncProductsUseCase
+- SyncProductImagesUseCase
+- SyncProductGroupsUseCase
+### Sync
+- SyncWorker
+- WorkManagerSyncManager
+### UI
+- MainActivity
+- ErplyApp
+- Login
+- MainScreen (NavHost)
+  - CatalogScreen
+  - ProductListScreen
+  - SettingsScreen
 
 ## Limitations
 - Erply API discovery is not implemented yet. See https://github.com/ydanneg/erply/issues/2
