@@ -11,7 +11,7 @@ The inspiration comes from [Now in Android App](https://github.com/android/nowin
 - Use modern android architecture practices: [Guide to app architecture](https://developer.android.com/topic/architecture) 
 - Use latest Compose Material 3 components and dynamic color scheme
 - Use new Erply PIM API [PIM API](https://learn-api.erply.com/new-apis/pim-api)
-- Implement syncronization (full/partial) with remote DB using Erply recommendation and the fact of hourly request limit: [Data Syncing](https://learn-api.erply.com/data-syncing)
+- Implement synchronization (full/partial) with remote DB using Erply recommendation and the fact of hourly request limit: [Data Syncing](https://learn-api.erply.com/data-syncing)
 - Use paging data from local DB using Room ORM ( potential large amount of data)
 - Use advanced fast search using sqlite fts4 support using Room ORM
 - Use well-typed Proto (protobuf) Datastore to store user preferences and session details
@@ -43,7 +43,6 @@ The inspiration comes from [Now in Android App](https://github.com/android/nowin
 ├── security        # Encyption Manager
 ├── sync            # Sync realted logic (worker, sync manager)
 └── ui              # UI Layer
-
 ```
 
 #### UI Layer structure (composables + activity)
@@ -59,21 +58,19 @@ The inspiration comes from [Now in Android App](https://github.com/android/nowin
 │       └── settings   # Settings screen and viewmodel
 ├── theme              # Application Compose theme
 └── util               # Some shared utilities
-
 ```
 
-### Databse structure
+### Database structure
 ```
 ../app/src/main/kotlin/com/ydanneg/erply/database
 ├── dao                # Dao
 ├── mappers            # Entity<->Domain Model mappers
 ├── model              # Entities
 └── util               # Utilities, converters
-
 ```
 
 ## Architecture
-This application follows [Official Android Architecure Guide](https://developer.android.com/topic/architecture)
+This application follows [Official Android Architecture Guide](https://developer.android.com/topic/architecture)
 Respected principals:
 - [Separation of concerns](https://developer.android.com/topic/architecture#separation-of-concerns) design pattern.
 - [Single source of truth](https://developer.android.com/topic/architecture#single-source-of-truth)
@@ -91,13 +88,13 @@ MainScreen is shown if UserSession.token exists in a datastore.
 ### Main 
 #### Catalog
 Catalog is a root navigation route
-Catalog screen shows the list of available Product groups downloaded (synced) from Erply PIM API. The list is shown immediatelly even if initial sync is not completed yet. List is bound to DB.
+Catalog screen shows the list of available Product groups downloaded (synced) from Erply PIM API. The list is shown immediately even if initial sync is not completed yet. List is bound to DB.
 Clicking on a group item user is navigated to ProductsScreen by passing an argument 'groupId'.
 Default sorting order is 'change, desc' for easy testing changes.
 #### Product list
 ProductsScreen is a child navigation route
-Product list by groupId is fetched from DB as a PaginSource to support large amount of data.
-ProductsScreen supports fast/advanced (fts4) full-text seearch that actually searches for all products, not just within a current group (see [#1](https://github.com/ydanneg/erply/issues/1)).
+Product list by groupId is fetched from DB as a PagingSource to support large amount of data.
+ProductsScreen supports fast/advanced (fts4) full-text search that actually searches for all products, not just within a current group (see [#1](https://github.com/ydanneg/erply/issues/1)).
 Default sorting order is 'change, desc' for easy testing changes.
 #### Settings
 SettingsScreen is a root navigation route
@@ -118,4 +115,3 @@ Worker job is used for synchronization. If Sync is failed it will be retried aut
 
 ## Roadmap
 See [Issues](https://github.com/ydanneg/erply/issues)
-
