@@ -109,58 +109,58 @@ Synchronization job is automatically scheduled to retry if failed.
 
 ## Main application components
 ### Repositories
-- ProductsRepository - Exposes paging products filtered by group and search results from DB
-- ProductGroupsRepository - Exposes product groups from DB
-- UserDataRepository - Exposes UserData from multiple data stores
-- UserSessionRepository - Exposes UserSession from data store, handles login and logout operations 
+- _ProductsRepository_ - Exposes paging products filtered by group and search results from DB
+- _ProductGroupsRepository_ - Exposes product groups from DB
+- _UserDataRepository_ - Exposes UserData from multiple data stores
+- _UserSessionRepository_ - Exposes UserSession from data store, handles login and logout operations 
 ### Data sources
-- UserSessionDataSource - Proto DataStore keeping user session persisted
-- UserPreferencesDataSource - Proto DataStore keeping user preferences persisted
-- ErplyNetworkDataSource - DataSource to Erply API, maps Erply DTOs to app models
+- _UserSessionDataSource_ - Proto DataStore keeping user session persisted
+- _UserPreferencesDataSource_ - Proto DataStore keeping user preferences persisted
+- _ErplyNetworkDataSource_ - DataSource to Erply API, maps Erply DTOs to app models
 ### DAOs
-- ErplyProductDao - Simple CRUD Product DAO
-- ErplyProductGroupDao - Simple CRUD Product Group DAO
-- ErplyProductImageDao - Simple CRUD Product Image DAO
-- ErplyProductWithImageDao - DAO that combines product and it's image if exists, returns pageable data
+- _ErplyProductDao_ - Simple CRUD Product DAO
+- _ErplyProductGroupDao_ - Simple CRUD Product Group DAO
+- _ErplyProductImageDao_ - Simple CRUD Product Image DAO
+- _ErplyProductWithImageDao_ - DAO that combines product and it's image if exists, returns pageable data
 ### Domain use-cases
-- GetServerVersionUseCase - Returns last server timestamp
-- GetAllProductsFromRemoteUseCase -  Returns products from API, Flow of pages
-- GetAllProductImagesFromRemoteUseCase - Returns images from API, flow of pages 
-- GetAllProductGroupsFromRemoteUseCase - Returns groups from API, flow of pages
-- GetAllDeletedProductsFromRemoteUseCase - Returns deleted product ids from API, since provided date
-- GetAllDeletedProductImageIdsFromRemoteUseCase - Returns deleted image ids from API, since provided date
-- SyncProductsUseCase - Starts products synchronization using provided Synchronizer 
-- SyncProductImagesUseCase - Starts product images synchronization using provided Synchronizer. Returns boolean result: Success or Failure.
-- SyncProductGroupsUseCase - Starts product images synchronization using provided Synchronizer, Returns boolean result: Success or Failure.
+- _GetServerVersionUseCase_ - Returns last server timestamp
+- _GetAllProductsFromRemoteUseCase_ -  Returns products from API, Flow of pages
+- _GetAllProductImagesFromRemoteUseCase_ - Returns images from API, flow of pages 
+- _GetAllProductGroupsFromRemoteUseCase_ - Returns groups from API, flow of pages
+- _GetAllDeletedProductsFromRemoteUseCase_ - Returns deleted product ids from API, since provided date
+- _GetAllDeletedProductImageIdsFromRemoteUseCase_ - Returns deleted image ids from API, since provided date
+- _SyncProductsUseCase_ - Starts products synchronization using provided Synchronizer 
+- _SyncProductImagesUseCase_ - Starts product images synchronization using provided Synchronizer. Returns boolean result: Success or Failure.
+- _SyncProductGroupsUseCase_ - Starts product images synchronization using provided Synchronizer, Returns boolean result: Success or Failure.
 ### Sync
-- SyncWorker - Implements Synchronizer implementation. Logic of a synchronization. A CoroutineWorker.
-- WorkManagerSyncManager - Manages sync status and provides 'requestSync' operation
+- _SyncWorker_ - Implements Synchronizer implementation. Logic of a synchronization. A CoroutineWorker.
+- _WorkManagerSyncManager_ - Manages sync status and provides 'requestSync' operation
 ### UI
-- MainActivity - Main Activity of the application. ViewModel: MainActivityViewModel
-- ErplyApp - Main composable who decides what flow to start: Login or Main. ViewModel: ErplyAppViewModel 
-- LoginScreen - Login screen composable. ViewModel: LoginScreenViewModel
-- MainScreen (NavHost) - Main navigation host. ViewModel: MainScreenViewModel
-  - CatalogScreen - Composable screen that renders all product groups. ViewModel: CatalogScreenModelView
-  - ProductsScreen - Composable screen that lists products of a specified group ID. Allows global product search. ViewModel: ProductsScreenViewModel
-  - SettingsScreen - Settings screen. Allows to switch theme between Dark, Light and System Default
+- _MainActivity_ - Main Activity of the application. ViewModel: _MainActivityViewModel_
+- _ErplyApp_ - Main composable who decides what flow to start: Login or Main. ViewModel: _ErplyAppViewModel_
+- _LoginScreen_ - Login screen composable. ViewModel: _LoginScreenViewModel_
+- _MainScreen_ (NavHost) - Main navigation host. ViewModel: _MainScreenViewModel_
+  - _CatalogScreen_ - Composable screen that renders all product groups. ViewModel: _CatalogScreenModelView_
+  - _ProductsScreen_ - Composable screen that lists products of a specified group ID. Allows global product search. ViewModel: _ProductsScreenViewModel_
+  - _SettingsScreen_ - Settings screen. Allows to switch theme between Dark, Light and System Default
 
 ## Tests
 NB! Test are added for demonstration purpose. Code coverage is low. 
 ### Unit tests
-Data:
-- ErplyApiFilterTest
-- ProductGroupsRepositoryImplTest
-- ProductsRepositoryImplTest
-- UserDataRepositoryImplTest
-- UserSessionRepositoryImplTest
-Datastore:
-- UserPreferencesDataSourceTest
-- UserSessionDataSourceTest
-View model:
-- ErplyAppViewModelTest
-- LoginScreenViewModelTest
+#### Data
+- _ErplyApiFilterTest_
+- _ProductGroupsRepositoryImplTest_
+- _ProductsRepositoryImplTest_
+- _UserDataRepositoryImplTest_
+- _UserSessionRepositoryImplTest_
+#### Datastore
+- _UserPreferencesDataSourceTest_
+- _UserSessionDataSourceTest_
+#### View model
+- _ErplyAppViewModelTest_
+- _LoginScreenViewModelTest_
 ### Instrumented tests
-- ErplyProductDaoTest
+- _ErplyProductDaoTest_
 
 ## Function Limitations
 - Erply API discovery is not implemented yet. See https://github.com/ydanneg/erply/issues/2
