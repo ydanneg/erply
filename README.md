@@ -2,10 +2,10 @@
 Erply Android Developer test task implementation
 
 ## Purpose
-- Implementstion of a test task for Erply (Android developer) role
-- Having a reference/template fully Kotlin/Croutines gradle-based project using the modern android architecture recommendations
+- Implementation of a test task for Erply (Android developer) role
+- Having a reference/template fully Kotlin/Coroutines gradle-based project using the modern android architecture recommendations
 
-The inspirstion comes from [Now in Android App](https://github.com/android/nowinandroid).
+The inspiration comes from [Now in Android App](https://github.com/android/nowinandroid).
 
 ## Main challenges
 - Use modern android architecture practices: [Guide to app architecture](https://developer.android.com/topic/architecture) 
@@ -14,22 +14,11 @@ The inspirstion comes from [Now in Android App](https://github.com/android/nowin
 - Implement syncronization (full/partial) with remote DB using Erply recommendation and the fact of hourly request limit: [Data Syncing](https://learn-api.erply.com/data-syncing)
 - Use paging data from local DB using Room ORM ( potential large amount of data)
 - Use advanced fast search using sqlite fts4 support using Room ORM
-- Use well-typed Proto (protobuff) Datastore to store user preferences and session details
-- Secure (encrypt) user credetials using device hardware backed keystore (HSM)
+- Use well-typed Proto (protobuf) Datastore to store user preferences and session details
+- Secure (encrypt) user credentials using device hardware backed keystore (HSM)
 - Kotlin DSL for Erply API filtering
 
-## Limitations
-- Erply API discovery is not inomlemeted yet. See https://github.com/ydanneg/erply/issues/2
-- Search is only available from inside group view, but anyway working globally. See https://github.com/ydanneg/erply/issues/1
-- Erply PIM API does not provide endpoints to get deleted Product Groups. This limitation now makes fetching all groups every sync. Deleted groups still can be shown in UI.
-- Erply Product Categories are not supported.
-- Minum Android version 12
-
-## Roadmap
-See [Issues](https://github.com/ydanneg/erply/issues)
-
 ## Project structure
-
 ### Project root folder structure
 
 ```
@@ -82,3 +71,51 @@ See [Issues](https://github.com/ydanneg/erply/issues)
 └── util               # Utilities, converters
 
 ```
+
+## Architecture
+This application follows [Official Android Architecure Guide](https://developer.android.com/topic/architecture)
+Respected principals:
+- [Separation of concerns](https://developer.android.com/topic/architecture#separation-of-concerns) design pattern.
+- [Single source of truth](https://developer.android.com/topic/architecture#single-source-of-truth)
+- [Unidirectional Data Flow](https://developer.android.com/topic/architecture#unidirectional-data-flow)
+Layers:
+- UI (MVVM), see [Ui Layer](https://developer.android.com/topic/architecture/ui-layer)
+- Data, see [Data Layer](https://developer.android.com/topic/architecture/data-layer)
+- Domain, see [Domain Layer](https://developer.android.com/topic/architecture/data-layer)
+
+## Functionality
+### Startup
+LoginScreen is shown if user is not logged-in (UserSession.token is not available from datastore).
+If login operation completes successfully and UserSession.isLoggedIn is true then ErplyApp renders MainScreen
+MainScreen is shown if UserSession.token exists in a datastore.
+### Main 
+#### Catalog
+Catalog is a root navigation route
+Catalog screen shows the list of available Product groups downloaded (synced) from Erply PIM API. The list is shown immediatelly even if initial sync is not completed yet. List is bound to DB.
+Clicking on a group item user is navigated to ProductsScreen by passing an argument 'groupId'.
+Default sorting order is 'change, desc' for easy testing changes.
+#### Product list
+ProductsScreen is a child navigation route
+Product list by groupId is fetched from DB as a PaginSource to support large amount of data.
+ProductsScreen supports fast/advanced (fts4) full-text seearch that actually searches for all products, not just within a current group (see [#1](https://github.com/ydanneg/erply/issues/1)).
+Default sorting order is 'change, desc' for easy testing changes.
+#### Settings
+SettingsScreen is a root navigation route
+A simple Settings screen that only has Theme setting that allows to switch theme between Dark, Light and System Default modes
+### Data Synchronization
+Sync is currently triggered when MainScreenViewModel is initialized.
+First login will trigger full sync that will download all clientCode related data from Erply PIM API.
+Next sync will be a fast sync that downloads only changed data since last sync.
+Worker job is used for synchronization. If Sync is failed it will be retried automatically.
+
+
+## Limitations
+- Erply API discovery is not implemented yet. See https://github.com/ydanneg/erply/issues/2
+- Search is only available from inside group view, but anyway working globally. See https://github.com/ydanneg/erply/issues/1
+- Erply PIM API does not provide endpoints to get deleted Product Groups. This limitation now makes fetching all groups every sync. Deleted groups still can be shown in UI.
+- Erply Product Categories are not supported.
+- Minimum Android version 12
+
+## Roadmap
+See [Issues](https://github.com/ydanneg/erply/issues)
+
