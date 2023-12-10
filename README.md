@@ -27,3 +27,58 @@ The inspirstion comes from [Now in Android App](https://github.com/android/nowin
 
 ## Roadmap
 See [Issues](https://github.com/ydanneg/erply/issues)
+
+## Project structure
+
+### Project root folder structure
+
+```
+.
+├── api     # Erply API pure (not Android) 'java library' written in Kotlin
+├── app     # Android application
+├── gradle  # Gradle wrapper and Version Catalog
+...
+```
+
+### Application module root folder structure
+
+```
+./app/src/main/kotlin/com/ydanneg/erply
+├── data            # Data Layer (repositories)
+├── database        # DB layer (database, entities, daos)
+├── datastore       # Proto Datastores (user session, user prefereences)
+├── di              # Dagger Hilt modules
+├── domain          # Domain Layer (use cases)
+├── model           # Application models
+├── network         # Network data sources (Erply API data source)
+├── security        # Encyption Manager
+├── sync            # Sync realted logic (worker, sync manager)
+└── ui              # UI Layer
+
+```
+
+#### UI Layer structure (composables + activity)
+```
+./app/src/main/kotlin/com/ydanneg/erply/ui
+├── app                # Main Application composable
+├── components         # Shared composable components
+├── screens            # Composable screen components
+│   ├── login          # Boarding flow: Login related composables and viewmodel
+│   └── main           # Logged-In flow
+│       ├── catalog    # List of Product Groups (Catalog) composables and viewmodel
+│       ├── products   # List of Groups Products composables and viewmodel
+│       └── settings   # Settings screen and viewmodel
+├── theme              # Application Compose theme
+└── util               # Some shared utilities
+
+```
+
+### Databse structure
+```
+../app/src/main/kotlin/com/ydanneg/erply/database
+├── dao                # Dao
+├── mappers            # Entity<->Domain Model mappers
+├── model              # Entities
+└── util               # Utilities, converters
+
+```
