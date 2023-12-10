@@ -4,35 +4,30 @@ import com.ydanneg.erply.model.DarkThemeConfig
 import com.ydanneg.erply.model.LastSyncTimestamps
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.model.UserSession
+import com.ydanneg.erply.test.tempDir
+import com.ydanneg.erply.test.testScope
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import org.junit.Rule
 import kotlin.random.Random
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class UserPreferencesDataSourceTest {
 
-    private val testScope = TestScope(UnconfinedTestDispatcher())
+    @get:Rule
+    val tempDir = tempDir()
+    private val testScope = testScope()
 
     private lateinit var dataStore: UserPreferencesDataSource
     private lateinit var userSessionDataSource: UserSessionDataSource
 
-    @TempDir
-    lateinit var tmpFolder: File
-
-
-    @BeforeEach
+    @BeforeTest
     fun setup() {
-        userSessionDataSource = UserSessionDataSource(tmpFolder.testUserSessionDataStore(testScope), TestDataStoreModule.encryptionManager())
-        dataStore = UserPreferencesDataSource(
-            tmpFolder.testUserPreferencesDataStore(testScope),
+        userSessionDataSource = UserSessionDataSource(tempDir.testUserSessionDataStore(testScope), TestDataStoreModule.fakeEncryptionManager())
+        dataStore = UserPreferencesDataSourceImpl(
+            tempDir.testUserPreferencesDataStore(testScope),
             userSessionDataSource
         )
     }

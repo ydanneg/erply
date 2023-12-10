@@ -25,7 +25,7 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.CoroutineScope
-import java.io.File
+import org.junit.rules.TemporaryFolder
 import javax.inject.Singleton
 import kotlin.random.Random
 
@@ -38,7 +38,7 @@ object TestDataStoreModule {
 
     @Provides
     @Singleton
-    fun encryptionManager(): EncryptionManager {
+    fun fakeEncryptionManager(): EncryptionManager {
         return object : EncryptionManager {
             private lateinit var encryptedData: EncryptedData
 
@@ -53,40 +53,24 @@ object TestDataStoreModule {
 
         }
     }
-//
-//    @Provides
-//    @Singleton
-//    fun providesUserSessionDataStore(
-//        @ApplicationScope scope: CoroutineScope,
-//        userSessionSerializer: UserSessionSerializer,
-//        tmpFolder: TemporaryFolder,
-//    ): DataStore<UserSessionProto> =
-//        tmpFolder.testUserSessionDataStore(
-//            coroutineScope = scope,
-//            serializer = userSessionSerializer,
-//        )
 }
 
-fun File.testUserSessionDataStore(
+fun TemporaryFolder.testUserSessionDataStore(
     coroutineScope: CoroutineScope,
     serializer: UserSessionSerializer = UserSessionSerializer(),
 ) = DataStoreFactory.create(
     serializer = serializer,
     scope = coroutineScope,
 ) {
-    resolve("user_session_test.pb").apply {
-        createNewFile()
-    }
+    newFile("user_session_test.pb")
 }
 
-fun File.testUserPreferencesDataStore(
+fun TemporaryFolder.testUserPreferencesDataStore(
     coroutineScope: CoroutineScope,
     serializer: UserPreferencesSerializer = UserPreferencesSerializer(),
 ) = DataStoreFactory.create(
     serializer = serializer,
     scope = coroutineScope,
 ) {
-    resolve("user_prefs_test.pb").apply {
-        createNewFile()
-    }
+    newFile("user_prefs_test.pb")
 }

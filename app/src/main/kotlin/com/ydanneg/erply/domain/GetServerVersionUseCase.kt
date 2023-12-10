@@ -1,8 +1,8 @@
 package com.ydanneg.erply.domain
 
-import com.ydanneg.erply.network.api.ErplyNetworkDataSource
-import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.data.repository.UserSessionRepository
+import com.ydanneg.erply.datastore.UserPreferencesDataSource
+import com.ydanneg.erply.network.api.ErplyNetworkDataSource
 import javax.inject.Inject
 
 class GetServerVersionUseCase @Inject constructor(
@@ -12,7 +12,7 @@ class GetServerVersionUseCase @Inject constructor(
 ) : AbstractAuthenticationAwareUseCase(userPreferencesDataSource, userSessionRepository) {
 
     suspend operator fun invoke(): Long {
-        return withAuthenticationAware(0) { auth ->
+        return ensureAuthenticated(0) { auth ->
             erplyNetworkDataSource.fetchServerTimestamp(auth.token!!)
         }
     }

@@ -9,7 +9,18 @@ data class UserSession(
     // password excluded from toString for security reasons
     var password: String? = null
 
-    constructor(clientCode: String, username: String, userId: String, token: String?, password: String?) : this(clientCode, username, userId, token) {
+    constructor(
+        clientCode: String,
+        username: String,
+        userId: String,
+        token: String?,
+        password: String?
+    ) : this(
+        clientCode = clientCode,
+        username = username,
+        userId = userId,
+        token = token
+    ) {
         this.password = password
     }
 }

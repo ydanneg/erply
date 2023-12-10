@@ -1,10 +1,10 @@
 package com.ydanneg.erply.sync
 
-import android.util.Log
 import com.ydanneg.erply.model.LastSyncTimestamps
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -34,6 +34,8 @@ interface Syncable {
     suspend operator fun invoke(synchronizer: Synchronizer): Boolean
 }
 
+private val log = LoggerFactory.getLogger("suspendRunCatching")
+
 /**
  * Attempts [block], returning a successful [Result] if it succeeds, otherwise a [Result.Failure]
  * taking care not to break structured concurrency
@@ -43,7 +45,7 @@ private suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> = 
 } catch (cancellationException: CancellationException) {
     throw cancellationException
 } catch (exception: Exception) {
-    Log.w("suspendRunCatching", "Failed to evaluate a suspendRunCatchingBlock. Returning failure Result", exception)//NON-NLS
+    log.warn("Failed to evaluate a suspendRunCatchingBlock. Returning failure Result", exception)//NON-NLS
     Result.failure(exception)
 }
 

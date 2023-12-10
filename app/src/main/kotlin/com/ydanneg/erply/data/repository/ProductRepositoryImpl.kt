@@ -15,12 +15,12 @@ import javax.inject.Inject
 private const val PAGE_SIZE = 60
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ProductWithImagesRepository @Inject constructor(
+class ProductRepositoryImpl @Inject constructor(
     private val erplyProductWithImageDao: ErplyProductWithImageDao,
     private val userSessionRepository: UserSessionRepository
-) {
+) : ProductRepository {
 
-    fun productsWithImagesPageable(groupId: String): Flow<PagingData<ProductWithImage>> {
+    override fun getAllProductsByGroupId(groupId: String): Flow<PagingData<ProductWithImage>> {
         return userSessionRepository.userSession.map { it.clientCode }.distinctUntilChanged().flatMapLatest { clientCode ->
             Pager(
                 PagingConfig(PAGE_SIZE)
@@ -30,7 +30,7 @@ class ProductWithImagesRepository @Inject constructor(
         }
     }
 
-    fun searchProducts(search: String): Flow<PagingData<ProductWithImage>> {
+    override fun searchAllProducts(search: String): Flow<PagingData<ProductWithImage>> {
         return userSessionRepository.userSession.map { it.clientCode }.distinctUntilChanged().flatMapLatest { clientCode ->
             Pager(
                 PagingConfig(PAGE_SIZE)

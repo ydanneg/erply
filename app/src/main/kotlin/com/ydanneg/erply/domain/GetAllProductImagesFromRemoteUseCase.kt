@@ -17,7 +17,7 @@ class GetAllProductImagesFromRemoteUseCase @Inject constructor(
 ) : AbstractAuthenticationAwareUseCase(userPreferencesDataSource, userSessionRepository) {
 
     suspend operator fun invoke(changedSince: Long? = null): Flow<List<ProductImage>> =
-        withAuthenticationAware(flowOf()) { auth ->
+        ensureAuthenticated(flowOf()) { auth ->
             erplyNetworkDataSource.fetchAllImages(auth.token!!, changedSince).map { it.map { image -> image.toModel() } }
         }
 }
