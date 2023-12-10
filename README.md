@@ -143,7 +143,25 @@ Synchronization is automatically retries if failed.
   - ProductListScreen
   - SettingsScreen
 
-## Limitations
+## Test
+NB! Test are added for demonstration purpose. Code coverage is low. 
+### Unit tests
+Data:
+- ErplyApiFilterTest
+- ProductGroupsRepositoryImplTest
+- ProductsRepositoryImplTest
+- UserDataRepositoryImplTest
+- UserSessionRepositoryImplTest
+Datastore:
+- UserPreferencesDataSourceTest
+- UserSessionDataSourceTest
+View model:
+- ErplyAppViewModelTest
+- LoginScreenViewModelTest
+### Instrumented tests
+- ErplyProductDaoTest
+
+## Function Limitations
 - Erply API discovery is not implemented yet. See https://github.com/ydanneg/erply/issues/2
 - Search is only available from inside group view, but anyway working globally. See https://github.com/ydanneg/erply/issues/1
 - Erply PIM API does not provide endpoints to get deleted Product Groups. This limitation now makes fetching all groups every sync. Deleted groups still can be shown in UI.
