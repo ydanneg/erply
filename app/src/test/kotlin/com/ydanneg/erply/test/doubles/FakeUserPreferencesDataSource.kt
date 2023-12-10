@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 
 object FakeUserPreferencesDataSource : UserPreferencesDataSource {
+
     private val _userPreferences = MutableSharedFlow<UserPreferences>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val currentUserPreferences get() = _userPreferences.replayCache.firstOrNull() ?: UserPreferences()
 

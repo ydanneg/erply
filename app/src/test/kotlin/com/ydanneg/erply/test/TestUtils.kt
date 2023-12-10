@@ -15,27 +15,25 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.extension.AfterEachCallback
-import org.junit.jupiter.api.extension.BeforeEachCallback
-import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.rules.TemporaryFolder
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun testScope() = TestScope(UnconfinedTestDispatcher())
+fun testScope() = TestScope(UnconfinedTestDispatcher())
+
+fun tempDir(): TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CoroutinesTestExtension(
-    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
-) : BeforeEachCallback, AfterEachCallback {
-
-    /**
-     * Set TestCoroutine dispatcher as main
-     */
-    override fun beforeEach(context: ExtensionContext?) {
-        Dispatchers.setMain(dispatcher)
+class MainDispatcherRule(
+    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
+) : TestWatcher() {
+    override fun starting(description: Description) {
+        Dispatchers.setMain(testDispatcher)
     }
 
-    override fun afterEach(context: ExtensionContext?) {
+    override fun finished(description: Description) {
         Dispatchers.resetMain()
     }
 }

@@ -13,7 +13,7 @@ plugins {
 
 subprojects {
     tasks.withType<Test> {
-        useJUnitPlatform()
+        useJUnit()
         testLogging {
             showStandardStreams = true
             exceptionFormat = TestExceptionFormat.FULL

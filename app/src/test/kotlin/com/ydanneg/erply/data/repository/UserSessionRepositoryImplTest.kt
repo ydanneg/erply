@@ -8,6 +8,7 @@ import com.ydanneg.erply.datastore.UserSessionDataSource
 import com.ydanneg.erply.datastore.testUserSessionDataStore
 import com.ydanneg.erply.network.api.ErplyNetworkDataSource
 import com.ydanneg.erply.network.api.toModel
+import com.ydanneg.erply.test.tempDir
 import com.ydanneg.erply.test.testScope
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -17,22 +18,19 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import org.junit.Rule
+import kotlin.test.BeforeTest
 import kotlin.test.Test
-
 
 class UserSessionRepositoryImplTest {
 
+    @get:Rule
+    val tempDir = tempDir()
     private val testScope = testScope()
 
     private lateinit var userSessionDataSource: UserSessionDataSource
 
-    @TempDir
-    private lateinit var tempDir: File
-
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         userSessionDataSource = UserSessionDataSource(
             userSessionDataStore = tempDir.testUserSessionDataStore(testScope),

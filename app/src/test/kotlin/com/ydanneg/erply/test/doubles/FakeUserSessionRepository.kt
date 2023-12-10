@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 
 object FakeUserSessionRepository : UserSessionRepository {
+
     private val _userSession = MutableSharedFlow<UserSession>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     override val userSession: Flow<UserSession> = _userSession.filterNotNull()

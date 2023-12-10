@@ -4,21 +4,22 @@ import app.cash.turbine.test
 import com.ydanneg.erply.model.UserData
 import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.model.UserSession
-import com.ydanneg.erply.test.CoroutinesTestExtension
+import com.ydanneg.erply.test.MainDispatcherRule
 import com.ydanneg.erply.test.doubles.FakeUserDataRepository
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.Rule
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
-@ExtendWith(CoroutinesTestExtension::class)
 class ErplyAppViewModelTest {
+
+    @get:Rule
+    val dispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: ErplyAppViewModel
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         viewModel = ErplyAppViewModel(FakeUserDataRepository(fakeUserData))
     }

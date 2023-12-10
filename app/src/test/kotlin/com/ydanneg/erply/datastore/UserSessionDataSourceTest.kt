@@ -1,31 +1,28 @@
 package com.ydanneg.erply.datastore
 
 import com.ydanneg.erply.model.UserSession
+import com.ydanneg.erply.test.tempDir
+import com.ydanneg.erply.test.testScope
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import org.junit.Rule
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class UserSessionDataSourceTest {
 
-    private val testScope = TestScope(UnconfinedTestDispatcher())
+    @get:Rule
+    val tempDir = tempDir()
+    private val testScope = testScope()
 
     private lateinit var dataStore: UserSessionDataSource
 
-    @TempDir
-    private lateinit var tmpFolder: File
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         dataStore = UserSessionDataSource(
-            tmpFolder.testUserSessionDataStore(testScope),
+            tempDir.testUserSessionDataStore(testScope),
             TestDataStoreModule.fakeEncryptionManager()
         )
     }
