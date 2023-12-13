@@ -47,6 +47,7 @@ class SyncWorker @AssistedInject constructor(
     private val log = LoggerFactory.getLogger("SyncWorker")
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
+        log.info("Sync started...")//NON-NLS
         // Login to be sure token is not expired within a sync job
         runCatching {
             userSessionRepository.tryLogin()
@@ -58,7 +59,7 @@ class SyncWorker @AssistedInject constructor(
             val deferredProducts = async { syncProductsUseCase.sync() }
             awaitAll(deferredGroups, deferredImages, deferredProducts).all { it }
         }
-        log.info("doWork complete: $syncedSuccessfully")//NON-NLS
+        log.info("Sync complete: $syncedSuccessfully")//NON-NLS
 
         if (syncedSuccessfully) Result.success() else Result.retry()
     }

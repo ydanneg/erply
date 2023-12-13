@@ -22,7 +22,7 @@ object ErplyApiModule {
     fun providesErplyApi(): ErplyApiClient =
         ErplyApiClient(
             ErplyApiClientConfiguration(
-                logger = { log.trace(it) },
+                logger = { log.debug(it) },
                 logLevel = valueOrNull<ErplyApiClientLogLevel>(BuildConfig.CLIENT_LOG_LEVEL) ?: ErplyApiClientLogLevel.NONE,
                 baseUrl = BuildConfig.CLIENT_PIM_BASE_URL,
                 userAgent = "${BuildConfig.CLIENT_USER_AGENT}/${BuildConfig.VERSION_NAME}.{${BuildConfig.VERSION_CODE}} (Android SDK ${Build.VERSION.SDK_INT}; ${Build.DEVICE})",//NON-NLS

@@ -19,7 +19,7 @@ import javax.inject.Inject
 sealed class LoginUIState {
     data object Idle : LoginUIState()
     data object Loading : LoginUIState()
-    data object Success : LoginUIState()
+    data object LoggedIn : LoginUIState()
 
     data class Error(val error: ErplyApiError) : LoginUIState()
 }
@@ -58,7 +58,7 @@ class LoginScreenViewModel @Inject constructor(
             try {
                 _uiState.value = LoginUIState.Loading
                 userSessionRepository.login(clientId, username, password)
-                _uiState.value = LoginUIState.Success
+                _uiState.value = LoginUIState.LoggedIn
             } catch (e: ErplyApiException) {
                 log.error("error", e)//NON-NLS
                 _uiState.value = LoginUIState.Error(e.type)

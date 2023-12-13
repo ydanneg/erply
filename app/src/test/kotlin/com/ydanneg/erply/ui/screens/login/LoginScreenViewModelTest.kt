@@ -29,7 +29,7 @@ class LoginScreenViewModelTest {
             awaitItem().shouldBeInstanceOf<LoginUIState.Idle>()
             viewModel.doLogin("testClient", "testUsername", "testPassword")
             awaitItem().shouldBeInstanceOf<LoginUIState.Loading>()
-            awaitItem().shouldBeInstanceOf<LoginUIState.Success>()
+            awaitItem().shouldBeInstanceOf<LoginUIState.LoggedIn>()
         }
     }
 
