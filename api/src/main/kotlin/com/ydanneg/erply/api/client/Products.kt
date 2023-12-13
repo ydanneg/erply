@@ -5,7 +5,6 @@ package com.ydanneg.erply.api.client
 import com.ydanneg.erply.api.client.util.apiFilter
 import com.ydanneg.erply.api.client.util.executeOrThrow
 import com.ydanneg.erply.api.client.util.fetchAllPages
-import com.ydanneg.erply.api.client.util.handleError
 import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import io.ktor.client.HttpClient
@@ -13,7 +12,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 
 
 class ProductsApi internal constructor(private val httpClient: HttpClient) {
@@ -32,7 +30,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     suspend fun fetchAllProductGroups(token: String, changedSince: Long? = null): Flow<List<ErplyProductGroup>> =
         fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchProductGroups(token = token, changedSince = changedSince, skip = skip, take = take)
-        }.catch { it.handleError() }
+        }
 
     private suspend fun fetchProductGroups(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProductGroup> =
         executeOrThrow {
@@ -53,7 +51,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     suspend fun fetchAllProducts(token: String, changedSince: Long? = null): Flow<List<ErplyProduct>> =
         fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchProducts(token, changedSince, skip = skip, take = take)
-        }.catch { it.handleError() }
+        }
 
     private suspend fun fetchProducts(token: String, changedSince: Long? = null, skip: Int = 0, take: Int = PAGE_SIZE): List<ErplyProduct> =
         executeOrThrow {
@@ -76,7 +74,7 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
     suspend fun fetchAllDeletedProductIds(token: String, changedSince: Long): Flow<List<String>> =
         fetchAllPages(PAGE_SIZE) { skip, take ->
             fetchDeletedProductIds(token, changedSince, skip = skip, take = take)
-        }.catch { it.handleError() }
+        }
 
     private suspend fun fetchDeletedProductIds(token: String, changedSince: Long, skip: Int = 0, take: Int = PAGE_SIZE): List<String> =
         executeOrThrow {
