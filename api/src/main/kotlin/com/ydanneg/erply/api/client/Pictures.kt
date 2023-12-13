@@ -1,5 +1,6 @@
 package com.ydanneg.erply.api.client
 
+import com.ydanneg.erply.api.client.util.handleError
 import com.ydanneg.erply.api.model.ErplyProductPicture
 import com.ydanneg.erply.api.model.ErplyProductPicturesResponse
 import io.ktor.client.HttpClient
@@ -7,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.yield
 
@@ -20,7 +22,7 @@ class CdnApi internal constructor(private val httpClient: HttpClient, private va
                 changedSince = changedSince,
                 isDeleted = false
             )
-        }
+        }.catch { it.handleError() }
 
     fun fetchAllDeletedProductPictures(token: String, changedSince: Long? = null): Flow<List<ErplyProductPicture>> =
         fetchAllPages { page ->
@@ -30,7 +32,7 @@ class CdnApi internal constructor(private val httpClient: HttpClient, private va
                 changedSince = changedSince,
                 isDeleted = true
             )
-        }
+        }.catch { it.handleError() }
 
     private suspend fun fetchProductPictures(
         token: String,

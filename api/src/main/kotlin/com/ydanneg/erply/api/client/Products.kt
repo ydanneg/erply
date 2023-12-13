@@ -2,18 +2,16 @@
 
 package com.ydanneg.erply.api.client
 
-import com.ydanneg.erply.api.client.util.fetchAllPages
 import com.ydanneg.erply.api.client.util.apiFilter
-import com.ydanneg.erply.api.model.ErplyApiError
-import com.ydanneg.erply.api.model.ErplyApiException
+import com.ydanneg.erply.api.client.util.executeOrThrow
+import com.ydanneg.erply.api.client.util.fetchAllPages
+import com.ydanneg.erply.api.client.util.handleError
 import com.ydanneg.erply.api.model.ErplyProduct
 import com.ydanneg.erply.api.model.ErplyProductGroup
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 
@@ -90,24 +88,6 @@ class ProductsApi internal constructor(private val httpClient: HttpClient) {
                 }
             }.body()
         }
-
-    private suspend fun <T> executeOrThrow(block: suspend () -> T): T = try {
-        block()
-    } catch (e: Throwable) {
-        e.handleError()
-    }
-
-    private fun Throwable.handleError(): Nothing {
-        throw when (this) {
-            is ClientRequestException -> when (response.status) {
-                HttpStatusCode.Unauthorized -> ErplyApiException(ErplyApiError.Unauthorized)
-                HttpStatusCode.Forbidden -> ErplyApiException(ErplyApiError.AccessDenied)
-                else -> throw ErplyApiException(ErplyApiError.Unknown)
-            }
-
-            else -> throw ErplyApiException(ErplyApiError.Unknown)
-        }
-    }
 
     companion object {
         private const val PAGE_SIZE = 1000

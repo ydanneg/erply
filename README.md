@@ -171,5 +171,10 @@ NB! Test are added for demonstration purpose. Code coverage is low.
 - Erply Product Categories are not supported.
 - Minimum Android version 12
 
+## Logging
+To see all application logs do the following:
+```bash
+adb shell setprop persist.log.tag D
+```
 ## Roadmap
 See [Issues](https://github.com/ydanneg/erply/issues)

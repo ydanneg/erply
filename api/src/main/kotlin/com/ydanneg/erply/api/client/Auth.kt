@@ -1,5 +1,6 @@
 package com.ydanneg.erply.api.client
 
+import com.ydanneg.erply.api.client.util.executeOrThrow
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.api.model.ErplyResponse
@@ -14,8 +15,8 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 
 class AuthApi internal constructor(private val httpClient: HttpClient) {
-    suspend fun login(clientCode: String, username: String, password: String): ErplyVerifiedUser {
-        return httpClient.post("https://$clientCode.erply.com/api/") {
+    suspend fun login(clientCode: String, username: String, password: String): ErplyVerifiedUser = executeOrThrow {
+        httpClient.post("https://$clientCode.erply.com/api/") {
             contentType(ContentType.Application.FormUrlEncoded)
             setBody(FormDataContent(Parameters.build {
                 append("clientCode", clientCode)
@@ -24,8 +25,8 @@ class AuthApi internal constructor(private val httpClient: HttpClient) {
                 append("request", "verifyUser")
                 append("sendContentType", "1")
             }))
-        }.body<ErplyResponse<ErplyVerifiedUser>>().contentOrThrow()
-    }
+        }.body<ErplyResponse<ErplyVerifiedUser>>()
+    }.contentOrThrow()
 }
 
 
