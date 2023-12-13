@@ -11,6 +11,4 @@ interface UserPreferencesDataSource {
     suspend fun updateChangeListVersion(clientCode: String, update: LastSyncTimestamps.() -> LastSyncTimestamps)
 
     suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
-
-    suspend fun setKeepMeSignedIn(value: Boolean)
 }

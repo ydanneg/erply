@@ -13,6 +13,5 @@ data class LastSyncTimestamps(
 
 data class UserPreferences(
     val darkThemeConfig: DarkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
-    val isKeepMeSignedIn: Boolean = false,
     val lastSyncTimestamps: LastSyncTimestamps = LastSyncTimestamps()
 )

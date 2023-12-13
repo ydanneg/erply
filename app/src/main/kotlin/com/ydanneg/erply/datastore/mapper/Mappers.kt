@@ -12,13 +12,13 @@ import com.ydanneg.erply.model.UserPreferences
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.security.EncryptedData
 
-fun UserSessionProto.toModel(encryptedPassword: String?): UserSession {
+fun UserSessionProto.toModel(password: String?): UserSession {
     return UserSession(
         clientCode = clientCode,
         username = username,
         userId = userId,
         token = if (hasToken()) token else null,
-        password = encryptedPassword
+        password = password
     )
 }
 
@@ -50,7 +50,6 @@ fun UserPreferencesProto.toModel(clientCode: String?): UserPreferences {
             DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT -> DarkThemeConfig.LIGHT
             else -> DarkThemeConfig.FOLLOW_SYSTEM
         },
-        isKeepMeSignedIn = keepMeSignedIn,
         lastSyncTimestamps = LastSyncTimestamps(
             productsLastSyncTimestamp = clientCode?.let { getProductsLastSyncTimestampOrDefault(it, 0) } ?: 0,
             productGroupsLastSyncTimestamp = clientCode?.let { getGroupsLastSyncTimestampOrDefault(clientCode, 0) } ?: 0,

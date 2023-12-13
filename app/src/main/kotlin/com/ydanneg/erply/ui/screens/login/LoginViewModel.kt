@@ -5,13 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.data.repository.UserSessionRepository
-import com.ydanneg.erply.datastore.UserPreferencesDataSource
-import com.ydanneg.erply.util.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
@@ -30,8 +27,7 @@ fun LoginUIState.getError() = if (this is LoginUIState.Error) error else null
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
-    private val userSessionRepository: UserSessionRepository,
-    private val userPreferencesDataSource: UserPreferencesDataSource
+    private val userSessionRepository: UserSessionRepository
 ) : ViewModel() {
 
     private val log = LoggerFactory.getLogger(LoginScreenViewModel::class.java)
@@ -40,16 +36,6 @@ class LoginScreenViewModel @Inject constructor(
 
     private var _uiState = MutableStateFlow<LoginUIState>(LoginUIState.Idle)
     val uiState = _uiState.asStateFlow()
-
-    val keepMeSignedIn = userPreferencesDataSource.userPreferences
-        .map { it.isKeepMeSignedIn }
-        .toStateFlow(viewModelScope, false)
-
-    fun setKeepMeLoggedIn(value: Boolean) {
-        viewModelScope.launch {
-            userPreferencesDataSource.setKeepMeSignedIn(value)
-        }
-    }
 
     fun doLogin(clientId: String, username: String, password: String) {
         log.debug("doLogin: $clientId, $username")

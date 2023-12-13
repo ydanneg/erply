@@ -16,10 +16,10 @@ class UserPreferencesDataSourceImpl @Inject constructor(
     userSessionDataSource: UserSessionDataSource
 ) : UserPreferencesDataSource {
 
-    override val userPreferences = userSessionDataSource.userSession.flatMapLatest { session ->
-        dataStore.data.map { it.toModel(session.clientCode) }
-            .distinctUntilChanged()
-    }
+    override val userPreferences = userSessionDataSource.userSession
+        .flatMapLatest { session ->
+            dataStore.data.map { it.toModel(session.clientCode) }
+        }.distinctUntilChanged()
 
     override suspend fun updateChangeListVersion(clientCode: String, update: LastSyncTimestamps.() -> LastSyncTimestamps) {
         runCatching {
@@ -49,16 +49,6 @@ class UserPreferencesDataSourceImpl @Inject constructor(
                         DarkThemeConfig.FOLLOW_SYSTEM -> DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM
                         DarkThemeConfig.LIGHT -> DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT
                     }
-                }
-            }
-        }
-    }
-
-    override suspend fun setKeepMeSignedIn(value: Boolean) {
-        runCatching {
-            dataStore.updateData {
-                it.copy {
-                    keepMeSignedIn = value
                 }
             }
         }

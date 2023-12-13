@@ -16,14 +16,14 @@ class UserSessionDataSource @Inject constructor(
 ) {
 
     val userSession = userSessionDataStore.data.map {
-        val password = it.passwordOrNull?.let { encryptedData ->
+        val decryptedPassword = it.passwordOrNull?.let { encryptedData ->
             encryptionManager.decryptText(
                 keyAlias = ENCRYPTION_KEY_ALIAS,
                 encrypted = encryptedData.value.toByteArray(),
                 iv = encryptedData.iv.toByteArray()
             )
         }
-        it.toModel(password)
+        it.toModel(decryptedPassword)
     }
 
     suspend fun updateUserSession(userSession: UserSession) {

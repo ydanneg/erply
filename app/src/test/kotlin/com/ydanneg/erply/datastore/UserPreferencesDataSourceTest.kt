@@ -53,17 +53,6 @@ class UserPreferencesDataSourceTest {
     }
 
     @Test
-    fun shouldChangeKeepMeSignedInSettingWithoutAffectingOtherSettings() = testScope.runTest {
-        dataStore.userPreferences.first() shouldBe DEFAULT_PREFS
-
-        dataStore.setKeepMeSignedIn(true)
-        dataStore.userPreferences.first() shouldBe DEFAULT_PREFS.copy(isKeepMeSignedIn = true)
-
-        dataStore.setKeepMeSignedIn(false)
-        dataStore.userPreferences.first() shouldBe DEFAULT_PREFS.copy(isKeepMeSignedIn = false)
-    }
-
-    @Test
     fun shouldChangeLastChangeVersionPerClientSettingWithoutAffectingOtherSettings() = testScope.runTest {
         dataStore.userPreferences.first() shouldBe DEFAULT_PREFS
 

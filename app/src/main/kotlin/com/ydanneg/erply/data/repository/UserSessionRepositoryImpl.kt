@@ -7,7 +7,6 @@ import com.ydanneg.erply.network.api.toModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-
 class UserSessionRepositoryImpl @Inject constructor(
     private val erplyNetworkDataSource: ErplyNetworkDataSource,
     private val userSessionDataSource: UserSessionDataSource
@@ -15,7 +14,8 @@ class UserSessionRepositoryImpl @Inject constructor(
     override val userSession: Flow<UserSession> = userSessionDataSource.userSession
 
     override suspend fun login(clientCode: String, username: String, password: String) {
-        val userSession = erplyNetworkDataSource.login(clientCode, username, password).toModel(clientCode, password)
+        val userSession = erplyNetworkDataSource.login(clientCode, username, password)
+            .toModel(clientCode, password)
         userSessionDataSource.updateUserSession(userSession)
     }
 

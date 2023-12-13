@@ -47,8 +47,11 @@ object TestDataStoreModule {
                 return encryptedData
             }
 
-            override suspend fun decryptText(keyAlias: String, encrypted: ByteArray, iv: ByteArray): String {
-                return String(encryptedData.data)
+            override suspend fun decryptText(keyAlias: String, encrypted: ByteArray, iv: ByteArray): String? {
+                if (::encryptedData.isInitialized) {
+                    return String(encryptedData.data)
+                }
+                return null
             }
 
         }

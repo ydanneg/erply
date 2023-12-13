@@ -34,7 +34,7 @@ fun ErplyProductPicture.toModel() = ProductImage(
     filename = filename
 )
 
-fun ErplyVerifiedUser.toModel(clientCode: String, password: String? = null) = UserSession(
+fun ErplyVerifiedUser.toModel(clientCode: String, password: String) = UserSession(
     username = username,
     userId = userId,
     clientCode = clientCode,

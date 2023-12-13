@@ -11,6 +11,7 @@ import android.security.keystore.KeyProperties.PURPOSE_ENCRYPT
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.slf4j.LoggerFactory
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -27,6 +28,8 @@ class AndroidEncryptionManager @Inject constructor(
     @ApplicationContext val context: Context
 ) : EncryptionManager {
 
+    private val log = LoggerFactory.getLogger("AndroidEncryptionManager")
+
     override suspend fun encryptText(keyAlias: String, data: String): EncryptedData =
         withContext(Dispatchers.IO) {
             Cipher.getInstance(TRANSFORMATION).run {
@@ -38,11 +41,16 @@ class AndroidEncryptionManager @Inject constructor(
             }
         }
 
-    override suspend fun decryptText(keyAlias: String, encrypted: ByteArray, iv: ByteArray): String =
+    override suspend fun decryptText(keyAlias: String, encrypted: ByteArray, iv: ByteArray): String? =
         withContext(Dispatchers.IO) {
-            Cipher.getInstance(TRANSFORMATION).run {
-                init(Cipher.DECRYPT_MODE, getOrCreateSecretKey(keyAlias), IvParameterSpec(iv))
-                doFinal(encrypted).toString(Charsets.UTF_8)
+            try {
+                Cipher.getInstance(TRANSFORMATION).run {
+                    init(Cipher.DECRYPT_MODE, getOrCreateSecretKey(keyAlias), IvParameterSpec(iv))
+                    doFinal(encrypted).toString(Charsets.UTF_8)
+                }
+            } catch (e: Exception) {
+                log.error("failed to decrypt data: ${e.message}")//NON-NLS
+                null
             }
         }
 

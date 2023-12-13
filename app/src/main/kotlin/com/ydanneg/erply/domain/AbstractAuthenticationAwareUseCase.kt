@@ -3,23 +3,17 @@ package com.ydanneg.erply.domain
 import com.ydanneg.erply.api.model.ErplyApiError
 import com.ydanneg.erply.api.model.ErplyApiException
 import com.ydanneg.erply.data.repository.UserSessionRepository
-import com.ydanneg.erply.datastore.UserPreferencesDataSource
 import com.ydanneg.erply.model.UserSession
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import org.slf4j.LoggerFactory
 
 abstract class AbstractAuthenticationAwareUseCase(
-    userPreferencesDataSource: UserPreferencesDataSource,
     private val userSessionRepository: UserSessionRepository,
 ) {
-    val log = LoggerFactory.getLogger("AbstractAuthenticationAwareUseCase")
-
-    private val isKeepMeSignedIn = userPreferencesDataSource.userPreferences
-        .map { it.isKeepMeSignedIn }
+    private val log = LoggerFactory.getLogger("AbstractAuthenticationAwareUseCase")
 
     protected suspend fun <T> ensureAuthenticated(defaultValue: T, block: suspend (UserSession) -> T): T {
-        val keepMeSignedIn = isKeepMeSignedIn.first()
+        val keepMeSignedIn = userSessionRepository.userSession.first().password != null
         try {
             return userSessionRepository.tryAuthenticateUnauthorized(keepMeSignedIn, block)
         } catch (e: ErplyApiException) {
