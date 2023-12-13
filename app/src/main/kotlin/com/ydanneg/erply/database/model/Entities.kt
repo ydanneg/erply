@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.math.BigDecimal
 
 const val PRODUCTS_TABLE_NAME = "products"
 const val PRODUCTS_FTS_TABLE_NAME = "products_fts"
@@ -33,7 +34,7 @@ data class ProductEntity(
     val name: String,
     val groupId: String,
     val description: String?,
-    val price: String,
+    val price: BigDecimal,
     val changed: Long
 )
 

@@ -28,7 +28,7 @@ interface ErplyProductWithImageDao {
                 AND product.id = image.productId  
         WHERE product.clientCode = :clientCode
             AND product.groupId = :groupId
-        ORDER BY product.changed DESC
+        ORDER BY product.price ASC
         """
     )
     fun findAllByGroupIdPageable(clientCode: String, groupId: String): PagingSource<Int, ProductWithImage>
@@ -55,7 +55,7 @@ interface ErplyProductWithImageDao {
                     ON product.rowId == fts.rowid 
                 WHERE $PRODUCTS_FTS_TABLE_NAME MATCH :search
             )
-        ORDER BY product.changed DESC
+        ORDER BY product.price ASC
         """
     )
     fun fastSearchAllProducts(clientCode: String, search: String): PagingSource<Int, ProductWithImage>

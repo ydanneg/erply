@@ -11,7 +11,7 @@ import com.ydanneg.erply.database.model.ProductEntity
 import com.ydanneg.erply.database.model.ProductFtsEntity
 import com.ydanneg.erply.database.model.ProductGroupEntity
 import com.ydanneg.erply.database.model.ProductImageEntity
-import com.ydanneg.erply.database.util.InstantConverter
+import com.ydanneg.erply.database.util.BigDecimalConverter
 
 @Database(
     entities = [
@@ -25,7 +25,7 @@ import com.ydanneg.erply.database.util.InstantConverter
     exportSchema = true,
 )
 @TypeConverters(
-    InstantConverter::class,
+    BigDecimalConverter::class
 )
 abstract class ErplyDatabase : RoomDatabase() {
     abstract fun productDao(): ErplyProductDao

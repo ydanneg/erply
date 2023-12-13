@@ -16,6 +16,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import java.math.BigDecimal
 import kotlin.test.Test
 
 class ProductsRepositoryImplTest {
@@ -92,7 +93,7 @@ class ProductsRepositoryImplTest {
                 id = "id",
                 name = "name",
                 description = null,
-                price = "99.99",
+                price = BigDecimal("99.99"),
                 filename = "",
                 tenant = "tenant"
             )

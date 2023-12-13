@@ -56,6 +56,7 @@ import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
 import com.ydanneg.erply.ui.util.generateAlphanumeric
 import kotlinx.coroutines.flow.flowOf
+import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -208,7 +209,7 @@ private fun ProductsScreenContentPreview() {
         ProductWithImage(
             id = it.toString(),
             name = "$it ${generateAlphanumeric()}",
-            price = "19.99",
+            price = BigDecimal("19.99"),
             description = "description$it",
             filename = null,
             tenant = null

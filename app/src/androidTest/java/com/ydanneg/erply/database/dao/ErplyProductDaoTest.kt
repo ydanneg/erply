@@ -14,6 +14,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
+import java.math.BigDecimal
 
 class ErplyProductDaoTest {
 
@@ -40,8 +41,8 @@ class ErplyProductDaoTest {
         val clientCode = "clientCode"
 
         val entities = listOf(
-            ProductEntity(0, "1", clientCode, "name1", "groupId", null, "99.99", 0),
-            ProductEntity(0, "2", clientCode, "name2", "groupId", null, "9.99", 0)
+            ProductEntity(0, "1", clientCode, "name1", "groupId", null, BigDecimal("99.99"), 0),
+            ProductEntity(0, "2", clientCode, "name2", "groupId", null, BigDecimal("9.99"), 0)
         )
 
         productDao.insertOrUpdate(entities)

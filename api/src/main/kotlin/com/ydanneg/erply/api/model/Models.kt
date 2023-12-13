@@ -1,7 +1,9 @@
 package com.ydanneg.erply.api.model
 
+import com.ydanneg.erply.api.client.serializer.BigDecimalSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.math.BigDecimal
 
 @Serializable
 data class ErplyResponseStatus(
@@ -71,7 +73,8 @@ data class ErplyProduct(
     @SerialName("description")
     val description: LocalizedDescriptionValue? = null,
     @SerialName("price")
-    val price: String,
+    @Serializable(with = BigDecimalSerializer::class)
+    val price: BigDecimal,
     @SerialName("changed")
     val changed: Long
 )

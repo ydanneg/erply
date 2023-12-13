@@ -95,7 +95,9 @@ User can click on a group to see it's products.
 
 User can search products using full-text search.
 
-Groups and Products are sorted by last change date by default desc.
+Groups are sorted by remote order. 
+
+Products are sorted by price ASC.
 
 User can logout and login again.
 
