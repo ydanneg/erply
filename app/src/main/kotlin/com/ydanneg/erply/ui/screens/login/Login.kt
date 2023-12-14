@@ -1,11 +1,18 @@
 package com.ydanneg.erply.ui.screens.login
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -16,13 +23,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -37,6 +50,7 @@ import com.ydanneg.erply.ui.components.ExitConfirmation
 import com.ydanneg.erply.ui.components.FadedProgressIndicator
 import com.ydanneg.erply.ui.theme.ErplyThemePreviewSurface
 import com.ydanneg.erply.ui.theme.PreviewThemes
+import kotlinx.coroutines.delay
 
 @PreviewThemes
 @Composable
@@ -83,11 +97,12 @@ fun LoginScreen(
 
 private typealias OnLoginClicked = (String, String, String) -> Unit
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LoginScreenContent(
     isLoading: Boolean = false,
     error: String? = null,
-    onLoginClicked: OnLoginClicked? = null,
+    onLoginClicked: OnLoginClicked = { _, _, _ -> },
 ) {
     var clientCode by rememberSaveable { mutableStateOf(BuildConfig.ERPLY_CLIENT_CODE) }
     var username by rememberSaveable { mutableStateOf(BuildConfig.ERPLY_USERNAME) }
@@ -95,10 +110,27 @@ private fun LoginScreenContent(
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
+    LaunchedEffect(Unit) {
+        delay(200)
+        // request focus on the first field
+        focusRequester.requestFocus()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
+        contentAlignment = Alignment.Center
+    ) {
         Card {
             Column(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState(0)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -108,35 +140,49 @@ private fun LoginScreenContent(
                     textAlign = TextAlign.Center
                 )
                 ErplyTextField(
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester),
                     value = clientCode,
                     enabled = !isLoading,
                     singleLine = true,
-                    onValueChange = { value: String -> clientCode = value },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    onValueChange = { clientCode = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                     labelText = stringResource(R.string.login_client_code_label),
-                    maxLength = 10
+                    maxLength = 6
                 )
                 ErplyTextField(
+                    modifier = Modifier
+                        .bringIntoViewRequester(bringIntoViewRequester),
                     value = username,
                     enabled = !isLoading,
                     singleLine = true,
-                    onValueChange = { value: String -> username = value },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    onValueChange = { username = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                     labelText = stringResource(R.string.login_username_label),
                     maxLength = 50
                 )
                 ErplyTextField(
+                    modifier = Modifier
+                        .bringIntoViewRequester(bringIntoViewRequester),
                     value = password,
                     singleLine = true,
                     enabled = !isLoading,
-                    onValueChange = { value: String -> password = value },
+                    onValueChange = { password = it },
                     labelText = stringResource(R.string.login_password_label),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        focusManager.clearFocus()
+                        onLoginClicked(clientCode, username, password)
+                    }),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description =
-                            if (passwordVisible) stringResource(R.string.login_hint_hide_password) else stringResource(R.string.login_hint_show_password)
+                        val description = if (passwordVisible)
+                            stringResource(R.string.login_hint_hide_password)
+                        else
+                            stringResource(R.string.login_hint_show_password)
+
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
                         }
@@ -145,7 +191,7 @@ private fun LoginScreenContent(
                 )
                 Button(
                     enabled = !isLoading,
-                    onClick = { onLoginClicked?.invoke(clientCode, username, password) }
+                    onClick = { onLoginClicked(clientCode, username, password) }
                 ) {
                     Text(text = stringResource(R.string.button_sign_in))
                 }
@@ -158,7 +204,6 @@ private fun LoginScreenContent(
     }
 
 }
-
 
 @Composable
 private fun ErplyApiError.message(): String = when (this) {
