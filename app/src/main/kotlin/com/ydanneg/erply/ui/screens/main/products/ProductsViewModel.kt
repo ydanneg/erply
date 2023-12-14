@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
 import com.ydanneg.erply.data.repository.ProductsRepository
+import com.ydanneg.erply.data.repository.SortingOrder
 import com.ydanneg.erply.model.ProductGroup
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.sync.WorkManagerSyncManager
@@ -22,8 +23,10 @@ import javax.inject.Inject
 data class UiState(
     val group: ProductGroup? = null,
     val isLoading: Boolean = false,
-    val searchQuery: String? = null
+    val searchQuery: String? = null,
+    val sortOder: SortingOrder = SortingOrder.PRICE_DESC
 )
+
 
 val UiState.notLoaded
     get() = group == null && !isLoading
@@ -45,25 +48,34 @@ class ProductsScreenViewModel @Inject constructor(
 
     private val groupId: String = checkNotNull(savedStateHandle[GROUP_ID_STATE_KEY])
 
-    val filteredProducts = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
-        .flatMapLatest { query ->
-            if (query?.isNotBlank() == true && query.length > 1) {
-                productsRepository.searchAllProducts(query.trim())
-            } else {
-                productsRepository.getAllProductsByGroupId(groupId)
-            }
-        }.cachedIn(viewModelScope)
+    private val _sort = savedStateHandle.getStateFlow(SORT_ORDER_KEY, SortingOrder.PRICE_ASC)
+    private val _searchQuery = savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null)
 
+    val filteredProducts = _sort.flatMapLatest { sort ->
+        _searchQuery.flatMapLatest { query ->
+            if (query?.isNotBlank() == true && query.length > 1) {
+                productsRepository.searchAllProducts(query.trim(), sort)
+            } else {
+                productsRepository.getAllProductsByGroupId(groupId, sort)
+            }
+        }
+    }.cachedIn(viewModelScope)
+
+    fun setSortingOder(sortOrder: SortingOrder) {
+        savedStateHandle[SORT_ORDER_KEY] = sortOrder
+    }
 
     val uiState = combine(
         productGroupsRepository.group(groupId).distinctUntilChanged(),
         workManagerSyncManager.isSyncing.distinctUntilChanged(),
-        savedStateHandle.getStateFlow<String?>(SEARCH_QUERY_KEY, null),
-    ) { group, isSyncing, searchQuery ->
+        _searchQuery,
+        _sort
+    ) { group, isSyncing, searchQuery, sort ->
         UiState(
             group = group,
             isLoading = isSyncing,
-            searchQuery = searchQuery
+            searchQuery = searchQuery,
+            sortOder = sort
         )
     }.toStateFlow(
         viewModelScope, UiState(isLoading = true)
@@ -83,6 +95,7 @@ class ProductsScreenViewModel @Inject constructor(
     companion object {
         private const val GROUP_ID_STATE_KEY = "groupId"
         private const val SEARCH_QUERY_KEY = "searchQuery"
+        private const val SORT_ORDER_KEY = "sortOrder"
 
     }
 }

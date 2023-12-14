@@ -1,19 +1,18 @@
 package com.ydanneg.erply.data.repository
 
-import androidx.paging.PagingData
 import androidx.paging.testing.asPagingSourceFactory
+import androidx.paging.testing.asSnapshot
 import com.ydanneg.erply.database.dao.ErplyProductWithImageDao
 import com.ydanneg.erply.datastore.UserSessionDataSource
 import com.ydanneg.erply.model.ProductWithImage
 import com.ydanneg.erply.model.UserSession
 import com.ydanneg.erply.network.api.ErplyNetworkDataSource
 import com.ydanneg.erply.test.testScope
-import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.mockk
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import java.math.BigDecimal
@@ -29,7 +28,7 @@ class ProductsRepositoryImplTest {
         val networkDataSource = mockk<ErplyNetworkDataSource>(relaxed = true)
         val erplyProductWithImageDao = mockk<ErplyProductWithImageDao>(relaxed = true) {
             coEvery {
-                findAllByGroupIdPageable(testSession.clientCode, groupId)
+                getAllByGroupIdOderByPrice(testSession.clientCode, groupId, true)
             } returns flowOf(testEntities).asPagingSourceFactory(testScope).invoke()
         }
         val userSessionDataSource = mockk<UserSessionDataSource>(relaxed = true) {
@@ -42,10 +41,10 @@ class ProductsRepositoryImplTest {
         )
         val productsRepository = ProductsRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
 
-        productsRepository.getAllProductsByGroupId(groupId).first()
-            .shouldBeInstanceOf<PagingData<ProductWithImage>>()
+        val result = productsRepository.getAllProductsByGroupId(groupId, SortingOrder.PRICE_DESC).asSnapshot()
+        result shouldBe testEntities
 
-        coVerify(exactly = 1) { erplyProductWithImageDao.findAllByGroupIdPageable(testSession.clientCode, groupId) }
+        coVerify(exactly = 1) { erplyProductWithImageDao.getAllByGroupIdOderByPrice(testSession.clientCode, groupId, true) }
         coVerify { userSessionDataSource.userSession }
 
         confirmVerified(userSessionDataSource, networkDataSource)
@@ -54,11 +53,10 @@ class ProductsRepositoryImplTest {
 
     @Test
     fun `should return products from DB filtered by current sessions clientCode and search query`() = testScope.runTest {
-        val groupId = "groupId"
         val networkDataSource = mockk<ErplyNetworkDataSource>(relaxed = true)
         val erplyProductWithImageDao = mockk<ErplyProductWithImageDao>(relaxed = true) {
             coEvery {
-                fastSearchAllProducts(testSession.clientCode, groupId)
+                searchAllOderByPrice(testSession.clientCode, "searchstring*", true)
             } returns flowOf(testEntities).asPagingSourceFactory(testScope).invoke()
         }
         val userSessionDataSource = mockk<UserSessionDataSource>(relaxed = true) {
@@ -71,10 +69,10 @@ class ProductsRepositoryImplTest {
         )
         val productsRepository = ProductsRepositoryImpl(erplyProductWithImageDao, userSessionRepository)
 
-        productsRepository.searchAllProducts("searchstring").first()
-            .shouldBeInstanceOf<PagingData<ProductWithImage>>()
+        val result = productsRepository.searchAllProducts("searchstring", SortingOrder.PRICE_DESC).asSnapshot()
+        result shouldBe testEntities
 
-        coVerify(exactly = 1) { erplyProductWithImageDao.fastSearchAllProducts(testSession.clientCode, "searchstring*") }
+        coVerify(exactly = 1) { erplyProductWithImageDao.searchAllOderByPrice(testSession.clientCode, "searchstring*", true) }
         coVerify { userSessionDataSource.userSession }
 
         confirmVerified(userSessionDataSource, networkDataSource)

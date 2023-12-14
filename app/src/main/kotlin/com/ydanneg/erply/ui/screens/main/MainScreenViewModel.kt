@@ -2,9 +2,9 @@ package com.ydanneg.erply.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.ydanneg.erply.data.repository.UserSessionRepository
 import com.ydanneg.erply.sync.WorkManagerSyncManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
