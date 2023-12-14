@@ -3,6 +3,7 @@
 package com.ydanneg.erply.ui.components
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -55,7 +56,8 @@ private fun ErplySearchableTopAppbar(
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
     navigationIcon: @Composable () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
 
     var searching by rememberSaveable {
@@ -88,7 +90,9 @@ private fun ErplySearchableTopAppbar(
                 IconButton(onClick = { searching = true }) {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = stringResource(R.string.top_bar_search_icon_description))
                 }
+                actions()
             }
+
         },
         scrollBehavior = scrollBehavior
     )
@@ -136,7 +140,8 @@ fun ErplyNavTopAppbar(
     searchQuery: String? = null,
     onSearch: (String?) -> Unit = {},
     navController: NavController = rememberNavController(),
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     ErplySearchableTopAppbar(
         title = title,
@@ -149,6 +154,7 @@ fun ErplyNavTopAppbar(
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "")
             }
         },
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
+        actions = actions
     )
 }
