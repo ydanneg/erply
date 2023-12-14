@@ -97,7 +97,7 @@ User can search products using full-text search.
 
 Groups are sorted by remote order. 
 
-Products are sorted by price ASC.
+Products are sorted by price ASC by default. You can change it.
 
 User can logout and login again.
 

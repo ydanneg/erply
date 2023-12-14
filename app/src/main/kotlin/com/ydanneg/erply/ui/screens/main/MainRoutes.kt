@@ -32,4 +32,15 @@ sealed class Screen(
     }
 }
 
-fun NavHostController.navigate(screen: Screen, builder: NavOptionsBuilder.() -> Unit = {}) = navigate(screen.route) { builder(this) }
+fun NavHostController.navigate(screen: Screen, builder: NavOptionsBuilder.() -> Unit = {}) {
+    navigate(screen.route) {
+        graph.startDestinationRoute?.let { route ->
+            popUpTo(route) {
+                saveState = true
+            }
+        }
+        launchSingleTop = true
+        restoreState = true
+        builder(this)
+    }
+}
