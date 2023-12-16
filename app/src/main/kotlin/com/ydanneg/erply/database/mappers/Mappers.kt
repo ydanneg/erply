@@ -5,6 +5,7 @@ import com.ydanneg.erply.database.model.ProductGroupEntity
 import com.ydanneg.erply.database.model.ProductImageEntity
 import com.ydanneg.erply.model.Product
 import com.ydanneg.erply.model.ProductGroup
+import com.ydanneg.erply.model.ProductGroupWithProductCount
 import com.ydanneg.erply.model.ProductImage
 
 fun ProductImage.toEntity(clientCode: String) = ProductImageEntity(
@@ -53,4 +54,15 @@ fun ProductGroupEntity.fromEntity() = ProductGroup(
     description = description,
     changed = changed,
     order = order
+)
+
+
+fun ProductGroupWithProductCount.fromWithProductCountEntity() = ProductGroupWithProductCount(
+    id = id,
+    parentId = parentId,
+    name = name,
+    description = description,
+    changed = changed,
+    order = order,
+    totalProducts = totalProducts
 )

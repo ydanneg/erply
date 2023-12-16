@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ydanneg.erply.R
-import com.ydanneg.erply.model.ProductGroup
+import com.ydanneg.erply.model.ProductGroupWithProductCount
 import com.ydanneg.erply.ui.components.ErplyDrawerTopAppbar
 import com.ydanneg.erply.ui.components.FadedLinerProgressIndicator
 import com.ydanneg.erply.ui.components.Loading
@@ -49,13 +49,14 @@ import com.ydanneg.erply.ui.theme.PreviewThemes
 @Composable
 private fun ProductGroupPreview() {
     val groups = (1L..15L).mapIndexed { index, item ->
-        ProductGroup(
+        ProductGroupWithProductCount(
             id = item.toString(),
             name = "name$item",//NON-NLS
             parentId = "0",
             order = index,
             description = "description$item",
-            changed = System.currentTimeMillis() / 1000
+            changed = System.currentTimeMillis() / 1000,
+            totalProducts = 6
         )
     }
 
@@ -107,7 +108,7 @@ fun ProductGroupsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductGroupsScreenContent(
-    groups: List<ProductGroup>,
+    groups: List<ProductGroupWithProductCount>,
     isLoading: Boolean = false,
     onGroupClicked: (String) -> Unit = {},
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
@@ -153,7 +154,7 @@ private fun ProductGroupsScreenContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = it.name.uppercase(),
+                                    text = "${it.name.uppercase()} (${it.totalProducts})",
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
