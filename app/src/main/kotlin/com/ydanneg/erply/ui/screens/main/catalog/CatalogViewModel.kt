@@ -3,7 +3,7 @@ package com.ydanneg.erply.ui.screens.main.catalog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ydanneg.erply.data.repository.ProductGroupsRepository
-import com.ydanneg.erply.model.ProductGroup
+import com.ydanneg.erply.model.ProductGroupWithProductCount
 import com.ydanneg.erply.sync.WorkManagerSyncManager
 import com.ydanneg.erply.util.toStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 data class UiState(
-    val groups: List<ProductGroup> = listOf(),
+    val groups: List<ProductGroupWithProductCount> = listOf(),
     val isLoading: Boolean = false
 )
 
@@ -27,7 +27,7 @@ class ProductGroupsScreenViewModel @Inject constructor(
     private val log = LoggerFactory.getLogger("ProductGroupsScreenViewModel")
 
     val uiState = combine(
-        productGroupsRepository.productGroups,
+        productGroupsRepository.productGroupsWithProductCount,
         workManagerSyncManager.isSyncing.distinctUntilChanged()
     ) { groups, isSyncing ->
         UiState(

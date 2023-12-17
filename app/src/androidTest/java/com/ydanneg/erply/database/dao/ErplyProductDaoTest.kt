@@ -5,6 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
 import com.ydanneg.erply.database.ErplyDatabase
 import com.ydanneg.erply.database.model.ProductEntity
+import com.ydanneg.erply.database.model.ProductGroupEntity
+import com.ydanneg.erply.model.ProductGroupWithProductCount
 import io.kotest.matchers.collections.shouldContainAllIgnoringFields
 import io.kotest.matchers.equality.shouldBeEqualUsingFields
 import io.kotest.matchers.shouldBe
@@ -20,6 +22,7 @@ class ErplyProductDaoTest {
 
     private lateinit var db: ErplyDatabase
     private lateinit var productDao: ErplyProductDao
+    private lateinit var groupDao: ErplyProductGroupDao
 
     @Before
     fun createDb() {
@@ -28,6 +31,7 @@ class ErplyProductDaoTest {
             ErplyDatabase::class.java,
         ).build()
         productDao = db.productDao()
+        groupDao = db.groupDao()
     }
 
     @After
@@ -40,12 +44,29 @@ class ErplyProductDaoTest {
     fun test() = runTest {
         val clientCode = "clientCode"
 
+        val group = ProductGroupEntity(0, "groupId", clientCode, "name", "0", null, 0, 1)
         val entities = listOf(
-            ProductEntity(0, "1", clientCode, "name1", "groupId", null, BigDecimal("99.99"), 0),
-            ProductEntity(0, "2", clientCode, "name2", "groupId", null, BigDecimal("9.99"), 0)
+            ProductEntity(0, "1", clientCode, "name1", group.id, null, BigDecimal("99.99"), 0),
+            ProductEntity(0, "2", clientCode, "name2", group.id, null, BigDecimal("9.99"), 0)
         )
 
         productDao.insertOrUpdate(entities)
+        groupDao.insertOrUpdate(listOf(group))
+
+        groupDao.getAllWithProductCount(clientCode).test {
+            awaitItem().apply {
+                size shouldBe  1
+                this[0] shouldBe ProductGroupWithProductCount(
+                    group.id,
+                    group.parentId,
+                    group.order,
+                    group.name,
+                    group.description,
+                    group.changed,
+                    2
+                )
+            }
+        }
 
         // should all of them by id
         entities.forEach { entity ->
